@@ -2,8 +2,6 @@ import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
 import { User, users, Roles } from "../models/userModel.js";
 
-const JWT_SECRET = process.env.JWT_SECRET;
-
 export const createUser = async (email, password, role = Roles.USER) => {
   if (!Object.values(Roles).includes(role)) {
     throw new Error("Role not allowed");
@@ -54,6 +52,7 @@ export const updatePassword = async (userEmail, currentPassword, newPassword) =>
 };
 
 export const generateToken = (user) => {
+  const JWT_SECRET = process.env.JWT_SECRET;
   const payload = { id: user.id, email: user.email, role: user.role };
   return jwt.sign(payload, JWT_SECRET, { expiresIn: "1h" });
 };

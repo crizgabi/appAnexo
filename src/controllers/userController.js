@@ -34,12 +34,14 @@ export const loginUser = async (req, res) => {
   }
 
   try {
-    const user = await userService.loginUser(email, password);
-    if (!user) {
+    const result = await userService.loginUser(email, password);
+    if (!result) {
       return res.status(401).json({ error: "Invalid email or password" });
     }
 
-    res.json({ message: "Login successful", user });
+    const { user, token } = result;
+
+    res.json({ message: "Login successful", user, token });
   } catch (error) {
     res.status(500).json({ error: "Error logging in" });
   }
