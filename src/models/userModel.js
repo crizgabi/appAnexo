@@ -1,5 +1,5 @@
+import Roles from "./roles.js"
 const users = []; //Banco em memória
-const Roles = require("./roles");
 
 class User{
     constructor(id, email, passwordHash, role = Roles.USER){
@@ -14,4 +14,4 @@ class User{
     }
 }
 
-module.exports = {User, users, Roles}
+export {User, users, Roles}

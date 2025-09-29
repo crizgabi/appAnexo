@@ -1,14 +1,15 @@
-require("dotenv").config();
+import dotenv from "dotenv";
+import express from "express";
+import bodyParser from "body-parser";
 
-const express = require("express");
-const bodyParser = require("body-parser");
+import userRoutes from "./routes/userRoutes.js";
 
-const userRoutes = require("./routes/userRoutes");
+dotenv.config();
 
 const app = express();
 app.use(bodyParser.json());
 
-//rotas
+// Rotas
 app.use("/users", userRoutes);
 
-module.exports = app;
+export default app;

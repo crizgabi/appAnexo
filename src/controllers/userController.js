@@ -1,73 +1,72 @@
-const userService = require("../service/userService");
+import * as userService from "../service/userService.js";
 
 // POST /users
-const createUser = async (req, res) => {
-    const {email, password, role} = req.body;
+export const createUser = async (req, res) => {
+  const { email, password, role } = req.body;
 
-    if (!email || !password) {
-        return res.status(400).json({ error: "Email and password are required"});
-    }
+  if (!email || !password) {
+    return res.status(400).json({ error: "Email and password are required" });
+  }
 
-    try {
-        const user = await userService.createUser(email, password);
-        res.status(201).json({id: user.id, email: user.email})
-    } catch (error) {
-        if (error.message === "Email already registered") {
-            return res.status(409).json({ error: error.message});
-        }
-        res.status(500).json({error: "Error creating user"})
+  try {
+    const user = await userService.createUser(email, password, role);
+    res.status(201).json({ id: user.id, email: user.email });
+  } catch (error) {
+    if (error.message === "Email already registered") {
+      return res.status(409).json({ error: error.message });
     }
+    res.status(500).json({ error: "Error creating user" });
+  }
 };
 
-// GET / users
-const listUsers = (req, res) => {
-    const users = userService.listUsers();
-    res.json(users)
+// GET /users
+export const listUsers = (req, res) => {
+  const users = userService.listUsers();
+  res.json(users);
 };
 
-//POST /login
-const loginUser = async (req, res) => {
-    const {email, password} = req.body;
+// POST /login
+export const loginUser = async (req, res) => {
+  const { email, password } = req.body;
 
-    if (!email || !password) {
-        return res.status(400).json({error: "Email and password are require"})
+  if (!email || !password) {
+    return res.status(400).json({ error: "Email and password are required" });
+  }
+
+  try {
+    const user = await userService.loginUser(email, password);
+    if (!user) {
+      return res.status(401).json({ error: "Invalid email or password" });
     }
 
-    try {
-        const user = await userService.loginUser(email,password);
-        if (!user){
-            return res.status(401).json({error: "Invalid email or password"});
-        }
+    res.json({ message: "Login successful", user });
+  } catch (error) {
+    res.status(500).json({ error: "Error logging in" });
+  }
+};
 
-        res.json({message: "Login sucessfull", user})
-    } catch (error) {
-        res.status(500).json({ error: "Error loggin in"})
+// PUT /users/update-password
+export const updatePassword = async (req, res) => {
+  const { currentPassword, newPassword } = req.body;
+  const { email } = req.user;
+
+  if (!currentPassword || !newPassword) {
+    return res.status(400).json({ error: "Current password and new password are required" });
+  }
+
+  if (currentPassword === newPassword) {
+    return res.status(400).json({ error: "Current password and new password cannot be the same" });
+  }
+
+  try {
+    const user = await userService.updatePassword(email, currentPassword, newPassword);
+
+    if (!user) {
+      return res.status(401).json({ error: "Invalid email or current password" });
     }
-}
 
-const updatePassword = async (req,res) => {
-    const { currentPassword, newPassword } = req.body;
-    const { email } = req.user;
-
-    if (!currentPassword || !newPassword) {
-        return res.status(400).json({ error: "Current password and new password cannot be the same"});
-    }
-
-    try {
-        const user = await userService.updatePassword(email, currentPassword, newPassword);
-
-        if (!user) {
-            return res.status(401).json({ error: "Invalid email or password"});
-        }
-        res.json({message: "Password updated!", user});
-    } catch (error) {
-        res.status(500).json({ error: "Error updating password"});
-    }
-}
-
-module.exports = {
-    createUser,
-    listUsers,
-    loginUser,
-    updatePassword
-}
+    res.json({ message: "Password updated!", user });
+  } catch (error) {
+    res.status(500).json({ error: "Error updating password" });
+  }
+};
