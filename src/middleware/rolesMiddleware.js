@@ -1,9 +1,9 @@
-const rolesMiddleware = (requireRole) => {
+const rolesMiddleware = (requiredRole) => {
     return (req, res, next) => {
         const user = req.user;
         if (!user) return res.status(401).json({ error: unauthorized})
 
-        if (user.role !== requireRole && user.role !== "admin") {
+        if (user.role !== requiredRole && user.role !== "admin") {
             return res.status(403).json({error: "Forbidden"})
         }
 

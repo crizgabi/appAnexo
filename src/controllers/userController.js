@@ -5,11 +5,11 @@ const createUser = async (req, res) => {
     const {email, password, role} = req.body;
 
     if (!email || !password) {
-        return res.status(400).json({ error: "Email and password are require"});
+        return res.status(400).json({ error: "Email and password are required"});
     }
 
     try {
-        const user = await userService.createUser(email, password, role);
+        const user = await userService.createUser(email, password);
         res.status(201).json({id: user.id, email: user.email})
     } catch (error) {
         if (error.message === "Email already registered") {

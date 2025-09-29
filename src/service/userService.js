@@ -4,21 +4,18 @@ const {User, users, Roles} = require("../models/userModel");
 
 const JWT_SECRET = process.env.JWT_SECRET;
 
-const createUser = async (email, password, role = Roles.USER) => {
-    if (!Object.values(Roles).includes(role)){
-        throw new Error("Role not allowed");
-    }
+const createUser = async (email, password) => {
 
     const normalizedEmail = email.toLowerCase().trim();
 
-    const existigUser = users.find(u => u.email === normalizedEmail);
-    if (existigUser) {
+    const existingUser = users.find(u => u.email === normalizedEmail);
+    if (existingUser) {
         throw new Error("Email already registered");
     }
 
     const id = users.length + 1;
-    const passwordHash = await bcrypt.hash(password, 10);
-    const user = new User(id, normalizedEmail, passwordHash, role);
+    const passwordHash = await bcrypt.hash(password, 10); //salt
+    const user = new User(id, normalizedEmail, passwordHash);
     users.push(user);
     return user;
 };
