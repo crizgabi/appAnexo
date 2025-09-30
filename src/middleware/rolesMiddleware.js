@@ -3,7 +3,7 @@ const rolesMiddleware = (requiredRole) => {
     const user = req.user;
     if (!user) return res.status(401).json({ error: "Unauthorized" });
 
-    if (user.role !== requiredRole && user.role !== "admin") {
+    if (user.role !== requiredRole && user.role !== "ADMIN") {
       return res.status(403).json({ error: "Forbidden" });
     }
 

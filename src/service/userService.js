@@ -1,33 +1,37 @@
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
-import { User, users, Roles } from "../models/userModel.js";
+import prisma from "../db/prisma.js";
 
-export const createUser = async (email, password, role = Roles.USER) => {
-  if (!Object.values(Roles).includes(role)) {
-    throw new Error("Role not allowed");
-  }
-
+export const createUser = async (email, password) => {
   const normalizedEmail = email.toLowerCase().trim();
 
-  const existingUser = users.find(u => u.email === normalizedEmail);
+  const existingUser = await prisma.user.findUnique({ where: { email: normalizedEmail } });
   if (existingUser) {
     throw new Error("Email already registered");
   }
 
-  const id = users.length + 1;
   const passwordHash = await bcrypt.hash(password, 10);
-  const user = new User(id, normalizedEmail, passwordHash, role);
-  users.push(user);
-  return user;
+
+  return await prisma.user.create({
+    data: { email: normalizedEmail, passwordHash, role },
+  });
 };
 
-export const listUsers = () => {
-  return users.map(u => ({ id: u.id, email: u.email }));
+export const listUsers = async () => {
+  return await prisma.user.findMany({
+    select: {
+      id: true,
+      email: true,
+      role: true,
+      createdAt: true,
+    },
+  });
 };
 
 export const loginUser = async (email, password) => {
   const normalizedEmail = email.toLowerCase().trim();
-  const user = users.find(u => u.email === normalizedEmail);
+  const user = await prisma.user.findUnique({ where: { email: normalizedEmail } });
+
   if (!user) return null;
 
   const valid = await bcrypt.compare(password, user.passwordHash);
@@ -37,18 +41,31 @@ export const loginUser = async (email, password) => {
   return { user: { id: user.id, email: user.email, role: user.role }, token };
 };
 
-export const updatePassword = async (userEmail, currentPassword, newPassword) => {
-  const normalizedEmail = userEmail.toLowerCase().trim();
-  const user = users.find(u => u.email === normalizedEmail);
+export const updatePassword = async (email, currentPassword, newPassword) => {
+  const normalizedEmail = email.toLowerCase().trim();
+
+  // Busca usuário no banco
+  const user = await prisma.user.findUnique({
+    where: { email: normalizedEmail },
+  });
+
   if (!user) return null;
 
+  // Verifica se a senha atual confere
   const valid = await bcrypt.compare(currentPassword, user.passwordHash);
   if (!valid) return null;
 
+  // Gera o novo hash
   const passwordHash = await bcrypt.hash(newPassword, 10);
-  user.passwordHash = passwordHash;
 
-  return { id: user.id, email: user.email };
+  // Atualiza a senha no banco
+  const updatedUser = await prisma.user.update({
+    where: { email: normalizedEmail },
+    data: { passwordHash },
+    select: { id: true, email: true },
+  });
+
+  return updatedUser;
 };
 
 export const generateToken = (user) => {

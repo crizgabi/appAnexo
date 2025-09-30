@@ -9,20 +9,25 @@ export const createUser = async (req, res) => {
   }
 
   try {
-    const user = await userService.createUser(email, password, role);
+    const user = await userService.createUser(email, password);
     res.status(201).json({ id: user.id, email: user.email });
   } catch (error) {
-    if (error.message === "Email already registered") {
+     if (error.message === "Email already registered") {
       return res.status(409).json({ error: error.message });
     }
+    console.log(error)
     res.status(500).json({ error: "Error creating user" });
   }
 };
 
-// GET /users
-export const listUsers = (req, res) => {
-  const users = userService.listUsers();
-  res.json(users);
+export const listUsers = async (req, res) => {
+  try {
+    const users = await userService.listUsers();
+    res.json(users);
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: "Erro ao listar usuários" });
+  }
 };
 
 // POST /login
