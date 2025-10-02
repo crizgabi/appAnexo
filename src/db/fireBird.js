@@ -1,6 +1,5 @@
 import dotenv from "dotenv";
 dotenv.config();
-import express from "express";
 import firebird from "node-firebird";
 
 
@@ -21,6 +20,7 @@ export function getConnection(callback) {
       console.error("Erro ao conectar:", err);
       callback(err, null);
     } else {
+      console.log("connected!")
       callback(null, db);
     }
   });
