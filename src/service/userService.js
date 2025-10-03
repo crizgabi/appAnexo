@@ -1,93 +1,42 @@
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
 import prisma from "../db/prisma.js";
-import { getConnection } from "../db/fireBird.js";
+import { UserRepository } from "../repository/userRepository.js";
 
-export const listUsers = async () => {
-  return await prisma.user.findMany({
-    select: {
-      id: true,
-      email: true,
-      role: true,
-      createdAt: true,
-    },
-  });
-};
+// export const listUsers = async () => {
+//   return await prisma.user.findMany({
+//     select: {
+//       id: true,
+//       email: true,
+//       role: true,
+//       createdAt: true,
+//     },
+//   });
+// };
 
-export const loginUser = (login, password) => {
-  return new Promise((resolve, reject) => {
-    getConnection((err, db) => {
-      if (err) return reject(err);
+export const UserService = {
+  loginUser: async (login, password) => {
+    const user = await UserRepository.findByLogin(login);
+    if (!user) return null;
 
-      const query = "SELECT * FROM TBUSUARIO WHERE LOGIN = ?";
+    const isPasswordValid = user.SENHA === password; 
 
-      db.query(query, [login], (qErr, result) => {
-        if (qErr) {
-          db.detach();
-          return reject(qErr);
-        }
+    if (!isPasswordValid) return null;
 
-        if (!result || result.length === 0) {
-          db.detach();
-          return resolve(null); // usuário não encontrado
-        }
+    const token = generateToken({ login: user.LOGIN });
+    return { user: { login: user.LOGIN }, token };
+  },
 
-        const user = result[0];
+  updatePassword: async (login, currentPassword, newPassword) => {
+    const user = await UserRepository.findByLogin(login);
+    if (!user) return null;
 
-        if (user.SENHA !== password) {
-          db.detach();
-          return resolve(null); // senha inválida
-        }
+    const isPasswordValid = user.SENHA === currentPassword;
+    if (!isPasswordValid) return null;
 
-        const token = generateToken({ login: user.LOGIN });
-
-        db.detach((dErr) => {
-          if (dErr) console.error("Erro ao desconectar:", dErr);
-          resolve({ user: { Login: user.LOGIN }, token });
-        });
-      });
-    });
-  });
-};
-
-export const updatePassword = (login, currentPassword, newPassword) => {
-  return new Promise((resolve, reject) => {
-    getConnection((err, db) => {
-      if (err) return reject(err);
-
-      // Busca usuário no banco
-      const selectQuery = "SELECT * FROM TBUSUARIO WHERE LOGIN = ?";
-      db.query(selectQuery, [login], (qErr, result) => {
-        if (qErr) {
-          db.detach();
-          return reject(qErr);
-        }
-
-        if (!result || result.length === 0) {
-          db.detach();
-          return resolve(null); // usuário não encontrado
-        }
-
-        const user = result[0];
-        console.log(user.SENHA)
-        
-        // Verifica se a senha atual confere
-        if (user.SENHA !== currentPassword) {
-          db.detach();
-          return resolve(null); // senha atual incorreta
-        }
-
-        // Atualiza a senha no banco
-        const updateQuery = "UPDATE TBUSUARIO SET SENHA = ? WHERE LOGIN = ?";
-        db.query(updateQuery, [newPassword, login], (uErr) => {
-          db.detach();
-          if (uErr) return reject(uErr);
-
-          resolve({ login: user.LOGIN }); // retorno similar ao login
-        });
-      });
-    });
-  });
+    await UserRepository.updatePassword(login, newPassword);
+    return { login: user.LOGIN };
+  },
 };
 
 export const generateToken = (user) => {

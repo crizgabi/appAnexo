@@ -1,33 +1,34 @@
-import * as userService from "../service/userService.js";
+import { UserService } from "../service/userService.js";
 
-export const listUsers = async (req, res) => {
-  try {
-    const users = await userService.listUsers();
-    res.json(users);
-  } catch (error) {
-    console.error(error);
-    res.status(500).json({ error: "Erro ao listar usuários" });
-  }
-};
+// export const listUsers = async (req, res) => {
+//   try {
+//     const users = await userService.listUsers();
+//     res.json(users);
+//   } catch (error) {
+//     console.error(error);
+//     res.status(500).json({ error: "Erro ao listar usuários" });
+//   }
+// };
 
 // POST /login
 export const loginUser = async (req, res) => {
-  const { email, password } = req.body;
+  const { login, password } = req.body;
 
-  if (!email || !password) {
+  if (!login || !password) {
     return res.status(400).json({ error: "Email and password are required" });
   }
 
   try {
-    const result = await userService.loginUser(email, password);
+    const result = await UserService.loginUser(login, password);
     if (!result) {
-      return res.status(401).json({ error: "Invalid email or password" });
+      return res.status(401).json({ error: "Invalid login or password" });
     }
 
     const { user, token } = result;
 
     res.json({ message: "Login successful", user, token });
   } catch (error) {
+    console.log(error)
     res.status(500).json({ error: "Error logging in" });
   }
 };
@@ -46,7 +47,7 @@ export const updatePassword = async (req, res) => {
   }
 
   try {
-    const user = await userService.updatePassword(login, currentPassword, newPassword);
+    const user = await UserService.updatePassword(login, currentPassword, newPassword);
 
     if (!user) {
       return res.status(401).json({ error: "Invalid email or current password" });

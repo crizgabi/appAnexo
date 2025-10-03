@@ -6,7 +6,7 @@ import Roles from "../models/roles.js"
 
 const router = express.Router();
 
-router.get("/", authMiddleware, rolesMiddleware(Roles.USER), userController.listUsers);
+// router.get("/", authMiddleware, rolesMiddleware(Roles.USER), userController.listUsers);
 router.post("/login", userController.loginUser);
 router.put("/update-password", authMiddleware, userController.updatePassword);
 
