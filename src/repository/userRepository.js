@@ -33,4 +33,39 @@ export const UserRepository = {
       });
     });
   },
+
+   getUserInfo: async (login) => {
+    return new Promise((resolve, reject) => {
+      getConnection((err, db) => {
+        if (err) return reject(err);
+
+        const sql = `
+          SELECT 
+              U.LOGIN,
+              U.SENHA,
+              U.FKTECNICO,
+              T.PKTECNICO,
+              T.NMTECNICO,
+              T.FONE1,
+              T.FONE2,
+              T.CPF,
+              T.RG,
+              T.ENDERECO,
+              T.NUM,
+              T.CEP,
+              T.DATANASC,
+              T.EMAIL,
+              T.CELULAR
+          FROM TBUSUARIO U
+          LEFT JOIN TBTECNICO T ON U.FKTECNICO = T.PKTECNICO
+          WHERE U.LOGIN = ?
+        `;
+
+        db.query(sql, [login], (qErr, result) => {
+          if (qErr) return reject(qErr);
+          resolve(result[0]); // só um usuário por login
+        });
+      });
+    });
+  }
 };

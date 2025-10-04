@@ -7,15 +7,10 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-model User {
-  id           Int      @id @default(autoincrement())
-  email        String   @unique
-  passwordHash String
-  role         Role     @default(USER)
-  createdAt    DateTime @default(now())
-}
-
-enum Role {
-  USER
-  ADMIN
+model RefreshToken {
+  id        Int      @id @default(autoincrement())
+  token     String   @unique
+  login     String
+  createdAt DateTime @default(now())
+  expiresAt DateTime
 }

@@ -24,13 +24,24 @@ export const loginUser = async (req, res) => {
       return res.status(401).json({ error: "Invalid login or password" });
     }
 
-    const { user, token } = result;
+    const { user, token, refreshToken } = result;
 
-    res.json({ message: "Login successful", user, token });
+    res.json({ message: "Login successful", user, token, refreshToken });
   } catch (error) {
     console.log(error)
     res.status(500).json({ error: "Error logging in" });
   }
+};
+
+// POST /users/refresh
+export const refreshSession = async (req, res) => {
+  const { refreshToken } = req.body;
+  if (!refreshToken) return res.status(400).json({ error: "Refresh token required" });
+
+  const result = await UserService.refreshToken(refreshToken);
+  if (!result) return res.status(401).json({ error: "Invalid or expired refresh token" });
+
+  return res.json(result);
 };
 
 // PUT /users/update-password
