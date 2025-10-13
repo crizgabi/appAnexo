@@ -2,13 +2,14 @@ import jwt from "jsonwebtoken";
 import { UserRepository } from "../repository/userRepository.js";
 import { refreshTokenRepository } from "../repository/refreshTokenRepository.js";
 import { randomBytes } from "crypto";
+import { User } from "../models/userModel.js"
 
 export const UserService = {
   loginUser: async (login, password) => {
     const user = await UserRepository.findByLogin(login);
     if (!user) return null;
 
-    const isPasswordValid = user.SENHA === password; 
+    const isPasswordValid = user.SENHA === password;
 
     if (!isPasswordValid) return null;
 
@@ -24,12 +25,12 @@ export const UserService = {
 
     await refreshTokenRepository.saveRefreshToken(user.LOGIN, refreshTokenValue, expiresAt);
 
-return { 
-      user: { login: user.LOGIN }, 
-      token, 
-      refreshToken: refreshTokenValue 
+    return {
+      user: { login: user.LOGIN },
+      token,
+      refreshToken: refreshTokenValue
     };
-},
+  },
 
   updatePassword: async (login, currentPassword, newPassword) => {
     const user = await UserRepository.findByLogin(login);
@@ -77,6 +78,42 @@ return {
 
     return row; // token válido
   },
+
+  showUserDetails: async (login) => {
+    try {
+      const user = await UserRepository.findByLogin(login);
+      if (!user) return null;
+
+      const details = await UserRepository.getUserInfo(login);
+
+      const userDetails = new User({
+        id: details.PKTECNICO,
+        login: details.LOGIN,
+        passwordHash: details.SENHA,
+        tecnico: {
+          id: details.PKTECNICO,
+          nome: details.NMTECNICO,
+          cpf: details.CPF,
+          rg: details.RG,
+          email: details.EMAIL,
+          celular: details.CELULAR,
+          telefone1: details.FONE1,
+          telefone2: details.FONE2,
+          endereco: {
+            logradouro: details.ENDERECO,
+            numero: details.NUM,
+            cep: details.CEP,
+          },
+          dataNascimento: details.DATANASC,
+        },
+      });
+
+      return userDetails;
+    } catch (error) {
+      console.error("Erro ao buscar detalhes do usuário:", error);
+      throw error;
+    }
+  },
 };
 
 function generateToken(user) {
@@ -86,6 +123,6 @@ function generateToken(user) {
 };
 
 function generateRefreshTokenValue() {
-    return randomBytes(40).toString("hex");
+  return randomBytes(40).toString("hex");
 
 }

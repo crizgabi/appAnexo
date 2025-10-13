@@ -1,3 +1,4 @@
+import { User } from "../models/userModel.js";
 import { UserService } from "../service/userService.js";
 
 // POST /login
@@ -57,5 +58,22 @@ export const updatePassword = async (req, res) => {
     res.json({ message: "Password updated!", user });
   } catch (error) {
     res.status(500).json({ error: "Error updating password" });
+  }
+};
+
+export const showUserDetails = async (req, res) => {
+  const { login } = req.user;
+
+  try {
+    const userDetails = await UserService.showUserDetails(login);
+
+    if (!userDetails) {
+      return res.status(401).json({ error: "User not found or unauthorized" });
+    }
+
+    return res.status(200).json(userDetails);
+  } catch (error) {
+    console.error("Erro no controller showUserDetails:", error);
+    return res.status(500).json({ error: "Error fetching user details" });
   }
 };

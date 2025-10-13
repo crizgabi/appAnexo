@@ -1,16 +1,35 @@
-import Roles from "./roles.js"
+class User {
+  constructor({
+    id,
+    login,
+    passwordHash,
+    tecnico = null
+  }) {
+    this.id = id;
+    this.login = login;
+    this.passwordHash = passwordHash;
 
-class User{
-    constructor(id, login, passwordHash, role = Roles.USER){
-        if (!Object.values(Roles).includes(role)) {
-            throw new Error(`Invalid role: ${role}`);
-        }
-
-        this.id = id;
-        this.login = login;
-        this.passwordHash = passwordHash;
-        this.role = Roles.USER;
+    if (tecnico) {
+      this.tecnico = {
+        id: tecnico.id,
+        nome: tecnico.nome,
+        cpf: tecnico.cpf,
+        rg: tecnico.rg,
+        email: tecnico.email,
+        celular: tecnico.celular,
+        telefone1: tecnico.telefone1,
+        telefone2: tecnico.telefone2,
+        endereco: {
+          logradouro: tecnico.endereco?.logradouro,
+          numero: tecnico.endereco?.numero,
+          cep: tecnico.endereco?.cep,
+        },
+        dataNascimento: tecnico.dataNascimento,
+      };
+    } else {
+      this.tecnico = null;
     }
+  }
 }
 
-export {User, Roles}
+export { User };
