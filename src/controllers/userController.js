@@ -1,15 +1,5 @@
 import { UserService } from "../service/userService.js";
 
-// export const listUsers = async (req, res) => {
-//   try {
-//     const users = await userService.listUsers();
-//     res.json(users);
-//   } catch (error) {
-//     console.error(error);
-//     res.status(500).json({ error: "Erro ao listar usuários" });
-//   }
-// };
-
 // POST /login
 export const loginUser = async (req, res) => {
   const { login, password } = req.body;

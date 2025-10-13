@@ -63,7 +63,7 @@ export const UserRepository = {
 
         db.query(sql, [login], (qErr, result) => {
           if (qErr) return reject(qErr);
-          resolve(result[0]); // só um usuário por login
+          resolve(result[0]);
         });
       });
     });

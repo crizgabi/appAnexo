@@ -64,6 +64,19 @@ return {
       refreshToken: newRefreshToken
     };
   },
+
+  validateRefreshToken: async (token) => {
+    const row = await refreshTokenRepository.findRefreshToken(token);
+    if (!row) return null;
+
+    if (new Date(row.expiresAt) <= new Date()) {
+      // token expirado -> limpa
+      await refreshTokenRepository.deleteRefreshToken(token);
+      return null;
+    }
+
+    return row; // token válido
+  },
 };
 
 function generateToken(user) {
