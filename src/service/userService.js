@@ -3,6 +3,7 @@ import { UserRepository } from "../repository/userRepository.js";
 import { refreshTokenRepository } from "../repository/refreshTokenRepository.js";
 import { randomBytes } from "crypto";
 import { User } from "../models/userModel.js"
+import { format } from "date-fns";
 
 export const UserService = {
   loginUser: async (login, password) => {
@@ -86,6 +87,10 @@ export const UserService = {
 
       const details = await UserRepository.getUserInfo(login);
 
+      const dataNascimento = details.DATANASC
+        ? format(new Date(details.DATANASC), "dd/MM/yyyy")
+        : null;
+
       const userDetails = new User({
         id: details.PKTECNICO,
         login: details.LOGIN,
@@ -104,7 +109,7 @@ export const UserService = {
             numero: details.NUM,
             cep: details.CEP,
           },
-          dataNascimento: details.DATANASC,
+          dataNascimento: dataNascimento,
         },
       });
 
