@@ -2,7 +2,7 @@ import jwt from "jsonwebtoken";
 import { UserRepository } from "../repository/userRepository.js";
 import { refreshTokenRepository } from "../repository/refreshTokenRepository.js";
 import { randomBytes } from "crypto";
-import { User } from "../models/userModel.js"
+import { User } from "../models/UserModel.js"
 import { format } from "date-fns";
 
 export const UserService = {

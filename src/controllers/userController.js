@@ -1,4 +1,4 @@
-import { User } from "../models/userModel.js";
+import { User } from "../models/UserModel.js";
 import { UserService } from "../service/userService.js";
 
 // POST /login
