@@ -61,6 +61,8 @@ export const updatePassword = async (req, res) => {
   }
 };
 
+// GET/users/details
+
 export const showUserDetails = async (req, res) => {
   const { login } = req.user;
 
