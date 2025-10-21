@@ -20,7 +20,6 @@ export function getConnection(callback) {
       console.error("Erro ao conectar:", err);
       callback(err, null);
     } else {
-      console.log("connected!")
       callback(null, db);
     }
   });

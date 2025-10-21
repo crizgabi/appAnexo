@@ -1,39 +1,41 @@
-import prisma from "../db/prisma.js";
+import redisClient from "../db/RedisClient.js";
+
+const PREFIX = "refreshToken:";
 
 export const refreshTokenRepository = {
   async saveRefreshToken(login, token, expiresAt) {
-      return prisma.refreshToken.create({ data: { login, token, expiresAt } });
+    const ttl = Math.floor((expiresAt.getTime() - Date.now()) / 1000);
+    
+    await redisClient.set(`${PREFIX}${token}`, login, { EX: ttl });
+    
+    await redisClient.set(`${PREFIX}login:${login}`, token, { EX: ttl });
   },
 
   async findRefreshToken(token) {
-    return prisma.refreshToken.findUnique({
-      where: { token },
-    });
+    const login = await redisClient.get(`${PREFIX}${token}`);
+    if (!login) return null;
+
+    const ttl = await redisClient.ttl(`${PREFIX}${token}`);
+    const expiresAt = new Date(Date.now() + ttl * 1000);
+
+    return { token, login, expiresAt };
   },
 
   async findRefreshTokenByLogin(login) {
-    return prisma.refreshToken.findFirst({
-      where: { login }
-    });
+    const token = await redisClient.get(`${PREFIX}login:${login}`);
+    if (!token) return null;
+
+    const ttl = await redisClient.ttl(`${PREFIX}${token}`);
+    const expiresAt = new Date(Date.now() + ttl * 1000);
+
+    return { token, login, expiresAt };
   },
 
   async deleteRefreshToken(token) {
-    try {
-      return await prisma.refreshToken.delete({
-        where: { token },
-      });
-    } catch (err) {
-      if (err?.code === "P2025") {
-        return null; 
-      }
-      throw err; 
+    const login = await redisClient.get(`${PREFIX}${token}`);
+    if (login) {
+      await redisClient.del(`${PREFIX}login:${login}`);
     }
+    await redisClient.del(`${PREFIX}${token}`);
   },
-
-  async deleteRefreshTokenIfExists(token) {
-    const result = await prisma.refreshToken.deleteMany({
-      where: { token },
-    });
-    return result.count;
-  }
 };
