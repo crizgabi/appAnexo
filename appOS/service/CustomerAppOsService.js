@@ -2,9 +2,31 @@ import { CustomerAppOsRepository } from "../repository/CustomerAppOsRepository.j
 import { CustomerType } from "../../src/models/CustomerModel.js";
 
 export const CustomerService = {
-  getCustomerByCpfCnpj: async (cpfCnpj) => {
+  getCustomersByName: async (razaoSocial) => {
     try {
-      const customer = await CustomerAppOsRepository.getCustomerByCpfCnpj(cpfCnpj);
+      const customers = await CustomerAppOsRepository.getCustomersByName(razaoSocial);
+
+      if (!customers) {
+        return [];
+      }
+
+      return customers.map((c) => ({
+        pkcodcli: c.PKCODCLI,
+        nome: c.RAZAOSOCIAL,
+        cpf: c.TIPOFJ === CustomerType.FISICA ? c.CNPJCPF : null,
+        cnpj: c.TIPOFJ === CustomerType.JURIDICA ? c.CNPJCPF : null,
+        telefone1: c.FONE1,
+        telefone2: c.FONE2,
+      }));
+    } catch (error) {
+      console.error("Error listing customers:", error);
+      throw error;
+    }
+  },
+
+  getCustomerByPrimaryKey: async (primaryKey) => {
+    try {
+      const customer = await CustomerAppOsRepository.getCustomerByPrimaryKey(primaryKey);
 
       if (!customer) {
         return null;
@@ -34,7 +56,7 @@ export const CustomerService = {
         obs: customer.OBS || "",
       };
     } catch (error) {
-      console.error("Erro no CustomerService.getCustomerByCpfCnpj:", error);
+      console.error("Error getting customer details", error);
       throw error;
     }
   },
