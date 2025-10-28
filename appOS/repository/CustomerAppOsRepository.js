@@ -13,10 +13,18 @@ export const CustomerAppOsRepository = {
             NOMEFANTASIA,
             ENDERECO,
             NUM,
+            COMP,
             CEP,
+            BAIRRO,
             FKCODCID,
+            FAX,
             FONE1,
+            FONE2,
+            FONE1WHATSAPP,
+            FONE2WHATSAPP,
+            CELULARWHATSAPP,
             EMAIL,
+            OBS,
             TIPOFJ,
             CNPJCPF
           FROM TBCLIENTE

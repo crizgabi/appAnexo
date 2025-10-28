@@ -4,10 +4,37 @@ export const CustomerType = Object.freeze({
   FISICA: 1,
 });
 
+export const isWhatsApp = Object.freeze({
+  NO: 0,
+  YES: 1,
+});
+
 class Customer {
-  constructor({ nome, codigoCidade, tipo, cpf, cnpj, nomeFantasia, endereco, telefone, email }) {
-    if (!nome || !codigoCidade) {
-      throw new Error("Os campos 'nome' e 'codigoCidade' são obrigatórios.");
+  constructor({
+    razaoSocial,
+    codigoCidade,
+    tipo,
+    cpf,
+    cnpj,
+    nomeFantasia,
+    endereco,
+    num,
+    comp,
+    bairro,
+    cep,
+    fax,
+    telefone1,
+    telefone2,
+    telefone1Whatsapp,
+    telefone2Whatsapp,
+    celularWhatsapp,
+    email,
+    obs,
+    fkcodusu,
+    status,
+  }) {
+    if (!razaoSocial || !codigoCidade) {
+      throw new Error("Os campos 'razaoSocial' e 'codigoCidade' são obrigatórios.");
     }
 
     if (tipo !== CustomerType.FISICA && tipo !== CustomerType.JURIDICA) {
@@ -27,15 +54,30 @@ class Customer {
     }
 
     // Inicialização das propriedades
-    this.nome = nome;
+    this.razaoSocial = razaoSocial;
     this.codigoCidade = codigoCidade;
-    this.tipo = tipo; // 0 = juridica | 1 = fisica
+    this.tipo = tipo;
     this.cpf = cpf || null;
     this.cnpj = cnpj || null;
     this.nomeFantasia = nomeFantasia || null;
-    this.endereco = endereco || null;
-    this.telefone = telefone || null;
-    this.email = email || null;
+
+    this.endereco = endereco || '';
+    this.num = num || '';
+    this.comp = comp || '';
+    this.bairro = bairro || '';
+    this.cep = cep || '';
+
+    this.fax = fax || '';
+    this.telefone1 = telefone1 || '';
+    this.telefone2 = telefone2 || '';
+    this.telefone1Whatsapp = telefone1Whatsapp || isWhatsApp.NO;
+    this.telefone2Whatsapp = telefone2Whatsapp || isWhatsApp.NO;
+    this.celularWhatsapp = celularWhatsapp || isWhatsApp.NO;
+
+    this.email = email || '';
+    this.obs = obs || '';
+    this.fkcodusu = fkcodusu || 1;
+    this.status = status || 1;
   }
 
   // Métodos genéricos para subclasses
