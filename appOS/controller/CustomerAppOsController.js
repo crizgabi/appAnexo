@@ -17,7 +17,7 @@ export const getCustomer = async (req, res) => {
 };
 
 export const getCustomersByName = async(req, res) => {
-    const { razaoSocial } = req.body;
+    const { razaoSocial } = req.query;
 
     try {
         const customers = await CustomerService.getCustomersByName(razaoSocial);
