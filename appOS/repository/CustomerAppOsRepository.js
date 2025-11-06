@@ -1,7 +1,9 @@
 import { getConnection } from "../../src/db/fireBird.js";
 import { CustomerType } from "../../src/models/CustomerModel.js";
 
-export const CustomerAppOsRepository = {
+export const CustomerAppOsRepository = { 
+
+  // LISTA CLIENTES BUSCANDO POR NOME OU RAZÃO SOCIAL. retorna vários clientes.
   getCustomersByName: async (razaoSocial) => {
     return new Promise((resolve, reject) => {
       getConnection((err, db) => {
@@ -32,6 +34,7 @@ export const CustomerAppOsRepository = {
     });
   },
 
+  // RETORNA TODOS OS DADOS DE UM CLIENTE COM BASE NA PRIMARY KEY.
   getCustomerByPrimaryKey: async (primaryKey) => {
     return new Promise((resolve, reject) => {
       getConnection((err, db) => {
@@ -71,7 +74,7 @@ export const CustomerAppOsRepository = {
       });
     });
   },
-
+// CRIA USUÁRIO
   createCustomer: async (customerData) => {
     return new Promise((resolve, reject) => {
       getConnection((err, db) => {
@@ -157,6 +160,7 @@ export const CustomerAppOsRepository = {
     });
   },
 
+  // ATUALIZA OS DADOS DE UM CLIENTE. Somente os dados enviados no body serão atualizados, os outros serão mantidos.
   updateCustomer: (pkcodcli, customerData) => {
     return new Promise((resolve, reject) => {
       getConnection((err, db) => {
