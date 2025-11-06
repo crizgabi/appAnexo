@@ -1,6 +1,6 @@
 import { CustomerAppOsRepository } from "../repository/CustomerAppOsRepository.js";
-import { CustomerType } from "../../models/CustomerModel.js";
-import { UserRepository } from "../../repository/userRepository.js";
+import { CustomerType } from "../../src/models/CustomerModel.js";
+import { UserRepository } from "../../src/repository/userRepository.js";
 import { CityRepository } from "../repository/CityRepository.js";
 import { CepService } from "./CepService.js";
 
