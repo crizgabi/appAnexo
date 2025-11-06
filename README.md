@@ -27,6 +27,15 @@ O projeto está organizado em camadas, seguindo boas práticas de separação de
 
 <img width="452" height="520" alt="image" src="https://github.com/user-attachments/assets/0f28c855-73c1-4001-895e-190f09b1b234" />
 
+### :bulb: Como rodar o projeto 
+
+1. Instale dependências:
+<img width="408" height="99" alt="Screenshot 2025-10-16 150050" src="https://github.com/user-attachments/assets/0dfc02e3-6604-481b-8eb4-04af0dea10c7" />
+
+3. Crie e aplique uma migração no banco de dados e gere o cliente para o Prisma
+<img width="544" height="70" alt="image" src="https://github.com/user-attachments/assets/1f2e4446-0b7f-4020-8947-2af3bcef46d7" />  
+
+4. Configure o .env com os dados de acesso do banco de dados
 ### :memo: Configuração do .env 
 
 <pre>FB_HOST=localhost
@@ -37,16 +46,12 @@ FB_PASSWORD=sua_senha
 JWT_SECRET=supersegredo 
 PORT=3000 </pre>
 
-### :bulb: Como rodar o projeto 
+5. Rode o servidor:
+<img width="397" height="90" alt="image" src="https://github.com/user-attachments/assets/b67cf2a1-4ec6-4b99-8ef6-689fe3b23af4" />
 
-1. Instale dependências:
-<img width="408" height="99" alt="Screenshot 2025-10-16 150050" src="https://github.com/user-attachments/assets/0dfc02e3-6604-481b-8eb4-04af0dea10c7" />
 
-2. Configure o .env com os dados de acesso do banco de dados
-3. Rode o servidor:
-<img width="408" height="103" alt="Screenshot 2025-10-16 150351" src="https://github.com/user-attachments/assets/d161bba0-7adf-453c-a09a-475ac1028bda" />
-
-4. O servidor vai rodar na porta definida:
+6. O servidor vai rodar na porta definida:
 <img width="321" height="70" alt="Screenshot 2025-10-16 151501" src="https://github.com/user-attachments/assets/7c3b7683-fb31-4c79-a7d0-e283cae1de43" />
+
 
 
