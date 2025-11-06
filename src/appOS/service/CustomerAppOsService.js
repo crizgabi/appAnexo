@@ -1,8 +1,8 @@
 import { CustomerAppOsRepository } from "../repository/CustomerAppOsRepository.js";
-import { CustomerType } from "../../src/models/CustomerModel.js";
-import { UserRepository } from "../../src/repository/userRepository.js";
+import { CustomerType } from "../../models/CustomerModel.js";
+import { UserRepository } from "../../repository/userRepository.js";
 import { CityRepository } from "../repository/CityRepository.js";
-import { CepService } from "../service/CepService.js";
+import { CepService } from "./CepService.js";
 
 export const CustomerService = {
   getCustomersByName: async (razaoSocial) => {
@@ -13,14 +13,18 @@ export const CustomerService = {
         return [];
       }
 
-      return customers.map((c) => ({
-        pkcodcli: c.PKCODCLI,
-        nome: c.RAZAOSOCIAL,
-        cpf: c.TIPOFJ === CustomerType.FISICA ? c.CNPJCPF : null,
-        cnpj: c.TIPOFJ === CustomerType.JURIDICA ? c.CNPJCPF : null,
-        telefone1: c.FONE1,
-        telefone2: c.FONE2,
-      }));
+      return customers.map((c) => {
+        const tipo = Number(c.TIPOFJ) === CustomerType.FISICA ? CustomerType.FISICA : CustomerType.JURIDICA;
+
+        return {
+          pkcodcli: c.PKCODCLI,
+          nome: c.RAZAOSOCIAL,
+          cpf: tipo === CustomerType.FISICA ? c.CNPJCPF : undefined,
+          cnpj: tipo === CustomerType.JURIDICA ? c.CNPJCPF : undefined,
+          telefone1: c.FONE1,
+          telefone2: c.FONE2,
+        };
+      });
     } catch (error) {
       console.error("Error listing customers:", error);
       throw error;

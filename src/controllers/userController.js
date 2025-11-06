@@ -6,7 +6,7 @@ export const loginUser = async (req, res) => {
   const { login, password } = req.body;
 
   if (!login || !password) {
-    return res.status(400).json({ error: "Email and password are required" });
+    return res.status(400).json({ error: "Login e senha são obrigatórios" });
   }
 
   try {

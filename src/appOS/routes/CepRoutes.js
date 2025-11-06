@@ -1,6 +1,6 @@
 import express from "express";
 import * as CepController from "../controller/CepController.js";
-import authMiddleware from "../../src/middleware/authMiddleware.js";
+import authMiddleware from "../../middleware/authMiddleware.js";
 
 const router = express.Router();
 

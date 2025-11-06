@@ -1,5 +1,5 @@
-import { getConnection } from "../../src/db/fireBird.js";
-import { CustomerType } from "../../src/models/CustomerModel.js";
+import { getConnection } from "../../db/fireBird.js";
+import { CustomerType } from "../../models/CustomerModel.js";
 
 export const CustomerAppOsRepository = {
   getCustomersByName: async (razaoSocial) => {
@@ -11,6 +11,7 @@ export const CustomerAppOsRepository = {
         SELECT
           PKCODCLI,
           RAZAOSOCIAL,
+          TIPOFJ,
           CNPJCPF,
           FONE1,
           FONE2
