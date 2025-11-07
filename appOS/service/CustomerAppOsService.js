@@ -53,6 +53,7 @@ export const CustomerService = {
         comp: customer.COMP || "",
         bairro: customer.BAIRRO || "",
         cep: customer.CEP || "",
+        cidade: customer.NOME_CIDADE,
         fax: customer.FAX || "",
         telefone1: customer.FONE1 || "",
         telefone2: customer.FONE2 || "",
