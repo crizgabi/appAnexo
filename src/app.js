@@ -5,6 +5,7 @@ import cors from "cors";
 import userRoutes from "./routes/userRoutes.js";
 import CustomerAppOsRoutes from "../appOS/routes/CustomerAppOSRoutes.js"
 import CepRoutes from "../appOS/routes/CepRoutes.js"
+import ServicesRoutes from "../appOS/routes/ServicesRoutes.js"
 
 
 const app = express();
@@ -19,5 +20,6 @@ app.use(cors({
 app.use("/users", userRoutes);
 app.use("/customers", CustomerAppOsRoutes)
 app.use("/cep", CepRoutes)
+app.use("/services", ServicesRoutes)
 
 export default app;

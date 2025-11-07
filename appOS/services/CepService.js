@@ -1,5 +1,5 @@
 import axios from "axios";
-import { CityRepository } from "../repository/CityRepository.js";
+import { CityRepository } from "../repositories/CityRepository.js";
 
 export const CepService = {
     getCityCode: async (cidade, uf) => {

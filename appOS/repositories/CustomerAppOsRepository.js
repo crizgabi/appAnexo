@@ -1,7 +1,7 @@
 import { getConnection } from "../../src/db/fireBird.js";
 import { CustomerType } from "../../src/models/CustomerModel.js";
 
-export const CustomerAppOsRepository = { 
+export const CustomerAppOsRepository = {
 
   // LISTA CLIENTES BUSCANDO POR NOME OU RAZÃO SOCIAL. retorna vários clientes.
   getCustomersByName: async (razaoSocial) => {
@@ -42,27 +42,29 @@ export const CustomerAppOsRepository = {
 
         const query = `
           SELECT
-            PKCODCLI,
-            RAZAOSOCIAL,
-            NOMEFANTASIA,
-            ENDERECO,
-            NUM,
-            COMP,
-            CEP,
-            BAIRRO,
-            FKCODCID,
-            FAX,
-            FONE1,
-            FONE2,
-            FONE1WHATSAPP,
-            FONE2WHATSAPP,
-            CELULARWHATSAPP,
-            EMAIL,
-            OBS,
-            TIPOFJ,
-            CNPJCPF
-          FROM TBCLIENTE
-          WHERE PKCODCLI = ?
+            C.PKCODCLI,
+            C.RAZAOSOCIAL,
+            C.NOMEFANTASIA,
+            C.ENDERECO,
+            C.NUM,
+            C.COMP,
+            C.CEP,
+            C.BAIRRO,
+            C.FKCODCID,
+            CI.NMCID AS NOME_CIDADE,
+            C.FAX,
+            C.FONE1,
+            C.FONE2,
+            C.FONE1WHATSAPP,
+            C.FONE2WHATSAPP,
+            C.CELULARWHATSAPP,
+            C.EMAIL,
+            C.OBS,
+            C.TIPOFJ,
+            C.CNPJCPF
+          FROM TBCLIENTE C
+          LEFT JOIN TBCIDADE CI ON C.FKCODCID = CI.PKCODCID
+          WHERE C.PKCODCLI = ?
         `;
 
         db.query(query, [primaryKey], (qErr, result) => {
@@ -74,7 +76,7 @@ export const CustomerAppOsRepository = {
       });
     });
   },
-// CRIA USUÁRIO
+  // CRIA USUÁRIO
   createCustomer: async (customerData) => {
     return new Promise((resolve, reject) => {
       getConnection((err, db) => {
