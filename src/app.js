@@ -5,7 +5,7 @@ import cors from "cors";
 import userRoutes from "./routes/userRoutes.js";
 import CustomerAppOsRoutes from "../appOS/routes/CustomerAppOSRoutes.js"
 import CepRoutes from "../appOS/routes/CepRoutes.js"
-
+import EquipamentRoutes from "./routes/EquipamentRoutes.js";
 
 const app = express();
 app.use(bodyParser.json());
@@ -19,5 +19,6 @@ app.use(cors({
 app.use("/users", userRoutes);
 app.use("/customers", CustomerAppOsRoutes)
 app.use("/cep", CepRoutes)
+app.use("/equipamentos", EquipamentRoutes);
 
 export default app;
