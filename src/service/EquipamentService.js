@@ -1,5 +1,5 @@
-import Equipament from "../models/EquipamentModel.js";
-import { EquipamentRepository } from "../repository/EquipamentRepository.js";
+import Equipament from "../models/equipmentModel.js";
+import { EquipamentRepository } from "../repository/equipmentRepository.js";
 
 export const EquipamentService = {
   async create(data) {
@@ -14,7 +14,7 @@ export const EquipamentService = {
     // Retorno conforme o schema esperado (sem imagens por enquanto)
     return {
       idEquipamento: result.idEquipamento,
-      idCliente: equip.idCliente,
+      pkcodcli: equip.idCliente,
       nomeEquipamento: equip.nomeEquipamento,
       marca: equip.marca,
       modelo: equip.modelo,
@@ -36,7 +36,7 @@ export const EquipamentService = {
     // Retornar lista simples (não paginada)
     return equipamentos.map(equip => ({
       idEquipamento: equip.idEquipamento,
-      idCliente: equip.idCliente,
+      pkcodcli: equip.idCliente,
       nomeEquipamento: equip.nomeEquipamento,
       marca: equip.marca,
       modelo: equip.modelo,
@@ -75,7 +75,7 @@ export const EquipamentService = {
     const equipamentos = await EquipamentRepository.findByCliente(idCliente);
     return equipamentos.map(equip => ({
       idEquipamento: equip.idEquipamento,
-      idCliente: equip.idCliente,
+      pkdocli: equip.idCliente,
       nomeEquipamento: equip.nomeEquipamento,
       marca: equip.marca,
       modelo: equip.modelo,

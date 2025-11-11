@@ -30,7 +30,7 @@ export const EquipamentController = {
   },
 
   // GET /equipamentos/cliente/:idCliente
-  getByCustomer: async (req, res) => {
+  getByCustomerId: async (req, res) => {
     try {
       const { idCliente } = req.params;
       const equipamentos = await EquipamentService.listByCliente(idCliente);
