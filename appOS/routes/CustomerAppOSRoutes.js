@@ -1,6 +1,6 @@
 import express from "express";
-import * as CustomerAppOsController from "../controller/CustomerAppOsController.js";
-import authMiddleware from "../../src/middleware/authMiddleware.js"
+import * as CustomerAppOsController from "../controllers/CustomerAppOsController.js";
+import authMiddleware from "../../src/middlewares/authMiddleware.js"
 import Customer from "../../src/models/CustomerModel.js";
 
 const router = express.Router();

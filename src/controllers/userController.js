@@ -1,5 +1,5 @@
 import { User } from "../models/UserModel.js";
-import { UserService } from "../service/userService.js";
+import { UserService } from "../services/userService.js";
 
 // POST /login
 export const loginUser = async (req, res) => {

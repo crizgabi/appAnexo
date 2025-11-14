@@ -1,5 +1,5 @@
 // import { User } from "../../src/models/UserModel.js";
-import { CustomerService } from "../service/CustomerAppOsService.js";
+import { CustomerService } from "../services/CustomerAppOsService.js";
 
 export const getCustomer = async (req, res) => {
     const { id } = req.params;

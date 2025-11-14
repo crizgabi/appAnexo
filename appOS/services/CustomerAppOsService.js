@@ -1,7 +1,7 @@
-import { CustomerAppOsRepository } from "../repository/CustomerAppOsRepository.js";
+import { CustomerAppOsRepository } from "../repositories/CustomerAppOsRepository.js";
 import { CustomerType } from "../../src/models/CustomerModel.js";
-import { UserRepository } from "../../src/repository/userRepository.js";
-import { CityRepository } from "../repository/CityRepository.js";
+import { UserRepository } from "../../src/repositories/userRepository.js";
+import { CityRepository } from "../repositories/CityRepository.js";
 import { CepService } from "./CepService.js";
 
 export const CustomerService = {

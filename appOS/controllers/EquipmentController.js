@@ -1,4 +1,4 @@
-import { EquipmentService } from "../service/EquipmentService.js";
+import { EquipmentService } from "../services/EquipmentService.js";
 
 export const EquipmentController = {
   // GET /equipamentos

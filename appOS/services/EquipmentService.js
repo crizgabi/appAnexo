@@ -1,5 +1,5 @@
-import Equipment from "../model/EquipmentModel.js";
-import { EquipmentRepository } from "../repository/EquipmentRepository.js";
+import Equipment from "../models/EquipmentModel.js";
+import { EquipmentRepository } from "../repositories/EquipmentRepository.js";
 
 export const EquipmentService = {
   async create(data) {

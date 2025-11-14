@@ -1,4 +1,4 @@
-import { CepService } from "../service/CepService.js";
+import { CepService } from "../services/CepService.js";
 
 export const getAddressByCep = async (req, res) => {
   try {
