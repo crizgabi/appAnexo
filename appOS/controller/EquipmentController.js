@@ -1,10 +1,10 @@
-import { EquipamentService } from "../service/EquipamentService.js";
+import { EquipmentService } from "../service/EquipamentService.js";
 
-export const EquipamentController = {
+export const EquipmentController = {
   // GET /equipamentos
   getAll: async (req, res) => {
     try {
-      const equipamentos = await EquipamentService.list();
+      const equipamentos = await EquipmentService.list();
     res.status(200).json(equipamentos);
   } catch (error) {
     console.error("Erro ao listar equipamentos:", error);
@@ -22,7 +22,7 @@ export const EquipamentController = {
       const osLimit = req.query.osLimit ? parseInt(req.query.osLimit, 10) : 10;
       const osOffset = req.query.osOffset ? parseInt(req.query.osOffset, 10) : 0;
 
-      const equipamento = await EquipamentService.find(id, { expand, osLimit, osOffset });
+      const equipamento = await EquipmentService.find(id, { expand, osLimit, osOffset });
       res.json(equipamento);
     } catch (err) {
       res.status(404).json({ error: err.message });
@@ -33,7 +33,7 @@ export const EquipamentController = {
   getByCustomerId: async (req, res) => {
     try {
       const { idCliente } = req.params;
-      const equipamentos = await EquipamentService.listByCliente(idCliente);
+      const equipamentos = await EquipmentService.listByCliente(idCliente);
       res.json(equipamentos);
     } catch (err) {
       res.status(500).json({ error: err.message });
@@ -43,7 +43,7 @@ export const EquipamentController = {
   // POST /equipamentos
   create: async (req, res) => {
     try {
-      const novo = await EquipamentService.create(req.body);
+      const novo = await EquipmentService.create(req.body);
       res.status(201).json(novo);
     } catch (err) {
       res.status(400).json({ error: err.message });
@@ -54,7 +54,7 @@ export const EquipamentController = {
   update: async (req, res) => {
     try {
       const { id } = req.params;
-      const atualizado = await EquipamentService.update(id, req.body);
+      const atualizado = await EquipmentService.update(id, req.body);
       res.json(atualizado);
     } catch (err) {
       res.status(400).json({ error: err.message });
@@ -64,7 +64,7 @@ export const EquipamentController = {
   // DELETE /equipamentos/:id
   delete: async (req, res) => {
     try {
-      const resultado = await EquipamentService.delete(req.params.id);
+      const resultado = await EquipmentService.delete(req.params.id);
       res.json(resultado);
     } catch (err) {
       res.status(400).json({ error: err.message });

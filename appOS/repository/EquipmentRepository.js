@@ -1,6 +1,6 @@
-import { getConnection } from "../db/fireBird.js";
+import { getConnection } from "../../src/db/fireBird.js";
 
-export const EquipamentRepository = {
+export const EquipmentRepository = {
   create(equip) {
     return new Promise((resolve, reject) => {
       getConnection((err, conn) => {
@@ -29,18 +29,18 @@ export const EquipamentRepository = {
 
           const params = [
             nextId,
-            equip.idCliente || null,
+            equip.idCliente,
             now,
             now,
-            equip.nomeEquipamento || null,
-            equip.fabricante || null,
-            equip.modelo || null,
-            equip.numeroSerie || null,
-            equip.localInstalacao || null,
-            equip.codigoInterno || null,
-            equip.numeroPatrimonio || null,
-            equip.descricao || null,
-            equip.marca || null,
+            equip.nomeEquipamento,
+            equip.fabricante || "",
+            equip.modelo || "",
+            equip.numeroSerie || "",
+            equip.localInstalacao || "",
+            equip.codigoInterno || "",
+            equip.numeroPatrimonio || "",
+            equip.descricao || "",
+            equip.marca || "",
           ];
 
           conn.query(query, params, (err2) => {
@@ -63,35 +63,19 @@ export const EquipamentRepository = {
         if (err) return reject(err);
 
         const query = `
-          SELECT
-            PKEQUIPAMENTO, FKCLIENTE, EQUIPAMENTO, MARCA, MODELO, NSERIE,
-            LOCALEQUIPAMENTO, FABRICANTE, CODINTERNO, NUMPATRIMONIO, OBS,
-            DATACAD, DATAATU
-          FROM TBEQUIPAMENTO
-          ORDER BY PKEQUIPAMENTO
-        `;
+        SELECT
+          PKEQUIPAMENTO, FKCLIENTE, EQUIPAMENTO, MARCA, MODELO, NSERIE,
+          LOCALEQUIPAMENTO, FABRICANTE, CODINTERNO, NUMPATRIMONIO, OBS,
+          DATACAD, DATAATU
+        FROM TBEQUIPAMENTO
+        ORDER BY PKEQUIPAMENTO
+      `;
 
         conn.query(query, (err, rows) => {
           conn.detach();
           if (err) return reject(err);
 
-          const equipamentos = (rows || []).map((row) => ({
-            idEquipamento: row.PKEQUIPAMENTO,
-            idCliente: row.FKCLIENTE,
-            nomeEquipamento: row.EQUIPAMENTO,
-            marca: row.MARCA,
-            modelo: row.MODELO,
-            numeroSerie: row.NSERIE,
-            localInstalacao: row.LOCALEQUIPAMENTO,
-            fabricante: row.FABRICANTE,
-            codigoInterno: row.CODINTERNO,
-            numeroPatrimonio: row.NUMPATRIMONIO,
-            descricao: row.OBS,
-            dataCadastro: row.DATACAD,
-            dataAtualizacao: row.DATAATU,
-          }));
-
-          resolve(equipamentos);
+          resolve(rows || []);
         });
       });
     });
@@ -117,21 +101,7 @@ export const EquipamentRepository = {
           const row = res && res[0];
           if (!row) return resolve(null);
 
-          resolve({
-            idEquipamento: row.PKEQUIPAMENTO,
-            idCliente: row.FKCLIENTE,
-            nomeEquipamento: row.EQUIPAMENTO,
-            marca: row.MARCA,
-            modelo: row.MODELO,
-            numeroSerie: row.NSERIE,
-            localInstalacao: row.LOCALEQUIPAMENTO,
-            fabricante: row.FABRICANTE,
-            codigoInterno: row.CODINTERNO,
-            numeroPatrimonio: row.NUMPATRIMONIO,
-            descricao: row.OBS,
-            dataCadastro: row.DATACAD,
-            dataAtualizacao: row.DATAATU,
-          });
+          resolve(row || []);
         });
       });
     });
@@ -162,33 +132,17 @@ export const EquipamentRepository = {
           if (err) {
             conn.detach();
             return reject(err);
-          }
-
-          // Mapeia o resultado
-          const equipamentos = result.map(equip => ({
-            idEquipamento: equip.PKEQUIPAMENTO,
-            idCliente: equip.FKCLIENTE,
-            nomeEquipamento: equip.EQUIPAMENTO,
-            marca: equip.MARCA,
-            modelo: equip.MODELO,
-            numeroSerie: equip.NSERIE,
-            localInstalacao: equip.LOCALEQUIPAMENTO,
-            fabricante: equip.FABRICANTE,
-            codigoInterno: equip.CODINTERNO,
-            numeroPatrimonio: equip.NUMPATRIMONIO,
-            descricao: equip.OBS,
-            dataCadastro: equip.DATACAD,
-            dataAtualizacao: equip.DATAATU
-          }));
+          };
 
           conn.detach();
-          resolve(equipamentos);
+          resolve(result);
         });
       });
     });
   },
 
-  update(id, equip) {
+  // ATUALIZA OS DADOS DE UM EQUIPAMENTO. Somente os dados enviados no body serão atualizados, os outros serão mantidos.
+  update(id, equipmentData) {
     return new Promise((resolve, reject) => {
       getConnection((err, conn) => {
         if (err) return reject(err);
@@ -212,17 +166,17 @@ export const EquipamentRepository = {
         `;
 
         const params = [
-          equip.idCliente || null,
-          equip.nomeEquipamento || null,
-          equip.marca || null,
-          equip.modelo || null,
-          equip.numeroSerie || null,
-          equip.localInstalacao || null,
-          equip.fabricante || null,
-          equip.codigoInterno || null,
-          equip.numeroPatrimonio || null,
-          equip.descricao || null,
-          now,
+          equipmentData.idCliente,
+          equipmentData.nomeEquipamento,
+          equipmentData.marca,
+          equipmentData.modelo,
+          equipmentData.numeroSerie,
+          equipmentData.localInstalacao,
+          equipmentData.fabricante,
+          equipmentData.codigoInterno,
+          equipmentData.numeroPatrimonio,
+          equipmentData.descricao,
+          equipmentData.now,
           id,
         ];
 

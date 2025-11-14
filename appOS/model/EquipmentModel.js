@@ -1,4 +1,4 @@
-export default class Equipament {
+export default class Equipment {
   constructor({
     idEquipamento = null,
     idCliente,
