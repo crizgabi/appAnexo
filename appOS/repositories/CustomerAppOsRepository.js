@@ -1,7 +1,7 @@
 import { getConnection } from "../../src/db/fireBird.js";
 import { CustomerType } from "../../src/models/CustomerModel.js";
 
-export const CustomerAppOsRepository = { 
+export const CustomerAppOsRepository = {
 
   // LISTA CLIENTES BUSCANDO POR NOME OU RAZÃO SOCIAL. retorna vários clientes.
   getCustomersByName: async (razaoSocial) => {
@@ -76,7 +76,7 @@ export const CustomerAppOsRepository = {
       });
     });
   },
-// CRIA USUÁRIO
+  // CRIA USUÁRIO
   createCustomer: async (customerData) => {
     return new Promise((resolve, reject) => {
       getConnection((err, db) => {
