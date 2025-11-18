@@ -1,5 +1,5 @@
 import { ProductService } from "../services/ProductService.js";
-
+//
 export const getProducts = async (req, res) => {
   const { barcode, name, reference, productId } = req.query;
 
