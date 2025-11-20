@@ -7,6 +7,7 @@ import CustomerAppOsRoutes from "../appOS/routes/CustomerAppOSRoutes.js"
 import CepRoutes from "../appOS/routes/CepRoutes.js"
 import EquipmentRoutes from "../appOS/routes/EquipmentRoutes.js";
 import ServicesRoutes from "../appOS/routes/ServicesRoutes.js"
+import ProductRoutes from "../appOS/routes/ProductRoutes.js"
 
 
 const app = express();
@@ -23,5 +24,6 @@ app.use("/customers", CustomerAppOsRoutes)
 app.use("/cep", CepRoutes)
 app.use("/equipments", EquipmentRoutes);
 app.use("/services", ServicesRoutes)
+app.use("/products", ProductRoutes)
 
 export default app;
