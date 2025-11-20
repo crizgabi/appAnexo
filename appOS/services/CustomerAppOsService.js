@@ -40,14 +40,14 @@ export const CustomerService = {
       }
 
       const tipo =
-        customer.TIPOFJ === 1 ? CustomerType.FISICA : CustomerType.JURIDICA;
+        customer.TIPOFJ === 0 ? "juridica" : "fisica";
 
       return {
         razaoSocial: customer.RAZAOSOCIAL,
         codigoCidade: customer.FKCODCID,
         tipo,
-        cpf: tipo === CustomerType.FISICA ? customer.CNPJCPF : null,
-        cnpj: tipo === CustomerType.JURIDICA ? customer.CNPJCPF : null,
+        cpf: tipo === "fisica" ? customer.CNPJCPF : null,
+        cnpj: tipo === "juridica" ? customer.CNPJCPF : null,
         nomeFantasia: tipo === CustomerType.JURIDICA ? customer.NOMEFANTASIA : null,
         endereco: (customer.ENDERECO || "").trim(),
         num: customer.NUM || "",
@@ -172,11 +172,12 @@ export const CustomerService = {
       };
 
       await CustomerAppOsRepository.updateCustomer(pkcodcli, updatedCustomer);
+      const customer = await CustomerService.getCustomerByPrimaryKey(pkcodcli);
 
       return {
         success: true,
         message: "Cliente atualizado com sucesso",
-        data: updatedCustomer,
+        data: customer,
       };
     } catch (error) {
       console.error("Erro no updateCustomer Service:", error);
@@ -184,4 +185,3 @@ export const CustomerService = {
     }
   },
 };
-
