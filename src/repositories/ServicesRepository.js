@@ -1,4 +1,4 @@
-import { getConnection } from "../../src/db/fireBird.js";
+import { getConnection } from "../db/fireBird.js";
 import Service from "../models/ServiceModel.js";
 
 export const ServicesRepository = {

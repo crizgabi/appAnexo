@@ -79,15 +79,6 @@ class Customer {
     this.fkcodusu = fkcodusu || 1;
     this.status = status || 1;
   }
-
-  // Métodos genéricos para subclasses
-  create() {
-    throw new Error("Método create() deve ser implementado pela subclasse.");
-  }
-
-  getDetails() {
-    throw new Error("Método getDetails() deve ser implementado pela subclasse.");
-  }
 }
 
 export default Customer;

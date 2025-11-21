@@ -1,7 +1,7 @@
-import { getConnection } from "../../src/db/fireBird.js";
-import { CustomerType } from "../../src/models/CustomerModel.js";
+import { getConnection } from "../db/fireBird.js";
+import { CustomerType } from "../models/CustomerModel.js";
 
-export const CustomerAppOsRepository = {
+export const CustomerRepository = {
 
   // LISTA CLIENTES BUSCANDO POR NOME OU RAZÃO SOCIAL. retorna vários clientes.
   getCustomersByName: async (razaoSocial) => {

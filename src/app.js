@@ -3,11 +3,11 @@ import bodyParser from "body-parser";
 import cors from "cors";
 
 import userRoutes from "./routes/userRoutes.js";
-import CustomerAppOsRoutes from "../appOS/routes/CustomerAppOSRoutes.js"
-import CepRoutes from "../appOS/routes/CepRoutes.js"
-import EquipmentRoutes from "../appOS/routes/EquipmentRoutes.js";
-import ServicesRoutes from "../appOS/routes/ServicesRoutes.js"
-import ProductRoutes from "../appOS/routes/ProductRoutes.js"
+import CustomerRoutes from "./routes/CustomerRoutes.js"
+import CepRoutes from "./routes/CepRoutes.js"
+import EquipmentRoutes from "./routes/EquipmentRoutes.js";
+import ServicesRoutes from "./routes/ServicesRoutes.js"
+import ProductRoutes from "./routes/ProductRoutes.js"
 
 
 const app = express();
@@ -20,7 +20,7 @@ app.use(cors({
 
 // Rotas
 app.use("/users", userRoutes);
-app.use("/customers", CustomerAppOsRoutes)
+app.use("/customers", CustomerRoutes)
 app.use("/cep", CepRoutes)
 app.use("/equipments", EquipmentRoutes);
 app.use("/services", ServicesRoutes)
