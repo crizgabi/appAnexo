@@ -35,6 +35,7 @@ export const EquipamentService = {
 
     // Retornar lista simples (não paginada)
     return equipamentos.map(equip => ({
+      clienteNome: equip.clienteNome,
       idEquipamento: equip.idEquipamento,
       pkcodcli: equip.idCliente,
       nomeEquipamento: equip.nomeEquipamento,

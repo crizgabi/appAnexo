@@ -58,44 +58,58 @@ export const EquipamentRepository = {
   },
 
   findAll() {
-    return new Promise((resolve, reject) => {
-      getConnection((err, conn) => {
+  return new Promise((resolve, reject) => {
+    getConnection((err, conn) => {
+      if (err) return reject(err);
+
+      const query = `
+        SELECT
+          e.PKEQUIPAMENTO,
+          e.FKCLIENTE,
+          e.EQUIPAMENTO,
+          e.MARCA,
+          e.MODELO,
+          e.NSERIE,
+          e.LOCALEQUIPAMENTO,
+          e.FABRICANTE,
+          e.CODINTERNO,
+          e.NUMPATRIMONIO,
+          e.OBS,
+          e.DATACAD,
+          e.DATAATU,
+          c.RAZAOSOCIAL AS CLIENTE_NOME
+        FROM TBEQUIPAMENTO e
+        LEFT JOIN TBCLIENTE c ON c.PKCODCLI = e.FKCLIENTE
+        ORDER BY e.PKEQUIPAMENTO
+      `;
+
+      conn.query(query, (err, rows) => {
+        conn.detach();
         if (err) return reject(err);
 
-        const query = `
-          SELECT
-            PKEQUIPAMENTO, FKCLIENTE, EQUIPAMENTO, MARCA, MODELO, NSERIE,
-            LOCALEQUIPAMENTO, FABRICANTE, CODINTERNO, NUMPATRIMONIO, OBS,
-            DATACAD, DATAATU
-          FROM TBEQUIPAMENTO
-          ORDER BY PKEQUIPAMENTO
-        `;
+        const equipamentos = (rows || []).map((row) => ({
+          idEquipamento: row.PKEQUIPAMENTO,
+          idCliente: row.FKCLIENTE,
+          clienteNome: row.CLIENTE_NOME || null,
+          nomeEquipamento: row.EQUIPAMENTO,
+          marca: row.MARCA,
+          modelo: row.MODELO,
+          numeroSerie: row.NSERIE,
+          localInstalacao: row.LOCALEQUIPAMENTO,
+          fabricante: row.FABRICANTE,
+          codigoInterno: row.CODINTERNO,
+          numeroPatrimonio: row.NUMPATRIMONIO,
+          descricao: row.OBS,
+          dataCadastro: row.DATACAD,
+          dataAtualizacao: row.DATAATU,
+        }));
 
-        conn.query(query, (err, rows) => {
-          conn.detach();
-          if (err) return reject(err);
-
-          const equipamentos = (rows || []).map((row) => ({
-            idEquipamento: row.PKEQUIPAMENTO,
-            idCliente: row.FKCLIENTE,
-            nomeEquipamento: row.EQUIPAMENTO,
-            marca: row.MARCA,
-            modelo: row.MODELO,
-            numeroSerie: row.NSERIE,
-            localInstalacao: row.LOCALEQUIPAMENTO,
-            fabricante: row.FABRICANTE,
-            codigoInterno: row.CODINTERNO,
-            numeroPatrimonio: row.NUMPATRIMONIO,
-            descricao: row.OBS,
-            dataCadastro: row.DATACAD,
-            dataAtualizacao: row.DATAATU,
-          }));
-
-          resolve(equipamentos);
-        });
+        resolve(equipamentos);
       });
     });
-  },
+  });
+},
+
 
   findById(id) {
     return new Promise((resolve, reject) => {
@@ -240,13 +254,18 @@ export const EquipamentRepository = {
       getConnection((err, conn) => {
         if (err) return reject(err);
 
+        const deletedAt = new Date();
+
         conn.query(
           "DELETE FROM TBEQUIPAMENTO WHERE PKEQUIPAMENTO = ?",
           [id],
           (err2) => {
             conn.detach();
             if (err2) return reject(err2);
-            resolve(true);
+            resolve({
+              sucess: true,
+              deletedAt
+            });
           }
         );
       });
