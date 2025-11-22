@@ -1,9 +1,9 @@
 import { ProductRepository } from "../repositories/ProductRepository.js";
 
 export const ProductService = {
-    getProductByBarcode: async (barcode) => {
+    getProductByBarcode: async (barcode, dbEnvKey, dbType) => {
         try {
-            const products = await ProductRepository.getProductByBarcode(barcode);
+            const products = await ProductRepository.getProductByBarcode(barcode, dbEnvKey, dbType);
 
             if (!products) {
                 return [];
@@ -24,9 +24,13 @@ export const ProductService = {
         }
     },
 
-    getProductByName: async (name) => {
+    getProductByName: async (name, dbEnvKey, dbType) => {
         try {
-            const products = await ProductRepository.getProductByName(name);
+            const products = await ProductRepository.getProductByName(
+                name, 
+                dbEnvKey, 
+                dbType
+            );
 
             if (!products) {
                 return [];
@@ -47,9 +51,13 @@ export const ProductService = {
         }
     },
 
-    getProductByReference: async (reference) => {
+    getProductByReference: async (reference, dbEnvKey, dbType) => {
         try {
-            const products = await ProductRepository.getProductByReference(reference);
+            const products = await ProductRepository.getProductByReference(
+                reference, 
+                dbEnvKey, 
+                dbType
+            );
 
             if (!products) {
                 return [];
@@ -70,9 +78,13 @@ export const ProductService = {
         }
     },
 
-    getProductByPrimaryKey: async (productId) => {
+    getProductByPrimaryKey: async (productId, dbEnvKey, dbType) => {
         try {
-            const products = await ProductRepository.getProductByPrimaryKey(productId);
+            const products = await ProductRepository.getProductByPrimaryKey(
+                productId, 
+                dbEnvKey, 
+                dbType
+            );
 
             if (!products) {
                 return [];
@@ -93,9 +105,13 @@ export const ProductService = {
         }
     },
 
-    getProductDetails: async (productId) => {
+    getProductDetails: async (productId, dbEnvKey, dbType) => {
         try {
-            const p = await ProductRepository.getProductDetails(productId);
+            const p = await ProductRepository.getProductDetails(
+                productId, 
+                dbEnvKey, 
+                dbType
+            );
 
             if (!p) {
                 return null;

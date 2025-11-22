@@ -2,9 +2,13 @@ import { ServicesRepository } from "../repositories/ServicesRepository.js";
 import Service from "../models/ServiceModel.js";
 
 export const ServicesService = {
-    getServiceByDescription: async (description) => {
+    getServicesByDescription: async (description, dbEnvKey, dbType) => {
         try {
-            const services = await ServicesRepository.getServiceByDescription(description);
+            const services = await ServicesRepository.getServicesByDescription(
+                description, 
+                dbEnvKey, 
+                dbType
+            );
 
             if (!services) {
                 return [];
@@ -25,9 +29,13 @@ export const ServicesService = {
         }
     },
 
-    getServiceByReference: async (reference) => {
+    getServicesByReference: async (reference, dbEnvKey, dbType) => {
         try {
-            const services = await ServicesRepository.getServiceByReference(reference);
+            const services = await ServicesRepository.getServicesByReference(
+                reference, 
+                dbEnvKey, 
+                dbType
+            );
 
             if (!services) {
                 return [];
@@ -48,9 +56,13 @@ export const ServicesService = {
         }
     },
 
-    getServiceByName: async (name) => {
+    getServicesByName: async (name, dbEnvKey, dbType) => {
         try {
-            const services = await ServicesRepository.getServiceByName(name);
+            const services = await ServicesRepository.getServicesByName(
+                name, 
+                dbEnvKey, 
+                dbType
+            );
 
             if (!services) {
                 return [];
@@ -71,9 +83,13 @@ export const ServicesService = {
         }
     },
 
-    getServiceByPrimaryKey: async (serviceId) => {
+    getServicesByPrimaryKey: async (serviceId, dbEnvKey, dbType) => {
         try {
-            const services = await ServicesRepository.getServiceByPrimaryKey(serviceId);
+            const services = await ServicesRepository.getServicesByPrimaryKey(
+                serviceId, 
+                dbEnvKey, 
+                dbType
+            );
 
             if (!services) {
                 return [];
@@ -94,9 +110,12 @@ export const ServicesService = {
         }
     },
 
-    getServiceDetails: async (serviceId) => {
+    getServiceDetails: async (serviceId, dbEnvKey, dbType) => {
         try {
-            const service = await ServicesRepository.getServiceDetails(serviceId);
+            const service = await ServicesRepository.getServiceDetails(
+                serviceId, 
+                dbEnvKey, 
+                dbType);
 
             if (!service) {
                 return null;

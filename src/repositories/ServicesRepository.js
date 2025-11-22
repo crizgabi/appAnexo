@@ -1,146 +1,48 @@
-import { getConnection } from "../db/fireBird.js";
-import Service from "../models/ServiceModel.js";
+import { DBClientFactory } from "../middlewares/DBClientFactory.js";
 
 export const ServicesRepository = {
-    getServiceByDescription: async (description) => {
-        return new Promise((resolve, reject) => {
-            getConnection((err, db) => {
-                if (err) return reject(err);
-
-                const query = `
-        SELECT
-          PKCODSER,
-          DESCRICAO,
-          NOMESERVICO,
-          REFERENCIA,
-          VALOR
-        FROM TBSERVICO
-        WHERE UPPER(DESCRICAO) LIKE UPPER(?)
-        ORDER BY PKCODSER
-      `;
-
-                const params = [`%${description}%`];
-
-                db.query(query, params, (qErr, result) => {
-                    db.detach();
-                    if (qErr) return reject(qErr);
-
-                    resolve(result || []);
-                });
-            });
+    getServicesByDescription: async (description, dbEnvKey, dbType) => {
+        const client = DBClientFactory.getClient({
+            dbType,
+            module: "services"
         });
+
+        return client.getServicesByDescription(description, dbEnvKey);
     },
 
-    getServiceByReference: async (reference) => {
-        return new Promise((resolve, reject) => {
-            getConnection((err, db) => {
-                if (err) return reject(err);
-
-                const query = `
-        SELECT
-          PKCODSER,
-          DESCRICAO,
-          NOMESERVICO,
-          REFERENCIA,
-          VALOR
-        FROM TBSERVICO
-        WHERE UPPER(REFERENCIA) LIKE UPPER(?)
-        ORDER BY PKCODSER
-      `;
-
-                const params = [`%${reference}%`];
-
-                db.query(query, params, (qErr, result) => {
-                    db.detach();
-                    if (qErr) return reject(qErr);
-
-                    resolve(result || []);
-                });
-            });
+    getServicesByReference: async (reference, dbEnvKey, dbType) => {
+        const client = DBClientFactory.getClient({
+            dbType,
+            module: "services"
         });
+
+        return client.getServicesByReference(reference, dbEnvKey);
     },
 
-    getServiceByName: async (name) => {
-        return new Promise((resolve, reject) => {
-            getConnection((err, db) => {
-                if (err) return reject(err);
-
-                const query = `
-        SELECT
-          PKCODSER,
-          DESCRICAO,
-          NOMESERVICO,
-          REFERENCIA,
-          VALOR
-        FROM TBSERVICO
-        WHERE UPPER(NOMESERVICO) LIKE UPPER(?)
-        ORDER BY PKCODSER
-      `;
-
-                const params = [`%${name}%`];
-
-                db.query(query, params, (qErr, result) => {
-                    db.detach();
-                    if (qErr) return reject(qErr);
-
-                    resolve(result || []);
-                });
-            });
+    getServicesByName: async (name, dbEnvKey, dbType) => {
+        const client = DBClientFactory.getClient({
+            dbType,
+            module: "services"
         });
+
+        return client.getServicesByName(name, dbEnvKey);
     },
 
-    getServiceByPrimaryKey: async (serviceId) => {
-        return new Promise((resolve, reject) => {
-            getConnection((err, db) => {
-                if (err) return reject(err);
-
-                const query = `
-        SELECT
-          PKCODSER,
-          DESCRICAO,
-          NOMESERVICO,
-          REFERENCIA,
-          VALOR
-        FROM TBSERVICO
-        WHERE UPPER(PKCODSER) LIKE UPPER(?)
-        ORDER BY PKCODSER
-      `;
-
-                const params = [`%${serviceId}%`];
-
-                db.query(query, params, (qErr, result) => {
-                    db.detach();
-                    if (qErr) return reject(qErr);
-
-                    resolve(result || []);
-                });
-            });
+    getServicesByPrimaryKey: async (serviceId, dbEnvKey, dbType) => {
+        const client = DBClientFactory.getClient({
+            dbType,
+            module: "services"
         });
+
+        return client.getServicesByPrimaryKey(serviceId, dbEnvKey);
     },
 
-    getServiceDetails: async (serviceId) => {
-        return new Promise((resolve, reject) => {
-            getConnection((err, db) => {
-                if (err) return reject(err);
-
-                const query = `
-        SELECT
-          PKCODSER,
-          DESCRICAO,
-          NOMESERVICO,
-          REFERENCIA,
-          VALOR
-        FROM TBSERVICO
-        WHERE PKCODSER = ?
-      `;
-
-                db.query(query, [serviceId], (qErr, result) => {
-                    db.detach();
-                    if (qErr) return reject(qErr);
-
-                    resolve(result[0] || null);
-                });
-            });
+    getServiceDetails: async (serviceId, dbEnvKey, dbType) => {
+        const client = DBClientFactory.getClient({
+            dbType,
+            module: "services"
         });
+
+        return client.getServiceDetails(serviceId, dbEnvKey);
     },
 };

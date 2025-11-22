@@ -1,15 +1,33 @@
 import { EquipmentService } from "../services/EquipmentService.js";
+import prisma from "../../src/db/prismaClient.js";
 
 export const EquipmentController = {
+
   // GET /equipamentos
   getAll: async (req, res) => {
     try {
-      const equipamentos = await EquipmentService.list();
-    res.status(200).json(equipamentos);
-  } catch (error) {
-    console.error("Erro ao listar equipamentos:", error);
-    res.status(500).json({ message: "Erro ao listar equipamentos", error: error.message });
-  }
+      const tenantId = req.headers["x-tenant-id"];
+      if (!tenantId)
+        return res.status(400).json({ error: "x-tenant-id header obrigatório" });
+
+      const tenant = await prisma.tenant.findUnique({ where: { id: tenantId } });
+      if (!tenant)
+        return res.status(404).json({ error: "Tenant inválido" });
+
+      const equipamentos = await EquipmentService.list(
+        tenant.dbEnvKey,
+        tenant.dbType
+      );
+
+      return res.status(200).json(equipamentos);
+
+    } catch (error) {
+      console.error("Erro ao listar equipamentos:", error);
+      return res.status(500).json({
+        message: "Erro ao listar equipamentos",
+        error: error.message,
+      });
+    }
   },
 
   // GET /equipamentos/:id
@@ -17,15 +35,33 @@ export const EquipmentController = {
     try {
       const { id } = req.params;
 
-      // expand pode vir como ?expand=historicoOs ou ?expand=historicoOs,outraCoisa
       const expand = req.query.expand || [];
       const osLimit = req.query.osLimit ? parseInt(req.query.osLimit, 10) : 10;
       const osOffset = req.query.osOffset ? parseInt(req.query.osOffset, 10) : 0;
 
-      const equipamento = await EquipmentService.find(id, { expand, osLimit, osOffset });
-      res.json(equipamento);
+      const tenantId = req.headers["x-tenant-id"];
+      if (!tenantId)
+        return res.status(400).json({ error: "x-tenant-id header obrigatório" });
+
+      const tenant = await prisma.tenant.findUnique({ where: { id: tenantId } });
+      if (!tenant)
+        return res.status(404).json({ error: "Tenant inválido" });
+
+      const equipamento = await EquipmentService.find(
+        id,
+        tenant.dbEnvKey,
+        tenant.dbType,
+        { expand, osLimit, osOffset }
+      );
+
+      if (!equipamento)
+        return res.status(404).json({ error: "Equipamento não encontrado" });
+
+      return res.json(equipamento);
+
     } catch (err) {
-      res.status(404).json({ error: err.message });
+      console.error("Erro ao buscar equipamento:", err);
+      return res.status(404).json({ error: err.message });
     }
   },
 
@@ -33,20 +69,55 @@ export const EquipmentController = {
   getByCustomerId: async (req, res) => {
     try {
       const { idCliente } = req.params;
-      const equipamentos = await EquipmentService.listByCliente(idCliente);
-      res.json(equipamentos);
+
+      const tenantId = req.headers["x-tenant-id"];
+      if (!tenantId)
+        return res.status(400).json({ error: "x-tenant-id header obrigatório" });
+
+      const tenant = await prisma.tenant.findUnique({ where: { id: tenantId } });
+      if (!tenant)
+        return res.status(404).json({ error: "Tenant inválido" });
+
+      const equipamentos = await EquipmentService.listByCustomer(
+        idCliente,
+        tenant.dbEnvKey,
+        tenant.dbType
+      );
+
+      return res.json(equipamentos);
+
     } catch (err) {
-      res.status(500).json({ error: err.message });
+      console.error("Erro ao buscar equipamentos do cliente:", err);
+      return res.status(500).json({ error: err.message });
     }
   },
 
   // POST /equipamentos
   create: async (req, res) => {
     try {
-      const novo = await EquipmentService.create(req.body);
-      res.status(201).json(novo);
+      const tenantId = req.headers["x-tenant-id"];
+      if (!tenantId)
+        return res.status(400).json({ error: "x-tenant-id header obrigatório" });
+
+      const tenant = await prisma.tenant.findUnique({ where: { id: tenantId } });
+      if (!tenant)
+        return res.status(404).json({ error: "Tenant inválido" });
+
+      const { login } = req.user;
+      if (!login)
+        return res.status(401).json({ error: "Usuário não autenticado" });
+
+      const novo = await EquipmentService.create(
+        req.body,
+        tenant.dbEnvKey,
+        tenant.dbType
+      );
+
+      return res.status(201).json(novo);
+
     } catch (err) {
-      res.status(400).json({ error: err.message });
+      console.error("Erro criando equipamento:", err);
+      return res.status(400).json({ error: err.message });
     }
   },
 
@@ -54,20 +125,58 @@ export const EquipmentController = {
   update: async (req, res) => {
     try {
       const { id } = req.params;
-      const atualizado = await EquipmentService.update(id, req.body);
-      res.json(atualizado);
+
+      const tenantId = req.headers["x-tenant-id"];
+      if (!tenantId)
+        return res.status(400).json({ error: "x-tenant-id header obrigatório" });
+
+      const tenant = await prisma.tenant.findUnique({ where: { id: tenantId } });
+      if (!tenant)
+        return res.status(404).json({ error: "Tenant inválido" });
+
+      const { login } = req.user;
+      if (!login)
+        return res.status(401).json({ error: "Usuário não autenticado" });
+
+      const atualizado = await EquipmentService.update(
+        id,
+        req.body,
+        tenant.dbEnvKey,
+        tenant.dbType
+      );
+
+      return res.json(atualizado);
+
     } catch (err) {
-      res.status(400).json({ error: err.message });
+      console.error("Erro atualizando equipamento:", err);
+      return res.status(400).json({ error: err.message });
     }
   },
 
   // DELETE /equipamentos/:id
   delete: async (req, res) => {
     try {
-      const resultado = await EquipmentService.delete(req.params.id);
-      res.json(resultado);
+      const { id } = req.params;
+
+      const tenantId = req.headers["x-tenant-id"];
+      if (!tenantId)
+        return res.status(400).json({ error: "x-tenant-id header obrigatório" });
+
+      const tenant = await prisma.tenant.findUnique({ where: { id: tenantId } });
+      if (!tenant)
+        return res.status(404).json({ error: "Tenant inválido" });
+
+      const resultado = await EquipmentService.deleteEquipment(
+        id,
+        tenant.dbEnvKey,
+        tenant.dbType
+      );
+
+      return res.json(resultado);
+
     } catch (err) {
-      res.status(400).json({ error: err.message });
+      console.error("Erro removendo equipamento:", err);
+      return res.status(400).json({ error: err.message });
     }
   },
 };
