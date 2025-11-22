@@ -1,13 +1,14 @@
-import { CustomerAppOsRepository } from "../repositories/CustomerAppOsRepository.js";
-import { CustomerType } from "../../src/models/CustomerModel.js";
-import { UserRepository } from "../../src/repositories/userRepository.js";
+import { CustomerRepository } from "../repositories/CustomerRepository.js";
+import { CustomerType } from "../models/CustomerModel.js";
+import { UserRepository } from "../repositories/userRepository.js";
 import { CityRepository } from "../repositories/CityRepository.js";
 import { CepService } from "./CepService.js";
+import Customer from "../models/CustomerModel.js"
 
 export const CustomerService = {
   getCustomersByName: async (razaoSocial) => {
     try {
-      const customers = await CustomerAppOsRepository.getCustomersByName(razaoSocial);
+      const customers = await CustomerRepository.getCustomersByName(razaoSocial);
 
       if (!customers) {
         return [];
@@ -33,7 +34,7 @@ export const CustomerService = {
 
   getCustomerByPrimaryKey: async (primaryKey) => {
     try {
-      const customer = await CustomerAppOsRepository.getCustomerByPrimaryKey(primaryKey);
+      const customer = await CustomerRepository.getCustomerByPrimaryKey(primaryKey);
 
       if (!customer) {
         return null;
@@ -48,7 +49,7 @@ export const CustomerService = {
         tipo,
         cpf: tipo === "fisica" ? customer.CNPJCPF : null,
         cnpj: tipo === "juridica" ? customer.CNPJCPF : null,
-        nomeFantasia: tipo === CustomerType.JURIDICA ? customer.NOMEFANTASIA : null,
+        nomeFantasia: tipo === "juridica" ? customer.NOMEFANTASIA : null,
         endereco: (customer.ENDERECO || "").trim(),
         num: customer.NUM || "",
         comp: customer.COMP || "",
@@ -91,11 +92,10 @@ export const CustomerService = {
         throw new Error("Cidade e UF são obrigatórios para criar o cliente.");
       }
 
-      const newCustomer = {
+      const payload = {
         ...customerData,
         tipo,
         fkcodusu: user.PKDOCUSU,
-        status: 0,
         codigoCidade,
         telefone1: customerData.telefone1 || "",
         telefone2: customerData.telefone2 || "",
@@ -114,10 +114,15 @@ export const CustomerService = {
         num: customerData.num || "",
       };
 
-      const pkcodcli = await CustomerAppOsRepository.createCustomer(newCustomer);
+      const customer = new Customer(payload);
+
+      const pkcodcli = await CustomerRepository.createCustomer(customer);
 
       return {
         pkcodcli,
+        razaoSocial: customer.razaoSocial,
+        tipo: customer.tipo,
+        codigoCidade: customer.codigoCidade,
         message: "Cliente criado com sucesso!",
       };
     } catch (error) {
@@ -131,7 +136,7 @@ export const CustomerService = {
       const user = await UserRepository.findByLogin(userLogin);
       if (!user) throw new Error("Usuário não encontrado");
 
-      const existingCustomer = await CustomerAppOsRepository.getCustomerByPrimaryKey(pkcodcli);
+      const existingCustomer = await CustomerRepository.getCustomerByPrimaryKey(pkcodcli);
       if (!existingCustomer) throw new Error("Cliente não encontrado.");
 
       const tipo = customerData.tipo
@@ -171,7 +176,7 @@ export const CustomerService = {
         FKCODUSU: user.PKCODUSU
       };
 
-      await CustomerAppOsRepository.updateCustomer(pkcodcli, updatedCustomer);
+      await CustomerRepository.updateCustomer(pkcodcli, updatedCustomer);
       const customer = await CustomerService.getCustomerByPrimaryKey(pkcodcli);
 
       return {

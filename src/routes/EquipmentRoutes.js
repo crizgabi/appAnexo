@@ -1,6 +1,6 @@
 import express from "express";
 import { EquipmentController } from   "../controllers/EquipmentController.js";
-import authMiddleware from "../../src/middlewares/authMiddleware.js"
+import authMiddleware from "../middlewares/authMiddleware.js"
 
 const router = express.Router();
 
