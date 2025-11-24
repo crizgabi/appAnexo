@@ -34,6 +34,7 @@ export const EquipmentService = {
     return rows.map(row => ({
       idEquipamento: row.PKEQUIPAMENTO,
       idCliente: row.FKCLIENTE,
+      clienteNome: row.CLIENTE_NOME,
       nomeEquipamento: row.EQUIPAMENTO,
       marca: row.MARCA,
       modelo: row.MODELO,
