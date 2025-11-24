@@ -1,0 +1,863 @@
+type: collection.insomnia.rest/5.0
+schema_version: "5.1"
+name: login/usuário/cliente
+meta:
+  id: wrk_a4f88d3299074f3c9123bd7af0c07db3
+  created: 1759100532763
+  modified: 1762459652791
+  description: ""
+collection:
+  - url: localhost:3000/users
+    name: CreateUser
+    meta:
+      id: req_684eb6dc4b764685b1ccf71bd9431397
+      created: 1759100533012
+      modified: 1759417348754
+      isPrivate: false
+      description: ""
+      sortKey: -1759100533012
+    method: POST
+    body:
+      mimeType: application/json
+      text: |-
+        {
+        	"email": "teste@teste.com.br",
+        	"password": "123456"
+        }
+    headers:
+      - name: Content-Type
+        value: application/json
+      - name: User-Agent
+        value: insomnia/11.5.0
+    settings:
+      renderRequestBody: true
+      encodeUrl: true
+      followRedirects: global
+      cookies:
+        send: true
+        store: true
+      rebuildPath: true
+  - url: localhost:3000/users/login
+    name: Login
+    meta:
+      id: req_baac6b8000054485870fb4ed99a0c953
+      created: 1759101411315
+      modified: 1764005937945
+      isPrivate: false
+      description: ""
+      sortKey: -1758010819997.5
+    method: POST
+    body:
+      mimeType: application/json
+      text: |-
+        {
+        	"login": "gabi",
+        	"password": "Teste",
+        	"empresaId": "Anexo00521"
+        }
+    headers:
+      - name: Content-Type
+        value: application/json
+      - name: User-Agent
+        value: insomnia/11.5.0
+    scripts:
+      afterResponse: |+
+        const jsonBody = insomnia.response.json();
+        const accessToken = jsonBody.token;
+        const refreshToken = jsonBody.refreshToken;
+        const tenantId = jsonBody.tenantId;
+        insomnia.environment.set("accessToken", accessToken);
+        insomnia.environment.set("refreshToken", refreshToken);
+        insomnia.environment.set("tenantId", tenantId);
+
+    settings:
+      renderRequestBody: true
+      encodeUrl: true
+      followRedirects: global
+      cookies:
+        send: true
+        store: true
+      rebuildPath: true
+  - url: localhost:3000/users/update-password
+    name: updatePassword
+    meta:
+      id: req_e3ba517c67d74bd79834ea3650a13723
+      created: 1759101457179
+      modified: 1762712908732
+      isPrivate: false
+      description: ""
+      sortKey: -1757465963490.25
+    method: PUT
+    body:
+      mimeType: application/json
+      text: |-
+        {
+        	"currentPassword": "Teste",
+        	"newPassword": "teste"
+        }
+    headers:
+      - name: Content-Type
+        value: application/json
+      - name: User-Agent
+        value: insomnia/11.5.0
+      - name: Authorization
+        value: bearer {{ accessToken }}
+        description: ""
+        disabled: false
+    settings:
+      renderRequestBody: true
+      encodeUrl: true
+      followRedirects: global
+      cookies:
+        send: true
+        store: true
+      rebuildPath: true
+  - url: localhost:3000/customers/115
+    name: GetCustomerDetails
+    meta:
+      id: req_421b5d634f9249b68f81727401264c8f
+      created: 1759101613847
+      modified: 1763843798954
+      isPrivate: false
+      description: ""
+      sortKey: -1757465963390.25
+    method: GET
+    headers:
+      - name: User-Agent
+        value: insomnia/11.5.0
+      - name: Authorization
+        value: Bearer {{ accessToken }}
+        description: ""
+        disabled: false
+      - name: x-tenant-id
+        value: "{{tenantId}}"
+        description: ""
+        disabled: false
+    settings:
+      renderRequestBody: true
+      encodeUrl: true
+      followRedirects: global
+      cookies:
+        send: true
+        store: true
+      rebuildPath: true
+  - url: localhost:3000/users/refresh
+    name: RefreshSession
+    meta:
+      id: req_3600184b504d4fb1bb19cf9ea99aa7c2
+      created: 1759539961208
+      modified: 1763085210267
+      isPrivate: false
+      description: ""
+      sortKey: -1757738391743.875
+    method: POST
+    body:
+      mimeType: application/json
+      text: |-
+        {
+        	"refreshToken": "{{ refreshToken }}"
+        }
+    headers:
+      - name: Content-Type
+        value: application/json
+      - name: User-Agent
+        value: insomnia/11.5.0
+    scripts:
+      afterResponse: |-
+        const jsonBody = insomnia.response.json();
+        const accessToken = jsonBody.token;
+        const refreshToken = jsonBody.refreshToken;
+        insomnia.environment.set("accessToken", accessToken);
+        insomnia.environment.set("refreshToken", refreshToken);
+    settings:
+      renderRequestBody: true
+      encodeUrl: true
+      followRedirects: global
+      cookies:
+        send: true
+        store: true
+      rebuildPath: true
+  - url: localhost:3000/users/
+    name: showUserDetails
+    meta:
+      id: req_3c94f8b677e941509c6eb19ad0e836ff
+      created: 1760378418692
+      modified: 1762726510908
+      isPrivate: false
+      description: ""
+      sortKey: -1757465963440.25
+    method: GET
+    headers:
+      - name: User-Agent
+        value: insomnia/11.5.0
+      - name: Authorization
+        value: bearer {{ accessToken }}
+        description: ""
+        disabled: false
+    settings:
+      renderRequestBody: true
+      encodeUrl: true
+      followRedirects: global
+      cookies:
+        send: true
+        store: true
+      rebuildPath: true
+  - url: localhost:3000/customers?razaoSocial=anexo
+    name: ListCustomers
+    meta:
+      id: req_a4d7e72046b047a39e8737d238d86f5b
+      created: 1761682360021
+      modified: 1763843431202
+      isPrivate: false
+      description: ""
+      sortKey: -1757465963415.25
+    method: GET
+    body:
+      mimeType: application/json
+      text: ""
+    headers:
+      - name: Content-Type
+        value: application/json
+      - name: User-Agent
+        value: insomnia/11.5.0
+      - name: Authorization
+        value: Bearer {{ accessToken }}
+        description: ""
+        disabled: false
+      - name: x-tenant-id
+        value: "{{tenantId}}"
+        description: ""
+        disabled: false
+    settings:
+      renderRequestBody: true
+      encodeUrl: true
+      followRedirects: global
+      cookies:
+        send: true
+        store: true
+      rebuildPath: true
+  - url: localhost:3000/customers/
+    name: CreateCustomer
+    meta:
+      id: req_cf31dfedd8bb4bd1ae275f4ab4815a85
+      created: 1761832741907
+      modified: 1763843783148
+      isPrivate: false
+      description: ""
+      sortKey: -1757261642237.5312
+    method: POST
+    body:
+      mimeType: application/json
+      text: |-
+        {
+          "razaoSocial": "Maria da Silva fisico",
+          "nomeFantasia": "Maria da Silva FE",
+          "tipo": "fisica",
+          "cpf": "05235485542",
+        	"cidade": "Porto Alegre",
+        	"uf": "RS",
+          "endereco": "Rua Doutor Barcelos",
+          "num": "120",
+          "comp": "Casa 15",
+          "bairro": "Tristeza",
+          "cep": "91910-251",
+          "telefone1": "(11) 99999-8888",
+          "telefone1Whatsapp": 1,
+          "telefone2": "(11) 2222-3333",
+          "telefone2Whatsapp": 1,
+          "celularWhatsapp": 0,
+          "email": "maria.silva.fis@email.com",
+          "obs": "Cliente novo, veio por indicação."
+        }
+    headers:
+      - name: Content-Type
+        value: application/json
+      - name: User-Agent
+        value: insomnia/11.5.0
+      - name: Authorization
+        value: Bearer {{ accessToken }}
+        description: ""
+        disabled: false
+      - name: x-tenant-id
+        value: "{{tenantId}}"
+        description: ""
+        disabled: false
+    settings:
+      renderRequestBody: true
+      encodeUrl: true
+      followRedirects: global
+      cookies:
+        send: true
+        store: true
+      rebuildPath: true
+  - url: localhost:3000/cep/91910251
+    name: GetAddress
+    meta:
+      id: req_94551bd2400f48438b6aaf7ea4e632bd
+      created: 1762008361015
+      modified: 1763843538920
+      isPrivate: false
+      description: ""
+      sortKey: -1757295695762.9844
+    method: GET
+    headers:
+      - name: User-Agent
+        value: insomnia/11.5.0
+      - name: Authorization
+        value: Bearer {{ accessToken }}
+        description: ""
+        disabled: false
+      - name: x-tenant-id
+        value: "{{tenantId}}"
+        description: ""
+        disabled: false
+    settings:
+      renderRequestBody: true
+      encodeUrl: true
+      followRedirects: global
+      cookies:
+        send: true
+        store: true
+      rebuildPath: true
+  - url: localhost:3000/customers/115
+    name: UpdateCustomer
+    meta:
+      id: req_50c0b94b55b24bc1a1b9b85e3cdbe22f
+      created: 1762117290726
+      modified: 1763843886289
+      isPrivate: false
+      description: ""
+      sortKey: -1757227588712.0781
+    method: PUT
+    body:
+      mimeType: application/json
+      text: |-
+        {
+        	"cpf": "05235485532"
+        }
+    headers:
+      - name: Content-Type
+        value: application/json
+      - name: User-Agent
+        value: insomnia/11.5.0
+      - name: Authorization
+        value: Bearer {{ accessToken }}
+        description: ""
+        disabled: false
+      - name: x-tenant-id
+        value: "{{tenantId}}"
+        description: ""
+        disabled: false
+    settings:
+      renderRequestBody: true
+      encodeUrl: true
+      followRedirects: global
+      cookies:
+        send: true
+        store: true
+      rebuildPath: true
+  - url: localhost:3000/services?description=lim
+    name: GetServicesByDescription
+    meta:
+      id: req_38f8b5490a7740ad8f51a863803ff30a
+      created: 1762478799138
+      modified: 1763844083441
+      isPrivate: false
+      description: ""
+      sortKey: -1757227588612.0781
+    method: GET
+    headers:
+      - name: User-Agent
+        value: insomnia/11.5.0
+      - name: Authorization
+        value: Bearer {{ accessToken }}
+        description: ""
+        disabled: false
+      - name: x-tenant-id
+        value: "{{tenantId}}"
+        description: ""
+        disabled: false
+    settings:
+      renderRequestBody: true
+      encodeUrl: true
+      followRedirects: global
+      cookies:
+        send: true
+        store: true
+      rebuildPath: true
+  - url: localhost:3000/services?reference=ssndb
+    name: GetServicesByReference
+    meta:
+      id: req_5ac432eec26848dbabe9d33a6ea49874
+      created: 1762479412865
+      modified: 1763844104426
+      isPrivate: false
+      description: ""
+      sortKey: -1757074347797.539
+    method: GET
+    headers:
+      - name: User-Agent
+        value: insomnia/11.5.0
+      - name: Authorization
+        value: Bearer {{ accessToken }}
+        description: ""
+        disabled: false
+      - name: x-tenant-id
+        value: "{{tenantId}}"
+        description: ""
+        disabled: false
+    settings:
+      renderRequestBody: true
+      encodeUrl: true
+      followRedirects: global
+      cookies:
+        send: true
+        store: true
+      rebuildPath: true
+  - url: localhost:3000/services?name=lubrificação
+    name: GetServicesByName
+    meta:
+      id: req_718003e8a0df4fa48e4609fb6fcce53b
+      created: 1762480211404
+      modified: 1763844124249
+      isPrivate: false
+      description: ""
+      sortKey: -1756997727390.2695
+    method: GET
+    headers:
+      - name: User-Agent
+        value: insomnia/11.5.0
+      - name: Authorization
+        value: Bearer {{ accessToken }}
+        description: ""
+        disabled: false
+      - name: x-tenant-id
+        value: "{{tenantId}}"
+        description: ""
+        disabled: false
+    settings:
+      renderRequestBody: true
+      encodeUrl: true
+      followRedirects: global
+      cookies:
+        send: true
+        store: true
+      rebuildPath: true
+  - url: localhost:3000/services?serviceId=1
+    name: GetServicesByPrimaryKey
+    meta:
+      id: req_53740a3bf12248e7b1d0db1143b0a948
+      created: 1762480247780
+      modified: 1763844141834
+      isPrivate: false
+      description: ""
+      sortKey: -1756959417186.6348
+    method: GET
+    headers:
+      - name: User-Agent
+        value: insomnia/11.5.0
+      - name: Authorization
+        value: Bearer {{ accessToken }}
+        description: ""
+        disabled: false
+      - name: x-tenant-id
+        value: "{{tenantId}}"
+        description: ""
+        disabled: false
+    settings:
+      renderRequestBody: true
+      encodeUrl: true
+      followRedirects: global
+      cookies:
+        send: true
+        store: true
+      rebuildPath: true
+  - url: localhost:3000/services/3
+    name: GetServicesDetails
+    meta:
+      id: req_5a3f460786d1497da0f5f79460c612f0
+      created: 1762480985102
+      modified: 1763844162357
+      isPrivate: false
+      description: ""
+      sortKey: -1756940262084.8174
+    method: GET
+    headers:
+      - name: User-Agent
+        value: insomnia/11.5.0
+      - name: Authorization
+        value: Bearer {{ accessToken }}
+        description: ""
+        disabled: false
+      - name: x-tenant-id
+        value: "{{tenantId}}"
+        description: ""
+        disabled: false
+    settings:
+      renderRequestBody: true
+      encodeUrl: true
+      followRedirects: global
+      cookies:
+        send: true
+        store: true
+      rebuildPath: true
+  - url: localhost:3000/equipments/
+    name: GetAllEquipments
+    meta:
+      id: req_9888a34baf2444ce840f15c9f21de802
+      created: 1762712380278
+      modified: 1763844981056
+      isPrivate: false
+      description: ""
+      sortKey: -1756940261984.8174
+    method: GET
+    headers:
+      - name: User-Agent
+        value: insomnia/11.5.0
+      - name: Authorization
+        value: Bearer {{ accessToken }}
+        description: ""
+        disabled: false
+      - name: x-tenant-id
+        value: "{{tenantId}}"
+        description: ""
+        disabled: false
+    settings:
+      renderRequestBody: true
+      encodeUrl: true
+      followRedirects: global
+      cookies:
+        send: true
+        store: true
+      rebuildPath: true
+  - url: localhost:3000/equipments/56124
+    name: GetEquipmentById
+    meta:
+      id: req_0fed25af53204dcab754b170d97632e4
+      created: 1762726611490
+      modified: 1763847019359
+      isPrivate: false
+      description: ""
+      sortKey: -1756930684483.9087
+    method: GET
+    headers:
+      - name: User-Agent
+        value: insomnia/11.5.0
+      - name: Authorization
+        value: Bearer {{ accessToken }}
+        description: ""
+        disabled: false
+      - name: x-tenant-id
+        value: "{{tenantId}}"
+        description: ""
+        disabled: false
+    settings:
+      renderRequestBody: true
+      encodeUrl: true
+      followRedirects: global
+      cookies:
+        send: true
+        store: true
+      rebuildPath: true
+  - url: localhost:3000/equipments/
+    name: CreateEquipment
+    meta:
+      id: req_a8c334d7e104479cbef490208c17cf9c
+      created: 1762728468377
+      modified: 1763846246913
+      isPrivate: false
+      description: ""
+      sortKey: -1756925895733.4543
+    method: POST
+    body:
+      mimeType: application/json
+      text: |-
+        {
+          "idCliente": 34,
+          "nomeEquipamento": "Impressora usada",
+          "fabricante": "EPSON",
+        	"marca": "EPSON",
+          "modelo": "HP2892FSW2",
+          "numeroSerie": "3547897545678579",
+          "localInstalacao": "",
+          "codigoInterno": "527789",
+          "numeroPatrimonio": "445678554",
+          "descricao": "Impressora wireless com cartuchos estourados"
+        }
+    headers:
+      - name: Content-Type
+        value: application/json
+      - name: User-Agent
+        value: insomnia/11.5.0
+      - name: Authorization
+        value: Bearer {{ accessToken }}
+        description: ""
+        disabled: false
+      - name: x-tenant-id
+        value: "{{tenantId}}"
+        description: ""
+        disabled: false
+    settings:
+      renderRequestBody: true
+      encodeUrl: true
+      followRedirects: global
+      cookies:
+        send: true
+        store: true
+      rebuildPath: true
+  - url: localhost:3000/equipments/customer/34
+    name: GetEquipmentByCustomer
+    meta:
+      id: req_35d5bcbe1d6543f980f95180dcf0d28f
+      created: 1762729183202
+      modified: 1763846136991
+      isPrivate: false
+      description: ""
+      sortKey: -1756928290108.6816
+    method: GET
+    headers:
+      - name: User-Agent
+        value: insomnia/11.5.0
+      - name: Authorization
+        value: Bearer {{ accessToken }}
+        description: ""
+        disabled: false
+      - name: x-tenant-id
+        value: "{{tenantId}}"
+        description: ""
+        disabled: false
+    settings:
+      renderRequestBody: true
+      encodeUrl: true
+      followRedirects: global
+      cookies:
+        send: true
+        store: true
+      rebuildPath: true
+  - url: localhost:3000/equipments/56124
+    name: UpdateEquipment
+    meta:
+      id: req_afd2d53c40a84a1fb7fc7d7c0dac126a
+      created: 1762729434814
+      modified: 1763847267648
+      isPrivate: false
+      description: ""
+      sortKey: -1756927092921.0679
+    method: PUT
+    body:
+      mimeType: application/json
+      text: |-
+        {
+        	"nomeEquipamento": "Impressora usada",
+        	"marca": "HP",
+        	"modelo": "HP2892FSG2",
+        	"fabricante": "HP"
+        }
+    headers:
+      - name: Content-Type
+        value: application/json
+      - name: User-Agent
+        value: insomnia/11.5.0
+      - name: Authorization
+        value: Bearer {{ accessToken }}
+        description: ""
+        disabled: false
+      - name: x-tenant-id
+        value: "{{tenantId}}"
+        description: ""
+        disabled: false
+    settings:
+      renderRequestBody: true
+      encodeUrl: true
+      followRedirects: global
+      cookies:
+        send: true
+        store: true
+      rebuildPath: true
+  - url: localhost:3000/equipments/936
+    name: DeleteEquipment
+    meta:
+      id: req_10a9887a7f1b4c0c8070020b02a62a2a
+      created: 1762729800165
+      modified: 1763084224322
+      isPrivate: false
+      description: ""
+      sortKey: -1756925895633.4543
+    method: DELETE
+    headers:
+      - name: User-Agent
+        value: insomnia/11.5.0
+      - name: Authorization
+        value: Bearer {{ accessToken }}
+        description: ""
+        disabled: false
+    settings:
+      renderRequestBody: true
+      encodeUrl: true
+      followRedirects: global
+      cookies:
+        send: true
+        store: true
+      rebuildPath: true
+  - url: localhost:3000/products?barcode=0
+    name: GetProductsByBarcode
+    meta:
+      id: req_8b13a0b88d774c3180ed4bcdaf06959b
+      created: 1763500844587
+      modified: 1763844869712
+      isPrivate: false
+      description: ""
+      sortKey: -1756940262034.8174
+    method: GET
+    headers:
+      - name: User-Agent
+        value: insomnia/11.5.0
+      - name: Authorization
+        value: Bearer {{ accessToken }}
+        description: ""
+        disabled: false
+      - name: x-tenant-id
+        value: "{{tenantId}}"
+        description: ""
+        disabled: false
+    settings:
+      renderRequestBody: true
+      encodeUrl: true
+      followRedirects: global
+      cookies:
+        send: true
+        store: true
+      rebuildPath: true
+  - url: localhost:3000/products?name=teclado
+    name: GetProductsByName
+    meta:
+      id: req_9eddaeabe8b64a8ca67ab2fe26cc7e74
+      created: 1763500997449
+      modified: 1763844916197
+      isPrivate: false
+      description: ""
+      sortKey: -1756940262009.8174
+    method: GET
+    headers:
+      - name: User-Agent
+        value: insomnia/11.5.0
+      - name: Authorization
+        value: Bearer {{ accessToken }}
+        description: ""
+        disabled: false
+      - name: x-tenant-id
+        value: "{{tenantId}}"
+        description: ""
+        disabled: false
+    settings:
+      renderRequestBody: true
+      encodeUrl: true
+      followRedirects: global
+      cookies:
+        send: true
+        store: true
+      rebuildPath: true
+  - url: localhost:3000/products?reference=FFCA
+    name: GetProductsByReference
+    meta:
+      id: req_bde84a1acddb468e88c6963fbe496a49
+      created: 1763501052640
+      modified: 1763844928066
+      isPrivate: false
+      description: ""
+      sortKey: -1756940261997.3174
+    method: GET
+    headers:
+      - name: User-Agent
+        value: insomnia/11.5.0
+      - name: Authorization
+        value: Bearer {{ accessToken }}
+        description: ""
+        disabled: false
+      - name: x-tenant-id
+        value: "{{tenantId}}"
+        description: ""
+        disabled: false
+    settings:
+      renderRequestBody: true
+      encodeUrl: true
+      followRedirects: global
+      cookies:
+        send: true
+        store: true
+      rebuildPath: true
+  - url: localhost:3000/products?productId=15
+    name: GetProductsByPrimaryKey
+    meta:
+      id: req_9d5dafcf6d654bae81e888ab6895f270
+      created: 1763501088634
+      modified: 1763844947089
+      isPrivate: false
+      description: ""
+      sortKey: -1756940261991.0674
+    method: GET
+    headers:
+      - name: User-Agent
+        value: insomnia/11.5.0
+      - name: Authorization
+        value: Bearer {{ accessToken }}
+        description: ""
+        disabled: false
+      - name: x-tenant-id
+        value: "{{tenantId}}"
+        description: ""
+        disabled: false
+    settings:
+      renderRequestBody: true
+      encodeUrl: true
+      followRedirects: global
+      cookies:
+        send: true
+        store: true
+      rebuildPath: true
+  - url: localhost:3000/products/3
+    name: getProductDetails
+    meta:
+      id: req_04c82208e4a343d9a388122e9a824df8
+      created: 1763501219604
+      modified: 1763844963481
+      isPrivate: false
+      description: ""
+      sortKey: -1756940261987.9424
+    method: GET
+    headers:
+      - name: User-Agent
+        value: insomnia/11.5.0
+      - name: Authorization
+        value: Bearer {{ accessToken }}
+        description: ""
+        disabled: false
+      - name: x-tenant-id
+        value: "{{tenantId}}"
+        description: ""
+        disabled: false
+    settings:
+      renderRequestBody: true
+      encodeUrl: true
+      followRedirects: global
+      cookies:
+        send: true
+        store: true
+      rebuildPath: true
+cookieJar:
+  name: Default Jar
+  meta:
+    id: jar_4f4c855ba7b50045ab7f117986b8d2a12cc3727c
+    created: 1759100532768
+    modified: 1764022464942
+environments:
+  name: Base Environment
+  meta:
+    id: env_4f4c855ba7b50045ab7f117986b8d2a12cc3727c
+    created: 1759100532766
+    modified: 1764022464945
+    isPrivate: false
+  data:
+    accessToken: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJsb2dpbiI6ImdhYmkiLCJpYXQiOjE3NjQwMjI0NjQsImV4cCI6MTc2NDAyNjA2NH0.gCHERC83losuxzbCcP3suPCeI4T79H0Q8VA3xXR3tnU
+    refreshToken: 67f4efc551025c6c0033026ec542251883dfab0e9688a170952560aab271b3daf48643e4287648d4
+    tenantId: 52IJF07
