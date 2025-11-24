@@ -23,40 +23,59 @@ O projeto está organizado em camadas, seguindo boas práticas de separação de
 - **node-firebird** → conecta ao banco Firebird.
 - **redis** → armazena refresh tokens e sessões de login de forma rápida e escalável.
 
-### :books: Estrutura do projeto
-
-
-
 ### :memo: Configuração do .env 
 
 <pre>
-FB_HOST=localhost
-FB_PORT=3050 
-FB_DATABASE=C:/firebird/data/app_users.fdb 
-FB_USER=seu_usuario 
-FB_PASSWORD=sua_senha 
-JWT_SECRET=supersegredo 
-REDIS_URL=redis://localhost:6379
+PORT=3000
+DATABASE_URL=
+REDIS_URL=
+
+JWT_SECRET=
+
+FB_DB_52IJF07_HOST
+FB_DB_52IJF07_PORT=
+FB_DB_52IJF07_DATABASE=
+FB_DB_52IJF07_USER=
+FB_DB_52IJF07_PASSWORD=
 </pre>
 
-### :bulb: Como rodar o projeto 
+### :bulb: Como rodar a aplicação em docker:
 
+1. Instale o docker para desktop.
+2. Abra um terminal PowerShell.  
+**Primeiro, remova tudo da sua aplicação para evitar conflitos:**
 
-1. Instale o docker para desktop
-2. Abra o docker
-3. Instale as dependências:
- 
- <pre>npm install</pre>
+<pre>Remove-Item -Recurse -Force .\node_modules    
+Remove-Item -Recurse -Force .\prisma\migrations </pre>
 
-3. Configure o arquivo .env com as credenciais do Firebird e do Redis.
+3. Abra o docker
+4. Em seguida, suba o container:
+<pre>docker compose up --build</pre>
 
-4. Inicie o Redis via docker
+5. Quando a aplicação subir, rode:
 
-<pre>docker run --name redis -p 6379:6379 -d redis</pre>
+<pre>docker exec -it node_app npx prisma migrate dev --init</pre>
 
-5. Rode o servidor
+6. Em outro terminal, rode:
 
-<pre>npm run dev</pre>
+<pre>docker exec -it node_app npx prisma studio</pre>
+
+7. Logo em seguida, acesse pelo browser:
+http://localhost:5555  
+
+8. Acesse a tabela tenants e crie um registro com os seguintes dados:
+<pre>id: 52IJF07
+dbtype: firebird
+dbEnvkey: FB_DB_52IJF07</pre>
+Clique em salvar.
+
+9. Acesse a tabela empresa e crie um registro com os seguintes dados:
+<pre>id: anexo00521
+nome: Anexo Tecnologia
+tenantId: 52IJF07</pre>
+Clique em salvar.
+
+Agora a aplicação vai estar funcionando corretamente. Note que por enquanto só existem clients para banco FIREBIRD, mas podem ser criados clientes para mySQL, Postgres e etc somente alterando DBClientFactory e adicionando os clients na pasta repositories, assim como ja existem os clients FireBird.
 
 ### 🧪  Teste rápido de autenticação no insomnia
 
@@ -68,7 +87,8 @@ REDIS_URL=redis://localhost:6379
  
 {
 	"login": "gabi",
-	"password": "Teste"
+	"password": "Teste",
+	"empresaId": "Anexo00521"
 }
 </pre>
 
@@ -82,7 +102,8 @@ REDIS_URL=redis://localhost:6379
 		"login": "gabi"
 	},
 	"token": "<jwt>",
-	"refreshToken": "<refresh_token>"
+	"refreshToken": "<refresh_token>",
+	"tenantId": "<tenantId>"
 }
 </pre>
 
