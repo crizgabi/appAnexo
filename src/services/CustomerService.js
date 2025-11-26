@@ -100,7 +100,7 @@ export const CustomerService = {
     if (!user) throw new Error("Usuário não encontrado");
 
     // tipo F/J
-    const tipo = customerData.tipo === "fisica"
+    const tipo = customerData.tipo === 1
       ? CustomerType.FISICA
       : CustomerType.JURIDICA;
 
@@ -168,7 +168,7 @@ export const CustomerService = {
 
     let tipo = existingCustomer.TIPOFJ;
     if (customerData.tipo) {
-      tipo = customerData.tipo === "fisica"
+      tipo = customerData.tipo === 1
         ? CustomerType.FISICA
         : CustomerType.JURIDICA;
     }
