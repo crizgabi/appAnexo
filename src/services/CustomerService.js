@@ -6,6 +6,32 @@ import { CepService } from "./CepService.js";
 import Customer from "../models/CustomerModel.js"
 
 export const CustomerService = {
+
+  // GET ALL CUSTOMERS (sem filtro)
+  async getAllCustomers(dbEnvKey, dbType) {
+    const customers = await CustomerRepository.getAllCustomers(
+      dbEnvKey,
+      dbType
+    );
+
+    if (!customers) return [];
+
+    return customers.map((c) => {
+      const tipo = Number(c.TIPOFJ) === CustomerType.FISICA
+        ? CustomerType.FISICA
+        : CustomerType.JURIDICA;
+
+      return {
+        pkcodcli: c.PKCODCLI,
+        nome: c.RAZAOSOCIAL,
+        cpf: tipo === CustomerType.FISICA ? c.CNPJCPF : undefined,
+        cnpj: tipo === CustomerType.JURIDICA ? c.CNPJCPF : undefined,
+        telefone1: c.FONE1,
+        telefone2: c.FONE2,
+      };
+    });
+  },
+  
   // GET CUSTOMER LIST (by name)
   async getCustomersByName(razaoSocial, dbEnvKey, dbType) {
     const customers = await CustomerRepository.getCustomersByName(

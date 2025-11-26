@@ -3,6 +3,27 @@ import { CustomerType } from "../models/CustomerModel.js";
 
 export const FireBirdCustomerClient = {
 
+  // LISTAR TODOS OS CLIENTES (SEM FILTRO)
+getAllCustomers: (dbEnvKey) => {
+  return new Promise((resolve, reject) => {
+    getConnection(dbEnvKey, (err, db) => {
+      if (err) return reject(err);
+
+      const query = `
+        SELECT PKCODCLI, RAZAOSOCIAL, TIPOFJ, CNPJCPF, FONE1, FONE2
+        FROM TBCLIENTE
+        ORDER BY RAZAOSOCIAL
+      `;
+
+      db.query(query, [], (qErr, result) => {
+        db.detach();
+        if (qErr) return reject(qErr);
+        resolve(result || []);
+      });
+    });
+  });
+},
+
   // LISTA CLIENTES
   getCustomersByName: (razaoSocial, dbEnvKey) => {
     return new Promise((resolve, reject) => {
