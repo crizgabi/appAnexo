@@ -1,11 +1,7 @@
 import { getConnection } from "../db/fireBird.js";
 import { CustomerType } from "../models/CustomerModel.js";
 
-<<<<<<<< HEAD:src/repositories/CustomerRepository.js
-export const CustomerRepository = {
-========
 export const FireBirdCustomerClient = {
->>>>>>>> feat/multiTenant:src/repositories/FireBirdCustomerClient.js
 
   // LISTA CLIENTES
   getCustomersByName: (razaoSocial, dbEnvKey) => {
@@ -105,7 +101,7 @@ export const FireBirdCustomerClient = {
       `;
 
         const params = [
-          customerData.status ?? 1,
+          customerData.status || 1,
           customerData.razaoSocial || "",
           customerData.nomeFantasia || "",
           customerData.telefone1 || "",

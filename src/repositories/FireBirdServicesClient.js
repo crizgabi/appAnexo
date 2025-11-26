@@ -1,8 +1,5 @@
 import { getConnection } from "../db/fireBird.js";
-<<<<<<<< HEAD:src/repositories/ServicesRepository.js
 import Service from "../models/ServiceModel.js";
-========
->>>>>>>> feat/multiTenant:src/repositories/FireBirdServicesClient.js
 
 export const FirebirdServicesClient = {
     getServicesByDescription: async (description, dbEnvKey) => {
