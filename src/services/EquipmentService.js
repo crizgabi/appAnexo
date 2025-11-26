@@ -2,16 +2,15 @@ import Equipment from "../models/EquipmentModel.js";
 import { EquipmentRepository } from "../repositories/EquipmentRepository.js";
 
 export const EquipmentService = {
-  async create(data) {
-    // Validação básica dos campos obrigatórios
+
+  async create(data, dbEnvKey, dbType) {
     if (!data.idCliente || !data.nomeEquipamento || !data.marca || !data.modelo || !data.numeroSerie) {
       throw new Error("Campos obrigatórios faltando: idCliente, nomeEquipamento, marca, modelo, numeroSerie");
     }
 
     const equip = new Equipment(data);
-    const result = await EquipmentRepository.create(equip);
+    const result = await EquipmentRepository.create(equip, dbEnvKey, dbType);
 
-    // Retorno conforme o schema esperado (sem imagens por enquanto)
     return {
       idEquipamento: result.idEquipamento,
       pkcodcli: equip.idCliente,
@@ -29,15 +28,13 @@ export const EquipmentService = {
     };
   },
 
-  async list() {
-    // Busca os dados crus do repositório
-    const rows = await EquipmentRepository.findAll();
+  async list(dbEnvKey, dbType) {
+    const rows = await EquipmentRepository.findAll(dbEnvKey, dbType);
 
-    // Faz o mapeamento dos campos aqui
     return rows.map(row => ({
       idEquipamento: row.PKEQUIPAMENTO,
       idCliente: row.FKCLIENTE,
-      clienteNome: row.CLIENTE_NOME ?? null,
+      clienteNome: row.CLIENTE_NOME,
       nomeEquipamento: row.EQUIPAMENTO,
       marca: row.MARCA,
       modelo: row.MODELO,
@@ -52,19 +49,20 @@ export const EquipmentService = {
     }));
   },
 
-  async find(id, { expand = [], osLimit = 10, osOffset = 0 } = {}) {
-    const equipamento = await EquipmentRepository.findById(id);
+  async find(id, dbEnvKey, dbType, { expand = [], osLimit = 10, osOffset = 0 } = {}) {
+    const equipamento = await EquipmentRepository.findById(id, dbEnvKey, dbType);
     if (!equipamento) throw new Error("Equipamento não encontrado");
 
-    // Expand opcional (ex: historicoOs)
     let historicoOs = null;
     const expandList = Array.isArray(expand)
       ? expand
       : String(expand).split(",").map(s => s.trim());
 
     if (expandList.includes("historicoOs")) {
-      // Implementar depois com TBOS
-      historicoOs = await EquipmentRepository.findOsByEquipamento(id, { limit: osLimit, offset: osOffset });
+      historicoOs = await EquipmentRepository.findOsByEquipamento(id, dbEnvKey, dbType, {
+        limit: osLimit,
+        offset: osOffset
+      });
     }
 
     const existingEquipment = {
@@ -81,15 +79,16 @@ export const EquipmentService = {
       descricao: equipamento.OBS,
       dataCadastro: equipamento.DATACAD,
       dataAtualizacao: equipamento.DATAATU,
-    }
+    };
 
     return { ...existingEquipment, historicoOs };
   },
 
-  async listByCliente(idCliente) {
+  async listByCustomer(idCliente, dbEnvKey, dbType) {
     if (!idCliente) throw new Error("idCliente é obrigatório");
 
-    const equipamentos = await EquipmentRepository.findByCliente(idCliente);
+    const equipamentos = await EquipmentRepository.findByCustomer(idCliente, dbEnvKey, dbType);
+
     return equipamentos.map(equip => ({
       idEquipamento: equip.PKEQUIPAMENTO,
       idCliente: equip.FKCLIENTE,
@@ -107,8 +106,8 @@ export const EquipmentService = {
     }));
   },
 
-  async update(id, equipmentData) {
-    const existingEquipment = await EquipmentRepository.findById(id);
+  async update(id, equipmentData, dbEnvKey, dbType) {
+    const existingEquipment = await EquipmentRepository.findById(id, dbEnvKey, dbType);
     if (!existingEquipment) throw new Error("Equipamento não encontrado");
 
     const updatedEquipment = {
@@ -123,26 +122,24 @@ export const EquipmentService = {
       numeroPatrimonio: equipmentData.numeroPatrimonio ?? existingEquipment.NUMPATRIMONIO,
       descricao: equipmentData.descricao ?? existingEquipment.OBS,
       now: new Date()
-    }
+    };
 
-    await EquipmentRepository.update(id, updatedEquipment);
+    await EquipmentRepository.update(id, updatedEquipment, dbEnvKey, dbType);
 
-    const updated = await this.find(id);
-    return updated;
+    return await this.find(id, dbEnvKey, dbType);
   },
 
-  async delete(id) {
-    const existing = await EquipmentRepository.findById(id);
+  async delete(id, dbEnvKey, dbType) {
+    const existing = await EquipmentRepository.findById(id, dbEnvKey, dbType);
     if (!existing) throw new Error("Equipamento não encontrado");
 
-    const ok = await EquipmentRepository.delete(id);
+    const ok = await EquipmentRepository.delete(id, dbEnvKey, dbType);
     if (!ok) throw new Error("Erro ao remover equipamento");
 
-    // Retorno conforme o schema de exclusão
     return {
       message: "Equipamento removido com sucesso",
       idEquipamento: Number(id),
-      deletedAt: null // exclusão física
+      deletedAt: null
     };
   }
 };

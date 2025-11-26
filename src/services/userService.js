@@ -6,13 +6,13 @@ import { User } from "../models/UserModel.js"
 import { format } from "date-fns";
 
 export const UserService = {
-  loginUser: async (login, password) => {
-    const user = await UserRepository.findByLogin(login);
+
+  // LOGIN
+  async loginUser({ login, password, dbEnvKey, dbType }) {
+    const user = await UserRepository.findByLogin(login, dbEnvKey, dbType);
     if (!user) return null;
 
-    const isPasswordValid = user.SENHA === password;
-
-    if (!isPasswordValid) return null;
+    if (user.SENHA !== password) return null;
 
     const token = generateToken({ login: user.LOGIN });
 
@@ -21,77 +21,78 @@ export const UserService = {
       await refreshTokenRepository.deleteRefreshToken(existingToken.token);
     }
 
-    const refreshTokenValue = generateRefreshTokenValue();
-    const expiresAt = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000); // 7 dias
+    const refreshValue = generateRefreshTokenValue();
+    const expires = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000);
 
-    await refreshTokenRepository.saveRefreshToken(user.LOGIN, refreshTokenValue, expiresAt);
+    await refreshTokenRepository.saveRefreshToken(user.LOGIN, refreshValue, expires);
 
     return {
       user: { login: user.LOGIN },
       token,
-      refreshToken: refreshTokenValue
+      refreshToken: refreshValue
     };
   },
 
-  updatePassword: async (login, currentPassword, newPassword) => {
-    const user = await UserRepository.findByLogin(login);
+  // UPDATE PASSWORD
+  async updatePassword(login, currentPassword, newPassword, dbEnvKey, dbType) {
+    const user = await UserRepository.findByLogin(login, dbEnvKey, dbType);
     if (!user) return null;
 
-    const isPasswordValid = user.SENHA === currentPassword;
-    if (!isPasswordValid) return null;
+    if (user.SENHA !== currentPassword) return null;
 
-    await UserRepository.updatePassword(login, newPassword);
+    await UserRepository.updatePassword(login, newPassword, dbEnvKey, dbType);
+
     return { login: user.LOGIN };
   },
 
-  refreshToken: async (refreshToken) => {
+  // REFRESH TOKEN
+  async refreshToken(refreshToken) {
     const existing = await refreshTokenRepository.findRefreshToken(refreshToken);
     if (!existing) return null;
 
-    if (new Date(existing.expiresAt) <= new Date()) {
-      await refreshTokenRepository.deleteRefreshToken(refreshToken);
-      return null;
-    }
+    this.validateRefreshToken(refreshToken)
 
     const newToken = generateToken({ login: existing.login });
-    const newRefreshToken = generateRefreshTokenValue();
+    const newRefreshValue = generateRefreshTokenValue();
     const newExpiresAt = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000);
 
     await refreshTokenRepository.deleteRefreshToken(refreshToken);
-    await refreshTokenRepository.saveRefreshToken(existing.login, newRefreshToken, newExpiresAt);
+    await refreshTokenRepository.saveRefreshToken(existing.login, newRefreshValue, newExpiresAt);
 
     return {
       user: { login: existing.login },
       token: newToken,
-      refreshToken: newRefreshToken
+      refreshToken: newRefreshValue
     };
   },
 
-  validateRefreshToken: async (token) => {
-    const row = await refreshTokenRepository.findRefreshToken(token);
+  // validateRefreshToken
+  async validateRefreshToken(refreshToken) {
+    const row = await refreshTokenRepository.findRefreshToken(refreshToken);
     if (!row) return null;
 
     if (new Date(row.expiresAt) <= new Date()) {
-      // token expirado -> limpa
-      await refreshTokenRepository.deleteRefreshToken(token);
+      await refreshTokenRepository.deleteRefreshToken(refreshToken);
       return null;
     }
 
-    return row; // token válido
+    return row;
   },
 
-  showUserDetails: async (login) => {
+  // USER DETAILS
+  async showUserDetails(login, dbEnvKey, dbType) {
     try {
-      const user = await UserRepository.findByLogin(login);
+      const user = await UserRepository.findByLogin(login, dbEnvKey, dbType);
       if (!user) return null;
 
-      const details = await UserRepository.getUserInfo(login);
+      const details = await UserRepository.getUserInfo(login, dbEnvKey, dbType);
+      if (!details) return null;
 
       const dataNascimento = details.DATANASC
         ? format(new Date(details.DATANASC), "dd/MM/yyyy")
         : null;
 
-      const userDetails = new User({
+      return new User({
         id: details.PKTECNICO,
         login: details.LOGIN,
         passwordHash: details.SENHA,
@@ -113,7 +114,6 @@ export const UserService = {
         },
       });
 
-      return userDetails;
     } catch (error) {
       console.error("Erro ao buscar detalhes do usuário:", error);
       throw error;
@@ -121,13 +121,11 @@ export const UserService = {
   },
 };
 
-function generateToken(user) {
-  const JWT_SECRET = process.env.JWT_SECRET;
-  const payload = { login: user.login };
-  return jwt.sign(payload, JWT_SECRET, { expiresIn: "1h" });
-};
+// Helpers
+function generateToken({ login }) {
+  return jwt.sign({ login }, process.env.JWT_SECRET, { expiresIn: "1h" });
+}
 
 function generateRefreshTokenValue() {
   return randomBytes(40).toString("hex");
-
 }

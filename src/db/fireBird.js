@@ -3,24 +3,27 @@ dotenv.config();
 import firebird from "node-firebird";
 
 
-const options = {
-    host: process.env.FB_HOST,
-    port: process.env.FB_PORT,
-    database: process.env.FB_DATABASE,
-    user: process.env.FB_USER,
-    password: process.env.FB_PASSWORD,
+export function getFirebirdOptions(dbEnvKey) {
+  return {
+    host: process.env[`${dbEnvKey}_HOST`],
+    port: Number(process.env[`${dbEnvKey}_PORT`]),
+    database: process.env[`${dbEnvKey}_DATABASE`],
+    user: process.env[`${dbEnvKey}_USER`],
+    password: process.env[`${dbEnvKey}_PASSWORD`],
     lowercase_keys: false,
     role: null,
     pageSize: 4096,
-};
+  };
+}
 
-export function getConnection(callback) {
+export function getConnection(dbEnvKey, callback) {
+  const options = getFirebirdOptions(dbEnvKey);
+
   firebird.attach(options, (err, db) => {
     if (err) {
-      console.error("Erro ao conectar:", err);
-      callback(err, null);
-    } else {
-      callback(null, db);
+      console.error("Erro ao conectar Firebird:", err);
+      return callback(err, null);
     }
+    callback(null, db);
   });
 }
