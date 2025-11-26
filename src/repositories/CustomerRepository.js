@@ -12,6 +12,16 @@ export const CustomerRepository = {
     return client.getCustomersByName(razaoSocial, dbEnvKey);
   },
 
+  // LISTA TODOS OS CLIENTES (SEM FILTRO)
+  async getAllCustomers(dbEnvKey, dbType) {
+    const client = DBClientFactory.getClient({
+      dbType,
+      module: "customer"
+    });
+
+    return client.getAllCustomers(dbEnvKey);
+  },
+
   // BUSCA POR PRIMARY KEY
   async getCustomerByPrimaryKey(primaryKey, dbEnvKey, dbType) {
     const client = DBClientFactory.getClient({
@@ -24,12 +34,13 @@ export const CustomerRepository = {
 
   // CRIAR CLIENTE
   async createCustomer(customerData, dbEnvKey, dbType) {
-  const client = DBClientFactory.getClient({ 
-    dbType, 
-    module: "customer" 
-  });
-  return client.createCustomer(customerData, dbEnvKey);
-},
+    const client = DBClientFactory.getClient({ 
+      dbType, 
+      module: "customer" 
+    });
+
+    return client.createCustomer(customerData, dbEnvKey);
+  },
 
   // UPDATE CLIENTE
   async updateCustomer(pkcodcli, customerData, dbEnvKey, dbType) {

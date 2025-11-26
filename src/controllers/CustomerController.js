@@ -33,12 +33,9 @@ export const getCustomer = async (req, res) => {
   }
 };
 
- // GET /customers/search?razaoSocial=...
+ // GET /customers/search?razaoSocial= (com mudanças para retornar mesmo vazio)
 export const getCustomersByName = async (req, res) => {
   const { razaoSocial } = req.query;
-
-  if (!razaoSocial)
-    return res.status(400).json({ error: "razão social é obrigatória" });
 
   try {
     const tenantId = req.headers["x-tenant-id"];
@@ -49,17 +46,49 @@ export const getCustomersByName = async (req, res) => {
     if (!tenant)
       return res.status(404).json({ error: "Tenant inválido" });
 
-    const customers = await CustomerService.getCustomersByName(
-      razaoSocial,
+    let customers = [];
+
+    if (!razaoSocial || razaoSocial.trim() === "") {
+      customers = await CustomerService.getAllCustomers(
+        tenant.dbEnvKey,
+        tenant.dbType
+      );
+    } else {
+      customers = await CustomerService.getCustomersByName(
+        razaoSocial,
+        tenant.dbEnvKey,
+        tenant.dbType
+      );
+    }
+
+    return res.json({ customers });
+
+  } catch (error) {
+    console.error("Erro no getCustomersByName:", error);
+    return res.status(500).json({ error: "Erro interno ao listar clientes" });
+  }
+};
+
+// GET /customers
+export const getAllCustomers = async (req, res) => {
+  try {
+    const tenantId = req.headers["x-tenant-id"];
+    if (!tenantId)
+      return res.status(400).json({ error: "x-tenant-id header obrigatório" });
+
+    const tenant = await prisma.tenant.findUnique({ where: { id: tenantId } });
+    if (!tenant)
+      return res.status(404).json({ error: "Tenant inválido" });
+
+    const customers = await CustomerService.getAllCustomers(
       tenant.dbEnvKey,
       tenant.dbType
     );
 
-    return res.json({
-      customers
-    });
+    return res.json({ customers });
+
   } catch (error) {
-    console.error("Erro no getCustomersByName:", error);
+    console.error("Erro no getAllCustomers:", error);
     return res.status(500).json({ error: "Erro interno ao listar clientes" });
   }
 };
