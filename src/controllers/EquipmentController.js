@@ -166,7 +166,7 @@ export const EquipmentController = {
       if (!tenant)
         return res.status(404).json({ error: "Tenant inválido" });
 
-      const resultado = await EquipmentService.deleteEquipment(
+      const resultado = await EquipmentService.delete(
         id,
         tenant.dbEnvKey,
         tenant.dbType
