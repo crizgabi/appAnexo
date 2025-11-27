@@ -40,7 +40,7 @@ export const Login: React.FC<LoginProps> = ({ onLogin }) => {
   return (
     <div className="min-h-screen bg-[#f8fafc] flex items-center justify-center p-4">
       <div className="bg-white rounded-lg shadow-xl w-full max-w-md overflow-hidden border border-gray-100 animate-fade-in">
-        <div className="bg-[#00314c] p-8 text-center flex flex-col items-center justify-center min-h-[200px]">
+        <div className="bg-[#2596be] p-8 text-center flex flex-col items-center justify-center min-h-[200px]">
           
           {/* Área da Logo */}
           <div className="w-full flex justify-center mb-2">
@@ -60,7 +60,6 @@ export const Login: React.FC<LoginProps> = ({ onLogin }) => {
             )}
           </div>
 
-          <p className="text-[#2596be] mt-2 text-sm font-medium uppercase tracking-wider">Gerenciador Multi-Tenant</p>
         </div>
         
         <form onSubmit={handleSubmit} className="p-8 space-y-6">
