@@ -1,0 +1,5 @@
+{
+  "name": "Gerenciador Multi-Tenant",
+  "description": "Interface administrativa para configuração de tenants e empresas com suporte a múltiplos bancos de dados.",
+  "requestFramePermissions": []
+}
