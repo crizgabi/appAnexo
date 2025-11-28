@@ -121,7 +121,7 @@ export const UserService = {
   },
 };
 
-// Helpers
+// HELPERS
 function generateToken({ login }) {
   return jwt.sign({ login }, process.env.JWT_SECRET, { expiresIn: "1h" });
 }
