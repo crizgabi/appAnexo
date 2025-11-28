@@ -1,6 +1,6 @@
 import { getConnection } from "../db/fireBird.js";
 
-export const FirebirdUserClient = {
+export const FireBirdUserClient = {
 
   findUserByLogin(login, dbEnvKey) {
     return new Promise((resolve, reject) => {

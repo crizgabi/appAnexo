@@ -1,7 +1,7 @@
 import { getConnection } from "../db/fireBird.js";
 import Service from "../models/ServiceModel.js";
 
-export const FirebirdServicesClient = {
+export const FireBirdServicesClient = {
     getServicesByDescription: async (description, dbEnvKey) => {
         return new Promise((resolve, reject) => {
             getConnection(dbEnvKey, (err, db) => {
