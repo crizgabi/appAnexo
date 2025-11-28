@@ -2,15 +2,15 @@
   "name": "appanexo",
   "version": "1.0.0",
   "description": "",
-  "main": "index.js",
   "type": "module",
+
   "scripts": {
     "start": "node src/server.js",
-    "dev": "nodemon src/server.js"
+    "dev": "nodemon src/server.js",
+
+    "postinstall": "prisma generate && prisma migrate deploy && prisma db seed"
   },
-  "keywords": [],
-  "author": "",
-  "license": "ISC",
+
   "dependencies": {
     "@prisma/client": "^6.19.0",
     "axios": "^1.13.1",
@@ -28,18 +28,10 @@
     "node-firebird": "^1.1.9",
     "nodemailer": "^7.0.6",
     "redis": "^5.8.3",
-    "save-dev": "^0.0.1-security",
     "sequelize": "^6.37.7",
     "uuid": "^13.0.0"
   },
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/crizgabi/appAnexo.git"
-  },
-  "bugs": {
-    "url": "https://github.com/crizgabi/appAnexo/issues"
-  },
-  "homepage": "https://github.com/crizgabi/appAnexo#readme",
+
   "devDependencies": {
     "nodemon": "^3.1.10",
     "prisma": "^6.19.0"
