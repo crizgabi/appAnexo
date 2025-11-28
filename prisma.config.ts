@@ -1,3 +1,4 @@
+//prisma configs
 import 'dotenv/config';
 
 export default {
