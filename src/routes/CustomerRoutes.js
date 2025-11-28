@@ -1,12 +1,12 @@
 import express from "express";
 import * as CustomerController from "../controllers/CustomerController.js";
-import authMiddleware from "../middlewares/authMiddleware.js"
+import AuthMiddleware from "../middlewares/AuthMiddleware.js"
 
 const router = express.Router();
 
-router.get("/:id", authMiddleware, CustomerController.getCustomer);
-router.get("", authMiddleware, CustomerController.getCustomersByName)
-router.post("/", authMiddleware, CustomerController.createCustomer)
-router.put("/:id", authMiddleware, CustomerController.updateCustomer)
+router.get("/:id", AuthMiddleware, CustomerController.getCustomer);
+router.get("", AuthMiddleware, CustomerController.getCustomersByName)
+router.post("/", AuthMiddleware, CustomerController.createCustomer)
+router.put("/:id", AuthMiddleware, CustomerController.updateCustomer)
 
 export default router;
