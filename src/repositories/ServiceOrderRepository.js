@@ -1,0 +1,43 @@
+import { DBClientFactory } from "../middlewares/DBClientFactory.js";
+
+export const ServiceOrderRepository = {
+    create: async (os, dbEnvKey, dbType) => {
+        const client = DBClientFactory.getClient({
+            dbType,
+            module: "serviceOrder"
+        });
+        return client.create(os, dbEnvKey);
+    },
+
+    getAll: async (dbEnvKey, dbType) => {
+        const client = DBClientFactory.getClient({
+            dbType,
+            module: "serviceOrder"
+        });
+        return client.getAll(dbEnvKey);
+    },
+
+    getById: async (id, dbEnvKey, dbType) => {
+        const client = DBClientFactory.getClient({
+            dbType,
+            module: "serviceOrder"
+        });
+        return client.getById(id, dbEnvKey);
+    },
+
+    update: async (id, data, dbEnvKey, dbType) => {
+        const client = DBClientFactory.getClient({
+            dbType,
+            module: "serviceOrder"
+        });
+        return client.update(id, data, dbEnvKey);
+    },
+
+    delete: async (id, dbEnvKey, dbType) => {
+        const client = DBClientFactory.getClient({
+            dbType,
+            module: "serviceOrder"
+        });
+        return client.delete(id, dbEnvKey);
+    }
+};
