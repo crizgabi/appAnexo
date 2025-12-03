@@ -13,19 +13,39 @@ export const getServices = async (req, res) => {
     if (!tenant)
       return res.status(404).json({ error: "Tenant inválido" });
 
+    let services = [];
+    
     try {
-      let services = [];
 
-      if (description) {
-        services = await ServicesService.getServicesByDescription(description, tenant.dbEnvKey, tenant.dbType);
+      if (!description && !reference && !name && !serviceId) {
+        services = await ServicesService.getAllServices(
+          tenant.dbEnvKey,
+          tenant.dbType
+        );
+      } else if (description) {
+        services = await ServicesService.getServicesByDescription(
+          description,
+          tenant.dbEnvKey,
+          tenant.dbType
+        );
       } else if (reference) {
-        services = await ServicesService.getServicesByReference(reference, tenant.dbEnvKey, tenant.dbType);
+        services = await ServicesService.getServicesByReference(
+          reference,
+          tenant.dbEnvKey,
+          tenant.dbType
+        );
       } else if (name) {
-        services = await ServicesService.getServicesByName(name, tenant.dbEnvKey, tenant.dbType);
+        services = await ServicesService.getServicesByName(
+          name,
+          tenant.dbEnvKey,
+          tenant.dbType
+        );
       } else if (serviceId) {
-        services = await ServicesService.getServicesByPrimaryKey(serviceId, tenant.dbEnvKey, tenant.dbType);
-      } else {
-        return res.status(400).json({ error: "Informe 'descricao', 'referencia', 'nome' ou 'id' na query." });
+        services = await ServicesService.getServicesByPrimaryKey(
+          serviceId,
+          tenant.dbEnvKey,
+          tenant.dbType
+        );
       }
 
       if (!services || services.length === 0) {
@@ -36,8 +56,9 @@ export const getServices = async (req, res) => {
 
     } catch (error) {
       console.error("Erro ao buscar serviços:", error);
-      res.status(500).json({ error: "Erro interno ao buscar serviços." });
+      return res.status(500).json({ error: "Erro interno ao buscar serviços." });
     }
+
   } catch (error) {
     console.error("Erro no getServices:", error);
     return res.status(500).json({ error: "Erro interno ao listar serviços" });

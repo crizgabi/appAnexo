@@ -142,4 +142,27 @@ export const ProductService = {
             throw error;
         }
     },
+
+    getAllProducts: async (dbEnvKey, dbType) => {
+        try {
+            const products = await ProductRepository.getAllProducts(dbEnvKey, dbType);
+
+            if (!products) {
+                return [];
+            }
+
+            return products.map((p) => {
+                return {
+                    pkcodprod: p.PKCODPROD,
+                    nome: p.NOME,
+                    referencia: p.REFERENCIA,
+                    codbarras: p.CODBARRAS,
+                    valorvenda: p.VALORVENDA,
+                };
+            });
+        } catch (error) {
+            console.error("Error listing products:", error);
+            throw error;
+        }
+    },
 };

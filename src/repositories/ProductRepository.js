@@ -45,4 +45,13 @@ export const ProductRepository = {
 
         return client.getProductDetails(productId, dbEnvKey);
     },
+
+    getAllProducts: async (dbEnvKey, dbType) => {
+        const client = DBClientFactory.getClient({
+            dbType,
+            module: "product"
+        });
+
+        return client.getAllProducts(dbEnvKey);
+    },
 };
