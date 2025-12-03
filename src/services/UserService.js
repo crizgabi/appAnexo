@@ -56,8 +56,8 @@ export const UserService = {
     const newRefreshValue = generateRefreshTokenValue();
     const newExpiresAt = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000);
 
-    await refreshTokenRepository.deleteRefreshToken(refreshToken);
-    await refreshTokenRepository.saveRefreshToken(existing.login, newRefreshValue, newExpiresAt);
+    await RefreshTokenRepository.deleteRefreshToken(refreshToken);
+    await RefreshTokenRepository.saveRefreshToken(existing.login, newRefreshValue, newExpiresAt);
 
     return {
       user: { login: existing.login },
