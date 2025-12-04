@@ -87,6 +87,7 @@ export const FireBirdServiceOrderClient = {
         db.query(query, [], (qErr, result) => {
           db.detach();
           if (qErr) return reject(qErr);
+          console.log("DEBUG FIREBIRD -> PRIMEIRA LINHA:", result[0]);
           resolve(result || []);
         });
       });

@@ -49,7 +49,7 @@ export const ServiceOrderService = {
         const rows = await ServiceOrderRepository.getAll(dbEnvKey, dbType);
 
         return (rows || []).map(r => ({
-            idConserto: r.IDCONSERT0 ?? r.idConserto ?? r.PKCONSERTO ?? null,
+            idConserto: r.IDCONSERTO ?? r.PKCONSERTO ?? null,
             numeroOS: r.NUMEROOS ?? r.numeroOS ?? null,
             idCliente: r.IDCLIENTE ?? r.idCliente ?? null,
             nomeCliente: r.NOMECLIENTE ?? r.nomeCliente ?? r.NOMECLIENTE ?? null,
@@ -77,9 +77,9 @@ export const ServiceOrderService = {
         return {
             idConserto: os.idConserto ?? os.IDCONSERTO ?? os.PKCONSERTO ?? null,
             numeroOS: os.numeroOS ?? os.NUMEROOS ?? null,
-            idCliente: os.idCliente ?? os.FKCLIENTE ?? null,
+            idCliente: os.idCliente ?? os.IDCLIENTE ?? null,
             nomeCliente: os.nomeCliente ?? os.NOMECLIENTE ?? null,
-            idEquipamento: os.idEquipamento ?? os.FKEQUIPAMENTO ?? null,
+            idEquipamento: os.idEquipamento ?? os.IDEQUIPAMENTO ?? null,
             nomeEquipamento: os.nomeEquipamento ?? os.NOMEEQUIPAMENTO ?? null,
             defeitoReclamado: os.defeitoReclamado ?? os.DEFEITORECLAMADO ?? null,
             idStatus: os.idStatus ?? os.FKSTATUS ?? null,
