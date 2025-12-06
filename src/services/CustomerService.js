@@ -1,8 +1,7 @@
 import { CustomerRepository } from "../repositories/CustomerRepository.js";
 import { CustomerType } from "../models/CustomerModel.js";
-import { UserRepository } from "../repositories/userRepository.js";
+import { UserRepository } from "../repositories/UserRepository.js";
 import { CityRepository } from "../repositories/CityRepository.js";
-import { CepService } from "./CepService.js";
 import Customer from "../models/CustomerModel.js"
 
 export const CustomerService = {
@@ -100,7 +99,7 @@ export const CustomerService = {
     if (!user) throw new Error("Usuário não encontrado");
 
     // tipo F/J
-    const tipo = customerData.tipo === "fisica"
+    const tipo = customerData.tipo === 1
       ? CustomerType.FISICA
       : CustomerType.JURIDICA;
 
@@ -168,7 +167,7 @@ export const CustomerService = {
 
     let tipo = existingCustomer.TIPOFJ;
     if (customerData.tipo) {
-      tipo = customerData.tipo === "fisica"
+      tipo = customerData.tipo === 1
         ? CustomerType.FISICA
         : CustomerType.JURIDICA;
     }

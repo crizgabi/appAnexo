@@ -1,7 +1,7 @@
 import { getConnection } from "../db/fireBird.js";
 import Service from "../models/ServiceModel.js";
 
-export const FirebirdServicesClient = {
+export const FireBirdServicesClient = {
     getServicesByDescription: async (description, dbEnvKey) => {
         return new Promise((resolve, reject) => {
             getConnection(dbEnvKey, (err, db) => {
@@ -139,6 +139,32 @@ export const FirebirdServicesClient = {
                     if (qErr) return reject(qErr);
 
                     resolve(result[0] || null);
+                });
+            });
+        });
+    },
+
+    getAllServices: async (dbEnvKey) => {
+        return new Promise((resolve, reject) => {
+            getConnection(dbEnvKey, (err, db) => {
+                if (err) return reject(err);
+
+                const query = `
+                SELECT
+                PKCODSER,
+                DESCRICAO,
+                NOMESERVICO,
+                REFERENCIA,
+                VALOR
+                FROM TBSERVICO
+                ORDER BY PKCODSER
+                `;
+
+                db.query(query, [], (qErr, result) => {
+                    db.detach();
+                    if (qErr) return reject(qErr);
+
+                    resolve(result || []);
                 });
             });
         });

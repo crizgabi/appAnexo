@@ -1,6 +1,6 @@
 import { getConnection } from "../db/fireBird.js";
 
-export const FirebirdUserClient = {
+export const FireBirdUserClient = {
 
   findUserByLogin(login, dbEnvKey) {
     return new Promise((resolve, reject) => {
@@ -71,5 +71,42 @@ export const FirebirdUserClient = {
         });
       });
     });
-  }
+  },
+
+  getAllUsers(dbEnvKey) {
+    return new Promise((resolve, reject) => {
+
+      const sql = `
+        SELECT 
+            U.LOGIN,
+            U.SENHA,
+            U.FKTECNICO,
+            T.PKTECNICO,
+            T.NMTECNICO,
+            T.FONE1,
+            T.FONE2,
+            T.CPF,
+            T.RG,
+            T.ENDERECO,
+            T.NUM,
+            T.CEP,
+            T.DATANASC,
+            T.EMAIL,
+            T.CELULAR
+        FROM TBUSUARIO U
+        LEFT JOIN TBTECNICO T ON U.FKTECNICO = T.PKTECNICO
+      `;
+
+      getConnection(dbEnvKey, (err, db) => {
+        if (err) return reject(err);
+
+        db.query(sql, [], (qErr, result) => {
+          db.detach();
+          if (qErr) return reject(qErr);
+
+          resolve(result || []);
+        });
+      });
+    });
+  },
 };

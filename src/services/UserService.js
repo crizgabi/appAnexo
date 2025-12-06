@@ -1,0 +1,173 @@
+import jwt from "jsonwebtoken";
+import { UserRepository } from "../repositories/UserRepository.js";
+import { RefreshTokenRepository } from "../repositories/RefreshTokenRepository.js";
+import { randomBytes } from "crypto";
+import { User } from "../models/UserModel.js"
+import { format } from "date-fns";
+
+export const UserService = {
+
+  // LOGIN
+  async loginUser({ login, password, dbEnvKey, dbType }) {
+    const user = await UserRepository.findByLogin(login, dbEnvKey, dbType);
+    if (!user) return null;
+
+    if (user.SENHA !== password) return null;
+
+    const token = generateToken({ login: user.LOGIN });
+
+    const existingToken = await RefreshTokenRepository.findRefreshTokenByLogin(user.LOGIN);
+    if (existingToken) {
+      await RefreshTokenRepository.deleteRefreshToken(existingToken.token);
+    }
+
+    const refreshValue = generateRefreshTokenValue();
+    const expires = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000);
+
+    await RefreshTokenRepository.saveRefreshToken(user.LOGIN, refreshValue, expires);
+
+    return {
+      user: { login: user.LOGIN },
+      token,
+      refreshToken: refreshValue
+    };
+  },
+
+  // UPDATE PASSWORD
+  async updatePassword(login, currentPassword, newPassword, dbEnvKey, dbType) {
+    const user = await UserRepository.findByLogin(login, dbEnvKey, dbType);
+    if (!user) return null;
+
+    if (user.SENHA !== currentPassword) return null;
+
+    await UserRepository.updatePassword(login, newPassword, dbEnvKey, dbType);
+
+    return { login: user.LOGIN };
+  },
+
+  // REFRESH TOKEN
+  async refreshToken(refreshToken) {
+    const existing = await RefreshTokenRepository.findRefreshToken(refreshToken);
+    if (!existing) return null;
+
+    this.validateRefreshToken(refreshToken)
+
+    const newToken = generateToken({ login: existing.login });
+    const newRefreshValue = generateRefreshTokenValue();
+    const newExpiresAt = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000);
+
+    await RefreshTokenRepository.deleteRefreshToken(refreshToken);
+    await RefreshTokenRepository.saveRefreshToken(existing.login, newRefreshValue, newExpiresAt);
+
+    return {
+      user: { login: existing.login },
+      token: newToken,
+      refreshToken: newRefreshValue
+    };
+  },
+
+  // validateRefreshToken
+  async validateRefreshToken(refreshToken) {
+    const row = await RefreshTokenRepository.findRefreshToken(refreshToken);
+    if (!row) return null;
+
+    if (new Date(row.expiresAt) <= new Date()) {
+      await RefreshTokenRepository.deleteRefreshToken(refreshToken);
+      return null;
+    }
+
+    return row;
+  },
+
+  // USER DETAILS
+  async showUserDetails(login, dbEnvKey, dbType) {
+    try {
+      const user = await UserRepository.findByLogin(login, dbEnvKey, dbType);
+      if (!user) return null;
+
+      const details = await UserRepository.getUserInfo(login, dbEnvKey, dbType);
+      if (!details) return null;
+
+      const dataNascimento = details.DATANASC
+        ? format(new Date(details.DATANASC), "dd/MM/yyyy")
+        : null;
+
+      return new User({
+        id: details.PKTECNICO,
+        login: details.LOGIN,
+        passwordHash: details.SENHA,
+        tecnico: {
+          id: details.PKTECNICO,
+          nome: details.NMTECNICO,
+          cpf: details.CPF,
+          rg: details.RG,
+          email: details.EMAIL,
+          celular: details.CELULAR,
+          telefone1: details.FONE1,
+          telefone2: details.FONE2,
+          endereco: {
+            logradouro: details.ENDERECO,
+            numero: details.NUM,
+            cep: details.CEP,
+          },
+          dataNascimento: dataNascimento,
+        },
+      });
+
+    } catch (error) {
+      console.error("Erro ao buscar detalhes do usuário:", error);
+      throw error;
+    }
+  },
+
+  // USER DETAILS
+  async getAllUsers(dbEnvKey, dbType) {
+    try {
+      const users = await UserRepository.getAllUsers(dbEnvKey, dbType);
+
+      if (!users) {
+        return [];
+      }
+
+      return users.map((u) => {
+        const dataNascimento = u.DATANASC
+          ? format(new Date(u.DATANASC), "dd/MM/yyyy")
+          : null;
+
+        return {
+          id: u.PKTECNICO,
+          login: u.LOGIN,
+          passwordHash: u.SENHA,
+          tecnico: {
+            id: u.PKTECNICO,
+            nome: u.NMTECNICO,
+            cpf: u.CPF,
+            rg: u.RG,
+            email: u.EMAIL,
+            celular: u.CELULAR,
+            telefone1: u.FONE1,
+            telefone2: u.FONE2,
+            endereco: {
+              logradouro: u.ENDERECO,
+              numero: u.NUM,
+              cep: u.CEP,
+            },
+            dataNascimento: dataNascimento,
+          },
+        };
+      });
+    } catch (error) {
+      console.error("Erro ao buscar detalhes do usuário:", error);
+      throw error;
+    }
+  },
+};
+
+// HELPERS
+function generateToken({ login }) {
+  return jwt.sign({ login }, process.env.JWT_SECRET, { expiresIn: "1h" });
+}
+
+function generateRefreshTokenValue() {
+  return randomBytes(40).toString("hex");
+}
