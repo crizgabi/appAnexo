@@ -1,4 +1,4 @@
-import { FirebirdUserClient } from "../repositories/FirebirdUserClient.js";
+import { FireBirdUserClient } from "../repositories/FireBirdUserClient.js";
 import { FireBirdCustomerClient } from "../repositories/FireBirdCustomerClient.js";
 import { FirebirdCityClient } from "../repositories/FirebirdCityClient.js";
 import { FirebirdServicesClient } from "../repositories/FireBirdServicesClient.js";
@@ -12,7 +12,7 @@ export class DBClientFactory {
       case "firebird":
         switch (module) {
           case "user":
-            return FirebirdUserClient;
+            return FireBirdUserClient;
           case "customer":
             return FireBirdCustomerClient;
           case "city":
