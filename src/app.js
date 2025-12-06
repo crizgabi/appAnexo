@@ -26,6 +26,6 @@ app.use("/cep", CepRoutes)
 app.use("/equipments", EquipmentRoutes);
 app.use("/services", ServicesRoutes)
 app.use("/products", ProductRoutes)
-app.use("/catalogs", CatalogRoutes)
+app.use("/catalog", CatalogRoutes)
 
 export default app;

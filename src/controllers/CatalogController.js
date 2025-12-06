@@ -3,6 +3,7 @@ import { CustomerService } from "../services/CustomerService.js";
 import { EquipmentService } from "../services/EquipmentService.js";
 import { ProductService } from "../services/ProductService.js";
 import { ServicesService } from "../services/ServicesService.js";
+import prisma from "../../src/db/prismaClient.js";
 
 // POST /catalog
 export const getCatalog = async (req, res) => {
