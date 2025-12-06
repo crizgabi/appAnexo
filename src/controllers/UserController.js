@@ -161,3 +161,31 @@ async function resolveTenant(req) {
 
   return { tenant };
 }
+
+// GET /users/all
+export const getAllUsers = async (req, res) => {
+
+  try {
+    const tenantId = req.headers["x-tenant-id"];
+    if (!tenantId)
+      return res.status(400).json({ error: "x-tenant-id header obrigatório" });
+
+    const tenant = await prisma.tenant.findUnique({ where: { id: tenantId } });
+    if (!tenant) return res.status(404).json({ error: "Tenant inválido" });
+
+    const users = await UserService.getAllUsers(
+      tenant.dbEnvKey,
+      tenant.dbType
+    );
+
+    if (!users)
+      return res.status(401).json({ error: "Users not found or unauthorized" });
+
+    return res.status(200).json({
+      users: users
+    });
+  } catch (error) {
+    console.error("Erro no controller showUserDetails:", error);
+    return res.status(500).json({ error: "Error fetching user details" });
+  }
+};
