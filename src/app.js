@@ -2,7 +2,7 @@ import express from "express";
 import bodyParser from "body-parser";
 import cors from "cors";
 
-import userRoutes from "./routes/userRoutes.js";
+import UserRoutes from "./routes/UserRoutes.js";
 import CustomerRoutes from "./routes/CustomerRoutes.js"
 import CepRoutes from "./routes/CepRoutes.js"
 import EquipmentRoutes from "./routes/EquipmentRoutes.js";
@@ -20,7 +20,7 @@ app.use(cors({
 }));
 
 // Rotas
-app.use("/users", userRoutes);
+app.use("/users", UserRoutes);
 app.use("/customers", CustomerRoutes);
 app.use("/cep", CepRoutes);
 app.use("/equipments", EquipmentRoutes);
