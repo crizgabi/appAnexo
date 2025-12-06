@@ -1,6 +1,7 @@
 import { getConnection } from "../db/fireBird.js";
 
 export const FireBirdServiceOrderClient = {
+
   create: (os, dbEnvKey) => {
     return new Promise((resolve, reject) => {
       getConnection(dbEnvKey, (err, db) => {
@@ -30,13 +31,16 @@ export const FireBirdServiceOrderClient = {
           os.situacao ?? 0,
           os.dataConserto ?? null,
           os.hora ?? null,
-          os.dataCadastro ?? new Date(),
-          os.dataAtualizacao ?? new Date()
+          os.dataCadastro ? formatToFbDateTime(os.dataCadastro) : fbDateTimeNow(),
+          os.dataAtualizacao ? formatToFbDateTime(os.dataAtualizacao) : fbDateTimeNow()
         ];
 
         db.query(query, params, (qErr, result) => {
           db.detach();
           if (qErr) return reject(qErr);
+
+          console.log("DEBUG RAW DATACAD:", result[0]?.dataCadastro); 
+    console.log("DEBUG RAW DATAATU:", result[0]?.dataAtualizacao);
 
           // result can be an array with row object or a single object depending on driver
           const row = Array.isArray(result) ? result[0] : result;

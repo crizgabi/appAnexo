@@ -2,9 +2,10 @@ import OrdemServico from "../models/ServiceOrderModel.js";
 import { ServiceOrderRepository } from "../repositories/ServiceOrderRepository.js";
 
 export const ServiceOrderService = {
+
     // CREATE
     async create(data, dbEnvKey, dbType) {
-        // Apenas idCliente é obrigatório por enquanto
+
         if (!data.idCliente) {
             throw new Error("Campo obrigatório faltando: idCliente");
         }
@@ -48,6 +49,16 @@ export const ServiceOrderService = {
     async list(dbEnvKey, dbType) {
         const rows = await ServiceOrderRepository.getAll(dbEnvKey, dbType);
 
+        function formatDate(date) {
+            if (!date) return null;
+            return new Date(date).toISOString().substring(0, 10);
+        }
+
+        function formatTime(time) {
+            if (!time) return null;
+            return new Date(time).toISOString().substring(11, 16);
+        }
+
         return (rows || []).map(r => ({
             idConserto: r.IDCONSERTO ?? r.PKCONSERTO ?? null,
             numeroOS: r.NUMEROOS ?? r.numeroOS ?? null,
@@ -60,11 +71,11 @@ export const ServiceOrderService = {
             nomeStatus: r.NOMESTATUS ?? r.nomeStatus ?? null,
             idTecnicoResponsavel: r.IDTECNICO ?? r.idTecnicoResponsavel ?? r.FKTECNICO ?? null,
             nomeTecnicoResponsavel: r.NOMETECNICO ?? r.nomeTecnicoResponsavel ?? r.NMTECNICO ?? null,
-            dataAgendamento: r.DATACONSERTO ?? r.dataConserto ?? null,
-            horaAgendamento: r.HORA ?? r.hora ?? null,
+            dataAgendamento: formatDate(r.DATACONSERTO),
+            horaAgendamento: formatTime(r.HORA),
             observacoes: r.OBS ?? r.observacao ?? null,
-            dataCadastro: r.DATACAD ?? r.dataCadastro ?? null,
-            dataAtualizacao: r.DATAATU ?? r.dataAtualizacao ?? null
+            dataCadastro: formatDate(r.DATACADASTRO),
+            dataAtualizacao: formatDate(r.DATAATUALIZACAO)
         }));
     },
 
@@ -72,6 +83,16 @@ export const ServiceOrderService = {
     async find(id, dbEnvKey, dbType) {
         const os = await ServiceOrderRepository.getById(id, dbEnvKey, dbType);
         if (!os) throw new Error("Ordem de serviço não encontrada");
+
+        function formatDate(date) {
+            if (!date) return null;
+            return new Date(date).toISOString().substring(0, 10);
+        }
+
+        function formatTime(time) {
+            if (!time) return null;
+            return new Date(time).toISOString().substring(11, 16);
+        }
 
         // normalize a single row to expected shape
         return {
@@ -82,15 +103,15 @@ export const ServiceOrderService = {
             idEquipamento: os.idEquipamento ?? os.IDEQUIPAMENTO ?? null,
             nomeEquipamento: os.nomeEquipamento ?? os.NOMEEQUIPAMENTO ?? null,
             defeitoReclamado: os.defeitoReclamado ?? os.DEFEITORECLAMADO ?? null,
-            idStatus: os.idStatus ?? os.FKSTATUS ?? null,
+            idStatus: os.idStatus ?? os.IDSTATUS ?? null,
             nomeStatus: os.nomeStatus ?? os.NOMESTATUS ?? null,
             idTecnicoResponsavel: os.idTecnicoResponsavel ?? os.FKTECNICO ?? null,
             nomeTecnicoResponsavel: os.nomeTecnicoResponsavel ?? os.NMTECNICO ?? null,
-            dataAgendamento: os.dataConserto ?? os.DATACONSERTO ?? null,
-            horaAgendamento: os.hora ?? os.HORA ?? null,
+            dataAgendamento: formatDate(os.DATACONSERTO),
+            horaAgendamento: formatTime(os.HORA),
             observacoes: os.observacao ?? os.OBS ?? null,
-            dataCadastro: os.dataCadastro ?? os.DATACAD ?? null,
-            dataAtualizacao: os.dataAtualizacao ?? os.DATAATU ?? null
+            dataCadastro: formatDate(os.DATACADASTRO),
+            dataAtualizacao: formatDate(os.DATAATUALIZACAO)
         };
     },
 
