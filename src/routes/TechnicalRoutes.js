@@ -1,10 +1,10 @@
 import express from "express";
 import { TechnicalController } from "../controllers/TechnicalController.js";
-import authMiddleware from "../middlewares/authMiddleware.js";
+import AuthMiddleware from "../middlewares/AuthMiddleware.js";
 
 const router = express.Router();
 
 console.log("TechnicalRoutes.js carregado!");
-router.get("/", authMiddleware, TechnicalController.getAll);
+router.get("/", AuthMiddleware, TechnicalController.getAll);
 
 export default router;
