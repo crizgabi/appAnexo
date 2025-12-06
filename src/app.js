@@ -9,6 +9,7 @@ import EquipmentRoutes from "./routes/EquipmentRoutes.js";
 import ServicesRoutes from "./routes/ServicesRoutes.js"
 import ProductRoutes from "./routes/ProductRoutes.js"
 import TechnicalRoutes from "./routes/TechnicalRoutes.js";
+import CatalogRoutes from "./routes/CatalogRoutes.js"
 
 const app = express();
 app.use(bodyParser.json());
@@ -26,5 +27,6 @@ app.use("/equipments", EquipmentRoutes);
 app.use("/services", ServicesRoutes);
 app.use("/products", ProductRoutes);
 app.use("/technicians", TechnicalRoutes);
+app.use("/catalog", CatalogRoutes)
 
 export default app;
