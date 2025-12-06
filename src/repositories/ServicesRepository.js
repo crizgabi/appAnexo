@@ -52,6 +52,6 @@ export const ServicesRepository = {
             module: "services"
         });
 
-        return client.getAllServicesByPrimaryKey(dbEnvKey);
+        return client.getAllServices(dbEnvKey);
     },
 };
