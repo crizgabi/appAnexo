@@ -1,7 +1,7 @@
 import { FireBirdUserClient } from "../repositories/FireBirdUserClient.js";
 import { FireBirdCustomerClient } from "../repositories/FireBirdCustomerClient.js";
-import { FirebirdCityClient } from "../repositories/FirebirdCityClient.js";
-import { FirebirdServicesClient } from "../repositories/FireBirdServicesClient.js";
+import { FireBirdCityClient } from "../repositories/FireBirdCityClient.js";
+import { FireBirdServicesClient } from "../repositories/FireBirdServicesClient.js";
 import { FireBirdProductClient } from "../repositories/FireBirdProductClient.js";
 import { FireBirdEquipmentClient } from "../repositories/FireBirdEquipmentClient.js";
 import { FireBirdTechnicalClient } from "../repositories/FireBirdTechnicalClient.js";
@@ -16,9 +16,9 @@ export class DBClientFactory {
           case "customer":
             return FireBirdCustomerClient;
           case "city":
-            return FirebirdCityClient;
+            return FireBirdCityClient;
           case "services":
-            return FirebirdServicesClient;
+            return FireBirdServicesClient;
           case "product":
             return FireBirdProductClient;
           case "equipment":
