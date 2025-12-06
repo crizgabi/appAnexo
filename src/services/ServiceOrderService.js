@@ -73,7 +73,7 @@ export const ServiceOrderService = {
             nomeTecnicoResponsavel: r.NOMETECNICO ?? r.nomeTecnicoResponsavel ?? r.NMTECNICO ?? null,
             dataAgendamento: formatDate(r.DATACONSERTO),
             horaAgendamento: formatTime(r.HORA),
-            observacoes: r.OBS ?? r.observacao ?? null,
+            observacoes: r.OBS ?? r.OBSERVACAO ?? r.observacao ?? null,
             dataCadastro: formatDate(r.DATACADASTRO),
             dataAtualizacao: formatDate(r.DATAATUALIZACAO)
         }));
@@ -109,7 +109,7 @@ export const ServiceOrderService = {
             nomeTecnicoResponsavel: os.nomeTecnicoResponsavel ?? os.NMTECNICO ?? null,
             dataAgendamento: formatDate(os.DATACONSERTO),
             horaAgendamento: formatTime(os.HORA),
-            observacoes: os.observacao ?? os.OBS ?? null,
+            observacoes: os.OBS ?? os.OBSERVACAO ?? os.observacao ?? null,
             dataCadastro: formatDate(os.DATACADASTRO),
             dataAtualizacao: formatDate(os.DATAATUALIZACAO)
         };

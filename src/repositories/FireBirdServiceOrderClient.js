@@ -39,9 +39,6 @@ export const FireBirdServiceOrderClient = {
           db.detach();
           if (qErr) return reject(qErr);
 
-          console.log("DEBUG RAW DATACAD:", result[0]?.dataCadastro); 
-    console.log("DEBUG RAW DATAATU:", result[0]?.dataAtualizacao);
-
           // result can be an array with row object or a single object depending on driver
           const row = Array.isArray(result) ? result[0] : result;
           if (!row || (row && row.PKCONSERTO == null)) {
@@ -91,7 +88,6 @@ export const FireBirdServiceOrderClient = {
         db.query(query, [], (qErr, result) => {
           db.detach();
           if (qErr) return reject(qErr);
-          console.log("DEBUG FIREBIRD -> PRIMEIRA LINHA:", result[0]);
           resolve(result || []);
         });
       });
