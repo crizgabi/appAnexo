@@ -31,8 +31,8 @@ export const FireBirdServiceOrderClient = {
           os.situacao ?? 0,
           os.dataConserto ?? null,
           os.hora ?? null,
-          os.dataCadastro ? formatToFbDateTime(os.dataCadastro) : fbDateTimeNow(),
-          os.dataAtualizacao ? formatToFbDateTime(os.dataAtualizacao) : fbDateTimeNow()
+          os.dataCadastro ? os.dataCadastro : fbDateTimeNow(),
+          os.dataAtualizacao ? os.dataAtualizacao : fbDateTimeNow()
         ];
 
         db.query(query, params, (qErr, result) => {
@@ -70,8 +70,8 @@ export const FireBirdServiceOrderClient = {
             C.DEFEITORECLAMADO AS defeitoReclamado,
             C.FKSTATUS AS idStatus,
             S.NOMESTATUS AS nomeStatus,
-            C.FKTECNICO AS idTecnicoResponsavel,
-            T.NMTECNICO AS nomeTecnicoResponsavel,
+            C.FKTECNICO AS IDTECNICO,
+            T.NMTECNICO AS NOMETECNICO,
             C.DATACONSERTO AS dataConserto,
             C.HORA AS hora,
             C.OBS AS observacao,
@@ -110,8 +110,8 @@ export const FireBirdServiceOrderClient = {
             C.DEFEITORECLAMADO AS defeitoReclamado,
             C.FKSTATUS AS idStatus,
             S.NOMESTATUS AS nomeStatus,
-            C.FKTECNICO AS idTecnicoResponsavel,
-            T.NMTECNICO AS nomeTecnicoResponsavel,
+            C.FKTECNICO AS IDTECNICO,
+            T.NMTECNICO AS NOMETECNICO,
             C.DATACONSERTO AS dataConserto,
             C.HORA AS hora,
             C.OBS AS observacao,
