@@ -242,4 +242,51 @@ export const FireBirdProductClient = {
             });
         });
     },
+
+    getAllProducts: async (dbEnvKey) => {
+        return new Promise((resolve, reject) => {
+            getConnection(dbEnvKey, (err, db) => {
+                if (err) return reject(err);
+
+                const query = `
+                SELECT
+                    p.PKCODPROD,
+                    p.STATUS,
+                    p.REFERENCIA,
+                    p.CODBARRAS,
+                    p.NOME,
+                    p.OBSERVACAO,
+                    p.IMAGEMPRINCIPAL,
+                    p.PRODUTOESPECIFICO,
+                    p.TIPOITEM,
+                    p.PESOLIQ,
+                    p.PESOBRUTO,
+                    p.ESTOQUEMIN,
+                    p.ESTOQUEMAX,
+                    p.AGILIZARESTOQUE,
+                    p.ESTOQUEATU,
+                    p.DESCONTOMAXIMO,
+                    p.VALORVENDA,
+                    p.FKCODUNI,
+                    u.NOME AS NOMEUNIDADE,
+                    u.SIGLA,
+                    p.FKCODCAT,
+                    c.NOME AS NOMECATEGORIA,
+                    p.FKCODMARCA,
+                    m.NOME AS NOMEMARCA
+                FROM TBPRODUTO p
+                LEFT JOIN TBUNIDADE u ON p.FKCODUNI = u.PKCODUNI
+                LEFT JOIN TBCATEGORIA c ON p.FKCODCAT = c.PKCODCAT
+                LEFT JOIN TBMARCA m ON p.FKCODMARCA = m.PKCODMARC
+                ORDER BY p.PKCODPROD
+            `;
+
+                db.query(query, [], (qErr, result) => {
+                    db.detach();
+                    if (qErr) return reject(qErr);
+                    resolve(result || []);
+                });
+            });
+        });
+    },
 };

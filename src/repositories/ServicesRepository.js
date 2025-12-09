@@ -45,4 +45,13 @@ export const ServicesRepository = {
 
         return client.getServiceDetails(serviceId, dbEnvKey);
     },
+
+    getAllServices: async (dbEnvKey, dbType) => {
+        const client = DBClientFactory.getClient({
+            dbType,
+            module: "services"
+        });
+
+        return client.getAllServices(dbEnvKey);
+    },
 };

@@ -56,8 +56,8 @@ export const UserService = {
     const newRefreshValue = generateRefreshTokenValue();
     const newExpiresAt = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000);
 
-    await refreshTokenRepository.deleteRefreshToken(refreshToken);
-    await refreshTokenRepository.saveRefreshToken(existing.login, newRefreshValue, newExpiresAt);
+    await RefreshTokenRepository.deleteRefreshToken(refreshToken);
+    await RefreshTokenRepository.saveRefreshToken(existing.login, newRefreshValue, newExpiresAt);
 
     return {
       user: { login: existing.login },
@@ -114,6 +114,48 @@ export const UserService = {
         },
       });
 
+    } catch (error) {
+      console.error("Erro ao buscar detalhes do usuário:", error);
+      throw error;
+    }
+  },
+
+  // USER DETAILS
+  async getAllUsers(dbEnvKey, dbType) {
+    try {
+      const users = await UserRepository.getAllUsers(dbEnvKey, dbType);
+
+      if (!users) {
+        return [];
+      }
+
+      return users.map((u) => {
+        const dataNascimento = u.DATANASC
+          ? format(new Date(u.DATANASC), "dd/MM/yyyy")
+          : null;
+
+        return {
+          id: u.PKTECNICO,
+          login: u.LOGIN,
+          passwordHash: u.SENHA,
+          tecnico: {
+            id: u.PKTECNICO,
+            nome: u.NMTECNICO,
+            cpf: u.CPF,
+            rg: u.RG,
+            email: u.EMAIL,
+            celular: u.CELULAR,
+            telefone1: u.FONE1,
+            telefone2: u.FONE2,
+            endereco: {
+              logradouro: u.ENDERECO,
+              numero: u.NUM,
+              cep: u.CEP,
+            },
+            dataNascimento: dataNascimento,
+          },
+        };
+      });
     } catch (error) {
       console.error("Erro ao buscar detalhes do usuário:", error);
       throw error;

@@ -13,10 +13,16 @@ export const getProducts = async (req, res) => {
     if (!tenant)
       return res.status(404).json({ error: "Tenant inválido" });
 
-    try {
-      let products = [];
+    let products = [];
 
-      if (barcode) {
+    try {
+
+      if (!barcode && !name && !reference && !productId) {
+        products = await ProductService.getAllProducts(
+          tenant.dbEnvKey,
+          tenant.dbType
+        );
+      } else if (barcode) {
         products = await ProductService.getProductByBarcode(
           barcode,
           tenant.dbEnvKey,
@@ -40,10 +46,6 @@ export const getProducts = async (req, res) => {
           tenant.dbEnvKey,
           tenant.dbType
         );
-      } else {
-        return res.status(400).json({
-          error: "Informe 'barcode', 'name', 'reference' ou 'productId' na query.",
-        });
       }
 
       if (!products || products.length === 0) {
@@ -54,8 +56,9 @@ export const getProducts = async (req, res) => {
 
     } catch (error) {
       console.error("Erro ao buscar produtos:", error);
-      res.status(500).json({ error: "Erro interno ao buscar produtos." });
+      return res.status(500).json({ error: "Erro interno ao buscar produtos." });
     }
+
   } catch (error) {
     console.error("Erro no getProducts:", error);
     return res.status(500).json({ error: "Erro interno ao listar produtos" });

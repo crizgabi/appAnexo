@@ -133,4 +133,30 @@ export const ServicesService = {
             throw error;
         }
     },
+
+    getAllServices: async (dbEnvKey, dbType) => {
+        try {
+            const services = await ServicesRepository.getAllServices(
+                dbEnvKey, 
+                dbType
+            );
+
+            if (!services) {
+                return [];
+            }
+
+            return services.map((c) => {
+                return {
+                    pkcodser: c.PKCODSER,
+                    descricao: c.DESCRICAO,
+                    nome: c.NOMESERVICO,
+                    referencia: c.REFERENCIA,
+                    valor: c.VALOR,
+                };
+            });
+        } catch (error) {
+            console.error("Error listing services:", error);
+            throw error;
+        }
+    },
 }

@@ -14,5 +14,10 @@ export const UserRepository = {
   updatePassword(login, newPassword, dbEnvKey, dbType) {
     const client = DBClientFactory.getClient({ dbType, module: "user" });
     return client.updatePassword(login, newPassword, dbEnvKey);
+  },
+
+  getAllUsers(dbEnvKey, dbType) {
+    const client = DBClientFactory.getClient({ dbType, module: "user" });
+    return client.getAllUsers(dbEnvKey);
   }
 };

@@ -4,6 +4,7 @@ import { FireBirdCityClient } from "../repositories/FireBirdCityClient.js";
 import { FireBirdServicesClient } from "../repositories/FireBirdServicesClient.js";
 import { FireBirdProductClient } from "../repositories/FireBirdProductClient.js";
 import { FireBirdEquipmentClient } from "../repositories/FireBirdEquipmentClient.js";
+import { FireBirdTechnicalClient } from "../repositories/FireBirdTechnicalClient.js";
 import { FireBirdServiceOrderClient } from "../repositories/FireBirdServiceOrderClient.js";
 
 export class DBClientFactory {
@@ -23,6 +24,8 @@ export class DBClientFactory {
             return FireBirdProductClient;
           case "equipment":
             return FireBirdEquipmentClient;
+          case "technical":
+            return FireBirdTechnicalClient;
           case "serviceOrder":
             return FireBirdServiceOrderClient;
           default:
@@ -33,4 +36,5 @@ export class DBClientFactory {
         throw new Error(`Unsupported DB type: ${dbType}`);
     }
   }
+
 };
