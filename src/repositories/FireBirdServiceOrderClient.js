@@ -158,8 +158,8 @@ export const FireBirdServiceOrderClient = {
           os.idEquipamento ?? null,
           os.defeitoReclamado ?? null,
           os.observacao ?? null,
-          os.dataConserto ?? null,
-          os.hora ?? null,
+          (os.dataConserto === "" ? null : os.dataConserto) ?? null, // DATACONSERTO
+          (os.hora === "" ? null : os.hora) ?? null,
           os.dataAtualizacao ?? new Date(),
           id
         ];
