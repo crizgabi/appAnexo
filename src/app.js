@@ -11,6 +11,7 @@ import ProductRoutes from "./routes/ProductRoutes.js"
 import TechnicalRoutes from "./routes/TechnicalRoutes.js";
 import CatalogRoutes from "./routes/CatalogRoutes.js";
 import ServiceOrderRoutes from "./routes/ServiceOrderRoutes.js";
+import ItemServiceOrderRoutes from "./routes/itemServiceOrderRoutes.js";
 
 const app = express();
 app.use(bodyParser.json());
@@ -30,5 +31,6 @@ app.use("/products", ProductRoutes);
 app.use("/technicians", TechnicalRoutes);
 app.use("/catalog", CatalogRoutes);
 app.use("/service-orders", ServiceOrderRoutes);
+app.use("/os/:id", ItemServiceOrderRoutes);
 
 export default app;
