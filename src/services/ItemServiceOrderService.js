@@ -12,7 +12,7 @@ export const ItemServiceOrderService = {
         const valorUnitario = data.valorUnitario ?? 0;
         const descontoPercentual = data.descontoPercentual ?? 0;
 
-        const valorTotal = quantidade * valorUnitario * (1 - descontoPercentual / 100);
+        const valorTotal = quantidade * valorUnitario;
 
         const item = new ItemServiceOrderModel({
             idConserto: data.idConserto,
