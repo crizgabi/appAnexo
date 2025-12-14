@@ -33,6 +33,14 @@ export const ServiceOrderRepository = {
         return client.update(id, data, dbEnvKey);
     },
 
+    addSignature: async (id, { assinatura1, assinatura2 }, dbEnvKey, dbType) => {
+        const client = DBClientFactory.getClient({
+            dbType,
+            module: "serviceOrder"
+        });
+        return client.addSignature(id, { assinatura1, assinatura2 }, dbEnvKey);
+    },
+
     delete: async (id, dbEnvKey, dbType) => {
         const client = DBClientFactory.getClient({
             dbType,

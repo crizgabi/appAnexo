@@ -61,22 +61,22 @@ export const FireBirdServiceOrderClient = {
 
         const query = `
           SELECT
-            C.PKCONSERTO AS idConserto,
-            C.CODIDENTIFICADOR AS numeroOS,
-            C.FKCLIENTE AS idCliente,
-            CL.RAZAOSOCIAL AS nomeCliente,
-            C.FKEQUIPAMENTO AS idEquipamento,
-            EQ.EQUIPAMENTO AS nomeEquipamento,
-            C.DEFEITORECLAMADO AS defeitoReclamado,
-            C.FKSTATUS AS idStatus,
-            S.NOMESTATUS AS nomeStatus,
-            C.FKTECNICO AS IDTECNICO,
-            T.NMTECNICO AS NOMETECNICO,
-            C.DATACONSERTO AS dataConserto,
-            C.HORA AS hora,
-            C.OBS AS observacao,
-            C.DATACAD AS dataCadastro,
-            C.DATAATU AS dataAtualizacao
+            C.PKCONSERTO,
+            C.CODIDENTIFICADOR,
+            C.FKCLIENTE,
+            CL.RAZAOSOCIAL,
+            C.FKEQUIPAMENTO,
+            EQ.EQUIPAMENTO,
+            C.DEFEITORECLAMADO,
+            C.FKSTATUS,
+            S.NOMESTATUS,
+            C.FKTECNICO,
+            T.NMTECNICO,
+            C.DATACONSERTO,
+            C.HORA,
+            C.OBS,
+            C.DATACAD,
+            C.DATAATU
           FROM TBCONSERTO C
           LEFT JOIN TBCLIENTE CL ON CL.PKCODCLI = C.FKCLIENTE
           LEFT JOIN TBEQUIPAMENTO EQ ON EQ.PKEQUIPAMENTO = C.FKEQUIPAMENTO
@@ -101,22 +101,22 @@ export const FireBirdServiceOrderClient = {
 
         const query = `
           SELECT
-            C.PKCONSERTO AS idConserto,
-            C.CODIDENTIFICADOR AS numeroOS,
-            C.FKCLIENTE AS idCliente,
-            CL.RAZAOSOCIAL AS nomeCliente,
-            C.FKEQUIPAMENTO AS idEquipamento,
-            EQ.EQUIPAMENTO AS nomeEquipamento,
-            C.DEFEITORECLAMADO AS defeitoReclamado,
-            C.FKSTATUS AS idStatus,
-            S.NOMESTATUS AS nomeStatus,
-            C.FKTECNICO AS IDTECNICO,
-            T.NMTECNICO AS NOMETECNICO,
-            C.DATACONSERTO AS dataConserto,
-            C.HORA AS hora,
-            C.OBS AS observacao,
-            C.DATACAD AS dataCadastro,
-            C.DATAATU AS dataAtualizacao
+            C.PKCONSERTO,
+            C.CODIDENTIFICADOR,
+            C.FKCLIENTE,
+            CL.RAZAOSOCIAL,
+            C.FKEQUIPAMENTO,
+            EQ.EQUIPAMENTO,
+            C.DEFEITORECLAMADO,
+            C.FKSTATUS,
+            S.NOMESTATUS,
+            C.FKTECNICO,
+            T.NMTECNICO,
+            C.DATACONSERTO,
+            C.HORA,
+            C.OBS,
+            C.DATACAD,
+            C.DATAATU
           FROM TBCONSERTO C
           LEFT JOIN TBCLIENTE CL ON CL.PKCODCLI = C.FKCLIENTE
           LEFT JOIN TBEQUIPAMENTO EQ ON EQ.PKEQUIPAMENTO = C.FKEQUIPAMENTO
@@ -140,27 +140,27 @@ export const FireBirdServiceOrderClient = {
         if (err) return reject(err);
 
         const query = `
-          UPDATE TBCONSERTO SET
-            FKCLIENTE = ?,
-            FKTECNICO = ?,
-            FKEQUIPAMENTO = ?,
-            DEFEITORECLAMADO = ?,
-            OBS = ?,
-            DATACONSERTO = ?,
-            HORA = ?,
-            DATAATU = ?
-          WHERE PKCONSERTO = ?
-        `;
+        UPDATE TBCONSERTO SET
+          FKCLIENTE = ?,
+          FKTECNICO = ?,
+          FKEQUIPAMENTO = ?,
+          DEFEITORECLAMADO = ?,
+          OBS = ?,
+          DATACONSERTO = ?,
+          HORA = ?,
+          DATAATU = ?
+        WHERE PKCONSERTO = ?
+      `;
 
         const params = [
-          os.idCliente,
-          os.idTecnico ?? null,
-          os.idEquipamento ?? null,
-          os.defeitoReclamado ?? null,
-          os.observacao ?? null,
-          (os.dataConserto === "" ? null : os.dataConserto) ?? null, // DATACONSERTO
-          (os.hora === "" ? null : os.hora) ?? null,
-          os.dataAtualizacao ?? new Date(),
+          os.FKCLIENTE,
+          os.FKTECNICO,
+          os.FKEQUIPAMENTO,
+          os.DEFEITORECLAMADO,
+          os.OBS,
+          os.DATACONSERTO,
+          os.HORA,
+          os.DATAATU ?? new Date(),
           id
         ];
 
@@ -169,6 +169,51 @@ export const FireBirdServiceOrderClient = {
           if (qErr) return reject(qErr);
           resolve(true);
         });
+      });
+    });
+  },
+
+  addSignature: (idConserto, { assinatura1 = null, assinatura2 = null }, dbEnvKey) => {
+    return new Promise((resolve, reject) => {
+      getConnection(dbEnvKey, (err, db) => {
+        if (err) return reject(err);
+
+        const updateQuery = `
+        UPDATE TBASSINATURA
+        SET ARQASS1 = ?, ARQASS2 = ?
+        WHERE FKCONSERTO = ?
+      `;
+
+        db.query(
+          updateQuery,
+          [assinatura1, assinatura2, idConserto],
+          (qErr, result) => {
+            if (qErr) {
+              db.detach();
+              return reject(qErr);
+            }
+
+            if (!result || result.affectedRows === 0) {
+              const insertQuery = `
+              INSERT INTO TBASSINATURA (FKCONSERTO, ARQASS1, ARQASS2)
+              VALUES (?,?,?)
+            `;
+
+              db.query(
+                insertQuery,
+                [idConserto, assinatura1, assinatura2],
+                (iErr) => {
+                  db.detach();
+                  if (iErr) return reject(iErr);
+                  resolve(true);
+                }
+              );
+            } else {
+              db.detach();
+              resolve(true);
+            }
+          }
+        );
       });
     });
   },
