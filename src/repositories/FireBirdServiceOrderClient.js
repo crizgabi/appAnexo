@@ -60,30 +60,33 @@ export const FireBirdServiceOrderClient = {
         if (err) return reject(err);
 
         const query = `
-          SELECT
-            C.PKCONSERTO,
-            C.CODIDENTIFICADOR,
-            C.FKCLIENTE,
-            CL.RAZAOSOCIAL,
-            C.FKEQUIPAMENTO,
-            EQ.EQUIPAMENTO,
-            C.DEFEITORECLAMADO,
-            C.FKSTATUS,
-            S.NOMESTATUS,
-            C.FKTECNICO,
-            T.NMTECNICO,
-            C.DATACONSERTO,
-            C.HORA,
-            C.OBS,
-            C.DATACAD,
-            C.DATAATU
-          FROM TBCONSERTO C
-          LEFT JOIN TBCLIENTE CL ON CL.PKCODCLI = C.FKCLIENTE
-          LEFT JOIN TBEQUIPAMENTO EQ ON EQ.PKEQUIPAMENTO = C.FKEQUIPAMENTO
-          LEFT JOIN TBTECNICO T ON T.PKTECNICO = C.FKTECNICO
-          LEFT JOIN TBSTATUS S ON S.PKSTATUS = C.FKSTATUS
-          ORDER BY C.PKCONSERTO DESC
-        `;
+        SELECT
+          C.PKCONSERTO,
+          C.CODIDENTIFICADOR,
+          C.FKCLIENTE,
+          CL.RAZAOSOCIAL,
+          C.FKEQUIPAMENTO,
+          EQ.EQUIPAMENTO,
+          C.DEFEITORECLAMADO,
+          C.FKSTATUS,
+          S.NOMESTATUS,
+          C.FKTECNICO,
+          T.NMTECNICO,
+          C.DATACONSERTO,
+          C.HORA,
+          C.OBS,
+          C.DATACAD,
+          C.DATAATU,
+          A.ARQASS1,
+          A.ARQASS2
+        FROM TBCONSERTO C
+        LEFT JOIN TBCLIENTE CL ON CL.PKCODCLI = C.FKCLIENTE
+        LEFT JOIN TBEQUIPAMENTO EQ ON EQ.PKEQUIPAMENTO = C.FKEQUIPAMENTO
+        LEFT JOIN TBTECNICO T ON T.PKTECNICO = C.FKTECNICO
+        LEFT JOIN TBSTATUS S ON S.PKSTATUS = C.FKSTATUS
+        LEFT JOIN TBASSINATURA A ON A.FKCONSERTO = C.PKCONSERTO
+        ORDER BY C.PKCONSERTO DESC
+      `;
 
         db.query(query, [], (qErr, result) => {
           db.detach();
@@ -100,30 +103,33 @@ export const FireBirdServiceOrderClient = {
         if (err) return reject(err);
 
         const query = `
-          SELECT
-            C.PKCONSERTO,
-            C.CODIDENTIFICADOR,
-            C.FKCLIENTE,
-            CL.RAZAOSOCIAL,
-            C.FKEQUIPAMENTO,
-            EQ.EQUIPAMENTO,
-            C.DEFEITORECLAMADO,
-            C.FKSTATUS,
-            S.NOMESTATUS,
-            C.FKTECNICO,
-            T.NMTECNICO,
-            C.DATACONSERTO,
-            C.HORA,
-            C.OBS,
-            C.DATACAD,
-            C.DATAATU
-          FROM TBCONSERTO C
-          LEFT JOIN TBCLIENTE CL ON CL.PKCODCLI = C.FKCLIENTE
-          LEFT JOIN TBEQUIPAMENTO EQ ON EQ.PKEQUIPAMENTO = C.FKEQUIPAMENTO
-          LEFT JOIN TBTECNICO T ON T.PKTECNICO = C.FKTECNICO
-          LEFT JOIN TBSTATUS S ON S.PKSTATUS = C.FKSTATUS
-          WHERE C.PKCONSERTO = ?
-        `;
+        SELECT
+          C.PKCONSERTO,
+          C.CODIDENTIFICADOR,
+          C.FKCLIENTE,
+          CL.RAZAOSOCIAL,
+          C.FKEQUIPAMENTO,
+          EQ.EQUIPAMENTO,
+          C.DEFEITORECLAMADO,
+          C.FKSTATUS,
+          S.NOMESTATUS,
+          C.FKTECNICO,
+          T.NMTECNICO,
+          C.DATACONSERTO,
+          C.HORA,
+          C.OBS,
+          C.DATACAD,
+          C.DATAATU,
+          A.ARQASS1,
+          A.ARQASS2
+        FROM TBCONSERTO C
+        LEFT JOIN TBCLIENTE CL ON CL.PKCODCLI = C.FKCLIENTE
+        LEFT JOIN TBEQUIPAMENTO EQ ON EQ.PKEQUIPAMENTO = C.FKEQUIPAMENTO
+        LEFT JOIN TBTECNICO T ON T.PKTECNICO = C.FKTECNICO
+        LEFT JOIN TBSTATUS S ON S.PKSTATUS = C.FKSTATUS
+        LEFT JOIN TBASSINATURA A ON A.FKCONSERTO = C.PKCONSERTO
+        WHERE C.PKCONSERTO = ?
+      `;
 
         db.query(query, [id], (qErr, result) => {
           db.detach();
@@ -178,42 +184,38 @@ export const FireBirdServiceOrderClient = {
       getConnection(dbEnvKey, (err, db) => {
         if (err) return reject(err);
 
-        const updateQuery = `
-        UPDATE TBASSINATURA
-        SET ARQASS1 = ?, ARQASS2 = ?
-        WHERE FKCONSERTO = ?
-      `;
-
-        db.query(
-          updateQuery,
-          [assinatura1, assinatura2, idConserto],
-          (qErr, result) => {
-            if (qErr) {
-              db.detach();
-              return reject(qErr);
-            }
-
-            if (!result || result.affectedRows === 0) {
-              const insertQuery = `
-              INSERT INTO TBASSINATURA (FKCONSERTO, ARQASS1, ARQASS2)
-              VALUES (?,?,?)
-            `;
-
-              db.query(
-                insertQuery,
-                [idConserto, assinatura1, assinatura2],
-                (iErr) => {
-                  db.detach();
-                  if (iErr) return reject(iErr);
-                  resolve(true);
-                }
-              );
-            } else {
-              db.detach();
-              resolve(true);
-            }
+        const selectQuery = `SELECT * FROM TBASSINATURA WHERE FKCONSERTO = ?`;
+        db.query(selectQuery, [idConserto], (selErr, selResult) => {
+          if (selErr) {
+            db.detach();
+            return reject(selErr);
           }
-        );
+
+          if (selResult && selResult.length > 0) {
+            const updateQuery = `
+            UPDATE TBASSINATURA
+            SET ARQASS1 = COALESCE(?, ARQASS1),
+                ARQASS2 = COALESCE(?, ARQASS2)
+            WHERE FKCONSERTO = ?
+          `;
+            db.query(updateQuery, [assinatura1, assinatura2, idConserto], (updErr) => {
+              db.detach();
+              if (updErr) return reject(updErr);
+              resolve(true);
+            });
+          } else {
+            // Não existe, faz INSERT
+            const insertQuery = `
+            INSERT INTO TBASSINATURA (FKCONSERTO, ARQASS1, ARQASS2)
+            VALUES (?, ?, ?)
+          `;
+            db.query(insertQuery, [idConserto, assinatura1, assinatura2], (insErr) => {
+              db.detach();
+              if (insErr) return reject(insErr);
+              resolve(true);
+            });
+          }
+        });
       });
     });
   },

@@ -56,6 +56,7 @@ export const ServiceOrderController = {
     },
 
     update: async (req, res) => {
+
         try {
             const tenantId = req.headers["x-tenant-id"];
             if (!tenantId) return res.status(400).json({ error: "x-tenant-id header obrigatório" });
@@ -63,7 +64,14 @@ export const ServiceOrderController = {
             const tenant = await prisma.tenant.findUnique({ where: { id: tenantId } });
             if (!tenant) return res.status(404).json({ error: "Tenant inválido" });
 
-            const os = await ServiceOrderService.update(req.params.id, req.body, tenant.dbEnvKey, tenant.dbType);
+            const os = await ServiceOrderService.update(
+                req.params.id,
+                req.body,
+                req.files,
+                tenant.dbEnvKey,
+                tenant.dbType
+            );
+
             res.json(os);
         } catch (err) {
             res.status(400).json({ error: err.message });

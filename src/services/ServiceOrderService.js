@@ -1,5 +1,6 @@
 import OrdemServico from "../models/ServiceOrderModel.js";
 import { ServiceOrderRepository } from "../repositories/ServiceOrderRepository.js";
+import { UploadService } from "./UploadService.js";
 
 export const ServiceOrderService = {
 
@@ -74,7 +75,9 @@ export const ServiceOrderService = {
             horaAgendamento: formatTime(r.HORA),
             observacoes: r.OBS ?? null,
             dataCadastro: formatDate(r.DATACAD),
-            dataAtualizacao: formatDate(r.DATAATU)
+            dataAtualizacao: formatDate(r.DATAATU),
+            assinaturaTecnico: r.ARQASS1 ?? null,
+            assinaturaCliente: r.ARQASS2 ?? null
         }));
     },
 
@@ -96,7 +99,7 @@ export const ServiceOrderService = {
         // normalize a single row to expected shape
         return {
             idConserto: os.PKCONSERTO ?? null,
-            idCliente:os.FKCLIENTE ?? null,
+            idCliente: os.FKCLIENTE ?? null,
             nomeCliente: os.RAZAOSOCIAL ?? null,
             idEquipamento: os.FKEQUIPAMENTO ?? null,
             nomeEquipamento: os.EQUIPAMENTO ?? null,
@@ -110,12 +113,15 @@ export const ServiceOrderService = {
             horaAgendamento: formatTime(os.HORA),
             observacoes: os.OBS ?? null,
             dataCadastro: formatDate(os.DATACAD),
-            dataAtualizacao: formatDate(os.DATAATU)
+            dataAtualizacao: formatDate(os.DATAATU),
+            assinaturaTecnico: os.ARQASS1 ?? null,
+            assinaturaCliente: os.ARQASS2 ?? null
         };
     },
 
     // UPDATE OS
-    async update(id, data, dbEnvKey, dbType) {
+    async update(id, data, files, dbEnvKey, dbType) {
+
         const existing =
             await ServiceOrderRepository.getById(id, dbEnvKey, dbType);
 
@@ -140,6 +146,28 @@ export const ServiceOrderService = {
             dbEnvKey,
             dbType
         );
+
+        let assinatura1Url = null;
+        let assinatura2Url = null;
+
+        if (files) {
+            if (files.assinatura1 && files.assinatura1.length > 0) {
+                const result1 = await UploadService.uploadImage(files.assinatura1[0]);
+                assinatura1Url = result1.url;
+            }
+            if (files.assinatura2 && files.assinatura2.length > 0) {
+                const result2 = await UploadService.uploadImage(files.assinatura2[0]);
+                assinatura2Url = result2.url;
+            }
+
+            if (assinatura1Url || assinatura2Url) {
+                await ServiceOrderRepository.addSignature(
+                    id,
+                    { assinatura1: assinatura1Url, assinatura2: assinatura2Url },
+                    dbEnvKey, dbType
+                );
+            }
+        }
 
         return await this.find(id, dbEnvKey, dbType);
     },
