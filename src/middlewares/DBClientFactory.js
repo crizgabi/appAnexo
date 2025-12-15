@@ -7,6 +7,7 @@ import { FireBirdEquipmentClient } from "../repositories/FireBirdEquipmentClient
 import { FireBirdTechnicalClient } from "../repositories/FireBirdTechnicalClient.js";
 import { FireBirdServiceOrderClient } from "../repositories/FireBirdServiceOrderClient.js";
 import { FireBirdItemServiceOrderClient } from "../repositories/FireBirdItemServiceOrderClient.js";
+import { FireBirdServiceOSClient } from "../repositories/FireBirdServiceOSClient.js";
 
 export class DBClientFactory {
   static getClient({ dbType, module }) {
@@ -29,8 +30,10 @@ export class DBClientFactory {
             return FireBirdTechnicalClient;
           case "serviceOrder":
             return FireBirdServiceOrderClient;
-            case "itemServiceOrder":
-              return FireBirdItemServiceOrderClient;
+          case "itemServiceOrder":
+            return FireBirdItemServiceOrderClient;
+          case "ServiceServiceOrder":
+            return FireBirdServiceOSClient;
           default:
             throw new Error(`Unsupported module for Firebird: ${module}`);
         }
