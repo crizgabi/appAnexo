@@ -1,6 +1,5 @@
 import { ServiceOrderService } from "../services/ServiceOrderService.js";
 import prisma from "../../src/db/prismaClient.js";
-import e from "express";
 
 export const ServiceOrderController = {
     create: async (req, res) => {
@@ -47,6 +46,23 @@ export const ServiceOrderController = {
             if (!tenant) return res.status(404).json({ error: "Tenant inválido" });
 
             const os = await ServiceOrderService.find(req.params.id, tenant.dbEnvKey, tenant.dbType);
+            if (!os) return res.status(404).json({ error: "Ordem de serviço não encontrada" });
+
+            res.json(os);
+        } catch (err) {
+            res.status(400).json({ error: err.message });
+        }
+    },
+
+    getByUser: async (req, res) => {
+        try {
+            const tenantId = req.headers["x-tenant-id"];
+            if (!tenantId) return res.status(400).json({ error: "x-tenant-id header obrigatório" });
+
+            const tenant = await prisma.tenant.findUnique({ where: { id: tenantId } });
+            if (!tenant) return res.status(404).json({ error: "Tenant inválido" });
+
+            const os = await ServiceOrderService.findByUser(req.params.id, tenant.dbEnvKey, tenant.dbType);
             if (!os) return res.status(404).json({ error: "Ordem de serviço não encontrada" });
 
             res.json(os);

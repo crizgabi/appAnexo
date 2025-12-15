@@ -14,6 +14,7 @@ const uploadFields = upload.fields([
 router.post("/", AuthMiddleware, ServiceOrderController.create);
 router.get("/", AuthMiddleware, ServiceOrderController.getAll);
 router.get("/:id", AuthMiddleware, ServiceOrderController.getById);
+router.get("/technician/:id", AuthMiddleware, ServiceOrderController.getByUser);
 router.put("/:id", AuthMiddleware, uploadFields, ServiceOrderController.update);
 router.delete("/:id", AuthMiddleware, ServiceOrderController.delete);
 

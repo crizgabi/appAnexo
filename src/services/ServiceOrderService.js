@@ -119,6 +119,42 @@ export const ServiceOrderService = {
         };
     },
 
+    // GET BY USER
+    async findByUser(id, dbEnvKey, dbType) {
+        const rows = await ServiceOrderRepository.getByUser(id, dbEnvKey, dbType);
+        if (!rows) return [];
+
+        function formatDate(date) {
+            if (!date) return null;
+            return new Date(date).toISOString().substring(0, 10);
+        }
+
+        function formatTime(time) {
+            if (!time) return null;
+            return new Date(time).toISOString().substring(11, 16);
+        }
+
+        return (rows || []).map(r => ({
+            idConserto: r.PKCONSERTO ?? null,
+            idCliente: r.FKCLIENTE ?? null,
+            nomeCliente: r.RAZAOSOCIAL ?? null,
+            idEquipamento: r.FKEQUIPAMENTO ?? null,
+            nomeEquipamento: r.EQUIPAMENTO ?? null,
+            defeitoReclamado: r.DEFEITORECLAMADO ?? null,
+            idStatus: r.FKSTATUS ?? null,
+            nomeStatus: r.NOMESTATUS ?? null,
+            idTecnicoResponsavel: r.FKTECNICO ?? null,
+            nomeTecnicoResponsavel: r.NMTECNICO ?? null,
+            dataAgendamento: formatDate(r.DATACONSERTO),
+            horaAgendamento: formatTime(r.HORA),
+            observacoes: r.OBS ?? null,
+            dataCadastro: formatDate(r.DATACAD),
+            dataAtualizacao: formatDate(r.DATAATU),
+            assinaturaTecnico: r.ARQASS1 ?? null,
+            assinaturaCliente: r.ARQASS2 ?? null
+        }));
+    },
+
     // UPDATE OS
     async update(id, data, files, dbEnvKey, dbType) {
 

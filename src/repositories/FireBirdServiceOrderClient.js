@@ -140,6 +140,50 @@ export const FireBirdServiceOrderClient = {
     });
   },
 
+  getByUser: (id, dbEnvKey) => {
+    return new Promise((resolve, reject) => {
+      getConnection(dbEnvKey, (err, db) => {
+        if (err) return reject(err);
+
+        const query = `
+        SELECT
+          C.PKCONSERTO,
+          C.CODIDENTIFICADOR,
+          C.FKCLIENTE,
+          CL.RAZAOSOCIAL,
+          C.FKEQUIPAMENTO,
+          EQ.EQUIPAMENTO,
+          C.DEFEITORECLAMADO,
+          C.FKSTATUS,
+          S.NOMESTATUS,
+          C.FKTECNICO,
+          T.NMTECNICO,
+          C.DATACONSERTO,
+          C.HORA,
+          C.OBS,
+          C.DATACAD,
+          C.DATAATU,
+          A.ARQASS1,
+          A.ARQASS2
+        FROM TBCONSERTO C
+        LEFT JOIN TBCLIENTE CL ON CL.PKCODCLI = C.FKCLIENTE
+        LEFT JOIN TBEQUIPAMENTO EQ ON EQ.PKEQUIPAMENTO = C.FKEQUIPAMENTO
+        LEFT JOIN TBTECNICO T ON T.PKTECNICO = C.FKTECNICO
+        LEFT JOIN TBSTATUS S ON S.PKSTATUS = C.FKSTATUS
+        LEFT JOIN TBASSINATURA A ON A.FKCONSERTO = C.PKCONSERTO
+        WHERE C.FKTECNICO = ?
+        ORDER BY C.DATACONSERTO DESC
+      `;
+
+        db.query(query, [id], (qErr, result) => {
+          db.detach();
+          if (qErr) return reject(qErr);
+          resolve((result || []));
+        });
+      });
+    });
+  },
+
   update: (id, os, dbEnvKey) => {
     return new Promise((resolve, reject) => {
       getConnection(dbEnvKey, (err, db) => {

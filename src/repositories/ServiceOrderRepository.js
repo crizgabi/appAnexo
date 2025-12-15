@@ -25,6 +25,14 @@ export const ServiceOrderRepository = {
         return client.getById(id, dbEnvKey);
     },
 
+    getByUser: async (id, dbEnvKey, dbType) => {
+        const client = DBClientFactory.getClient({
+            dbType,
+            module: "serviceOrder"
+        });
+        return client.getByUser(id, dbEnvKey);
+    },
+
     update: async (id, data, dbEnvKey, dbType) => {
         const client = DBClientFactory.getClient({
             dbType,
