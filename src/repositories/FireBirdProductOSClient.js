@@ -1,6 +1,6 @@
 import { getConnection } from "../db/fireBird.js";
 
-export const FireBirdItemServiceOrderClient = {
+export const FireBirdProductOSClient = {
     create(item, dbEnvKey) {
         return new Promise((resolve, reject) => {
             getConnection(dbEnvKey, (err, conn) => {

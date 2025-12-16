@@ -1,10 +1,10 @@
 import { DBClientFactory } from "../middlewares/DBClientFactory.js";
 
-export const ItemServiceOrderRepository = {
+export const ProductOSRepository = {
     create: async (item, dbEnvKey, dbType) => {
         const client = DBClientFactory.getClient({
             dbType,
-            module: "itemServiceOrder"
+            module: "ProductServiceOrder"
         });
         return client.create(item, dbEnvKey);
     },
@@ -12,7 +12,7 @@ export const ItemServiceOrderRepository = {
     getAllByOS: async (idOS, dbEnvKey, dbType) => {
         const client = DBClientFactory.getClient({
             dbType,
-            module: "itemServiceOrder"
+            module: "ProductServiceOrder"
         });
         return client.getAllByOS(idOS, dbEnvKey);
     },
@@ -20,7 +20,7 @@ export const ItemServiceOrderRepository = {
     delete: async (idItem, dbEnvKey, dbType) => {
         const client = DBClientFactory.getClient({
             dbType,
-            module: "itemServiceOrder"
+            module: "ProductServiceOrder"
         });
         return client.delete(idItem, dbEnvKey);
     }

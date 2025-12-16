@@ -6,7 +6,7 @@ import { FireBirdProductClient } from "../repositories/FireBirdProductClient.js"
 import { FireBirdEquipmentClient } from "../repositories/FireBirdEquipmentClient.js";
 import { FireBirdTechnicalClient } from "../repositories/FireBirdTechnicalClient.js";
 import { FireBirdServiceOrderClient } from "../repositories/FireBirdServiceOrderClient.js";
-import { FireBirdItemServiceOrderClient } from "../repositories/FireBirdItemServiceOrderClient.js";
+import { FireBirdProductOSClient } from "../repositories/FireBirdProductOSClient.js";
 import { FireBirdServiceOSClient } from "../repositories/FireBirdServiceOSClient.js";
 
 export class DBClientFactory {
@@ -30,8 +30,8 @@ export class DBClientFactory {
             return FireBirdTechnicalClient;
           case "serviceOrder":
             return FireBirdServiceOrderClient;
-          case "itemServiceOrder":
-            return FireBirdItemServiceOrderClient;
+          case "ProductServiceOrder":
+            return FireBirdProductOSClient;
           case "ServiceServiceOrder":
             return FireBirdServiceOSClient;
           default:

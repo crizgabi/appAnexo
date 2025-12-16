@@ -1,9 +1,9 @@
-import ItemServiceOrderModel from "../models/ItemServiceOrderModel.js";
-import { ItemServiceOrderRepository } from "../repositories/ItemServiceOrderRepository.js";
+import ProductOSModel from "../models/ProductOSModel.js";
+import { ProductOSRepository } from "../repositories/ProductOSRepository.js";
 
-export const ItemServiceOrderService = {
+export const ProductOSService = {
     create: async (data, dbEnvKey, dbType) => {
-        const idOS = data.idConserto; // pegar da URL
+        const idOS = data.idConserto; 
 
         if (!idOS) throw new Error("Parâmetro obrigatório faltando: idConserto");
         if (!data.idProduto) throw new Error("Campo obrigatório faltando: idProduto");
@@ -14,7 +14,7 @@ export const ItemServiceOrderService = {
 
         const valorTotal = quantidade * valorUnitario;
 
-        const item = new ItemServiceOrderModel({
+        const item = new ProductOSModel({
             idConserto: data.idConserto,
             idProduto: data.idProduto,
             observacao: data.observacao ?? null,
@@ -26,14 +26,14 @@ export const ItemServiceOrderService = {
             unidade: data.unidade ?? null
         });
 
-        return ItemServiceOrderRepository.create(item, dbEnvKey, dbType);
+        return ProductOSRepository.create(item, dbEnvKey, dbType);
     },
 
     getAllByOS: async (idOS, dbEnvKey, dbType) => {
-        return ItemServiceOrderRepository.getAllByOS(idOS, dbEnvKey, dbType);
+        return ProductOSRepository.getAllByOS(idOS, dbEnvKey, dbType);
     },
 
     delete: async (idItem, dbEnvKey, dbType) => {
-        return ItemServiceOrderRepository.delete(idItem, dbEnvKey, dbType);
+        return ProductOSRepository.delete(idItem, dbEnvKey, dbType);
     }
 };

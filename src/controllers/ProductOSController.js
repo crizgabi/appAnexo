@@ -1,7 +1,7 @@
-import { ItemServiceOrderService } from "../services/ItemServiceOrderService.js";
+import { ProductOSService } from "../services/ProductOSService.js";
 import prisma from "../db/prismaClient.js";
 
-export const ItemServiceOrderController = {
+export const ProductOSController = {
 
   // CRIAR ITEM NA OS
   create: async (req, res) => {
@@ -25,7 +25,7 @@ export const ItemServiceOrderController = {
         return res.status(400).json({ error: "ID da Ordem de Serviço inválido. Esperado um número." });
       }
 
-      const novoItem = await ItemServiceOrderService.create(
+      const novoItem = await ProductOSService.create(
         {
           idConserto: idConsertoNumerico,
           idProduto: req.body.idProduto,
@@ -62,7 +62,7 @@ export const ItemServiceOrderController = {
         return res.status(404).json({ error: "Tenant inválido" });
 
       const idConserto = req.params.id;
-      const items = await ItemServiceOrderService.getAllByOS(
+      const items = await ProductOSService.getAllByOS(
         idConserto,
         tenant.dbEnvKey,
         tenant.dbType
@@ -87,7 +87,7 @@ export const ItemServiceOrderController = {
       if (!tenant)
         return res.status(404).json({ error: "Tenant inválido" });
 
-      await ItemServiceOrderService.delete(
+      await ProductOSService.delete(
         req.params.idItem,
         tenant.dbEnvKey,
         tenant.dbType

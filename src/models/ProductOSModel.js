@@ -1,4 +1,4 @@
-export default class ItemServiceOrderModel {
+export default class ProductOSModel {
   constructor({
     idItemProduto = null,
     idConserto,
