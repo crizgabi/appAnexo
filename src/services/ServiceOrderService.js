@@ -156,7 +156,7 @@ export const ServiceOrderService = {
     },
 
     // UPDATE OS
-    async update(id, data, files, dbEnvKey, dbType) {
+    async update(id, data, dbEnvKey, dbType) {
 
         const existing =
             await ServiceOrderRepository.getById(id, dbEnvKey, dbType);
@@ -183,29 +183,83 @@ export const ServiceOrderService = {
             dbType
         );
 
+        return await this.find(id, dbEnvKey, dbType);
+    },
+
+    // add signatures to OS
+    async addSignature(id, files, dbEnvKey, dbType) {
+        const existing =
+            await ServiceOrderRepository.getById(id, dbEnvKey, dbType);
+
+        if (!existing) {
+            throw new Error("Ordem de serviço não encontrada");
+        }
+
         let assinatura1Url = null;
         let assinatura2Url = null;
 
-        if (files) {
-            if (files.assinatura1 && files.assinatura1.length > 0) {
-                const result1 = await UploadService.uploadImage(files.assinatura1[0]);
-                assinatura1Url = result1.url;
-            }
-            if (files.assinatura2 && files.assinatura2.length > 0) {
-                const result2 = await UploadService.uploadImage(files.assinatura2[0]);
-                assinatura2Url = result2.url;
-            }
-
-            if (assinatura1Url || assinatura2Url) {
-                await ServiceOrderRepository.addSignature(
-                    id,
-                    { assinatura1: assinatura1Url, assinatura2: assinatura2Url },
-                    dbEnvKey, dbType
-                );
-            }
+        if (files.assinatura1 && files.assinatura1.length > 0) {
+            const result1 = await UploadService.uploadImage(files.assinatura1[0]);
+            assinatura1Url = result1.url;
+        }
+        if (files.assinatura2 && files.assinatura2.length > 0) {
+            const result2 = await UploadService.uploadImage(files.assinatura2[0]);
+            assinatura2Url = result2.url;
         }
 
-        return await this.find(id, dbEnvKey, dbType);
+        await ServiceOrderRepository.addSignature(
+            id,
+            { assinatura1: assinatura1Url, assinatura2: assinatura2Url },
+            dbEnvKey, dbType
+        );
+
+        return this.getSignature(
+            id,
+            dbEnvKey,
+            dbType
+        )
+    },
+
+    async getSignature(id, dbEnvKey, dbType) {
+        const row =
+            await ServiceOrderRepository.getSignature(id, dbEnvKey, dbType);
+
+        if (!row) {
+            return null;
+        }
+
+        return {
+            idConserto: row.FKCONSERTO ?? null,
+            assinaturaTecnico: row.ARQASS1 ?? null,
+            assinaturaCliente: row.ARQASS2 ?? null
+        };
+    },
+
+    async deleteSignature(id, tipo, dbEnvKey, dbType) {
+        const existing = await ServiceOrderRepository.getSignature(id, dbEnvKey, dbType);
+
+        if (!existing) {
+            throw new Error("Assinatura não encontrada");
+        }
+
+        if (
+            (tipo === "tecnico" && !existing.ARQASS1) ||
+            (tipo === "cliente" && !existing.ARQASS2)
+        ) {
+            throw new Error("Assinatura já está vazia");
+        }
+
+        await ServiceOrderRepository.deleteSignature(
+            id,
+            tipo,
+            dbEnvKey,
+            dbType
+        );
+
+        return {
+            deleted: true,
+            tipo
+        };
     },
 
     // DELETE

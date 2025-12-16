@@ -7,15 +7,18 @@ const router = express.Router();
 const upload = multer({ storage: multer.memoryStorage() });
 
 const uploadFields = upload.fields([
-    { name: "assinatura1", maxCount: 1 },
-    { name: "assinatura2", maxCount: 1 },
+  { name: "assinatura1", maxCount: 1 },
+  { name: "assinatura2", maxCount: 1 },
 ]);
 
 router.post("/", AuthMiddleware, ServiceOrderController.create);
 router.get("/", AuthMiddleware, ServiceOrderController.getAll);
-router.get("/:id", AuthMiddleware, ServiceOrderController.getById);
 router.get("/technician/:id", AuthMiddleware, ServiceOrderController.getByUser);
-router.put("/:id", AuthMiddleware, uploadFields, ServiceOrderController.update);
+router.get("/:id/assinatura", AuthMiddleware, ServiceOrderController.getSignature);
+router.put("/:id/assinatura", AuthMiddleware, uploadFields, ServiceOrderController.addSignature);
+router.delete("/:id/assinatura/:tipo", AuthMiddleware, ServiceOrderController.deleteSignature);
+router.get("/:id", AuthMiddleware, ServiceOrderController.getById);
+router.put("/:id", AuthMiddleware, ServiceOrderController.update);
 router.delete("/:id", AuthMiddleware, ServiceOrderController.delete);
 
 export default router;

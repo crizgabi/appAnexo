@@ -248,7 +248,6 @@ export const FireBirdServiceOrderClient = {
               resolve(true);
             });
           } else {
-            // Não existe, faz INSERT
             const insertQuery = `
             INSERT INTO TBASSINATURA (FKCONSERTO, ARQASS1, ARQASS2)
             VALUES (?, ?, ?)
@@ -259,6 +258,75 @@ export const FireBirdServiceOrderClient = {
               resolve(true);
             });
           }
+        });
+      });
+    });
+  },
+
+  getSignature: (id, dbEnvKey) => {
+    return new Promise((resolve, reject) => {
+      getConnection(dbEnvKey, (err, db) => {
+        if (err) return reject(err);
+
+        const selectQuery = `
+        SELECT
+          PKASSINATURA,
+          FKCONSERTO,
+          ARQASS1,
+          DESCASS1,
+          ARQASS2,
+          DESCASS2
+        FROM TBASSINATURA
+        WHERE FKCONSERTO = ?
+      `;
+
+        db.query(selectQuery, [id], (selErr, selResult) => {
+          db.detach();
+
+          if (selErr) {
+            return reject(selErr);
+          }
+
+          if (!selResult || selResult.length === 0) {
+            return resolve(null);
+          }
+
+          resolve(selResult[0]);
+        });
+      });
+    });
+  },
+
+  deleteSignature: (idConserto, tipo, dbEnvKey) => {
+    return new Promise((resolve, reject) => {
+      getConnection(dbEnvKey, (err, db) => {
+        if (err) return reject(err);
+
+        let updateQuery;
+
+        if (tipo === "tecnico") {
+          updateQuery = `
+          UPDATE TBASSINATURA
+          SET ARQASS1 = NULL
+          WHERE FKCONSERTO = ?
+        `;
+        } else if (tipo === "cliente") {
+          updateQuery = `
+          UPDATE TBASSINATURA
+          SET ARQASS2 = NULL
+          WHERE FKCONSERTO = ?
+        `;
+        } else {
+          db.detach();
+          return reject(new Error("Tipo de assinatura inválido"));
+        }
+
+        db.query(updateQuery, [idConserto], (updErr, result) => {
+          db.detach();
+
+          if (updErr) return reject(updErr);
+
+          resolve(true);
         });
       });
     });
