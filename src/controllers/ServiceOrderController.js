@@ -236,14 +236,18 @@ export const ServiceOrderController = {
                 return res.status(400).json({ error: "x-tenant-id header obrigatório" });
             }
 
-            const tenant = await prisma.tenant.findUnique({ where: { id: tenantId } });
+            const tenant = await prisma.tenant.findUnique({
+                where: { id: tenantId }
+            });
             if (!tenant) {
                 return res.status(404).json({ error: "Tenant inválido" });
             }
 
+            const { id, imageId } = req.params; // 🔥 ISSO FALTAVA
+
             const result = await ServiceOrderService.deleteImage(
-                req.params.id,
-                req.params.idImage,
+                id,
+                imageId,
                 tenant.dbEnvKey,
                 tenant.dbType
             );

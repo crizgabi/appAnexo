@@ -23,6 +23,6 @@ router.delete("/:id", AuthMiddleware, ServiceOrderController.delete);
 router.get("/:id/images", AuthMiddleware, ServiceOrderController.getImages);
 router.post("/:id/image", AuthMiddleware,  upload.single("image"), ServiceOrderController.addImage);
 router.get("/:id/images/:id", AuthMiddleware, ServiceOrderController.getImageById);
-router.delete("/:id/image/:id", AuthMiddleware, ServiceOrderController.deleteImage);
+router.delete("/:id/images/:imageId", AuthMiddleware, ServiceOrderController.deleteImage);
 
 export default router;

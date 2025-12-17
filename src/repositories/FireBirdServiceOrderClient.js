@@ -346,14 +346,25 @@ export const FireBirdServiceOrderClient = {
           TIPO
         )
         VALUES (?, ?, ?, ?, 2)
-        `;
+        RETURNING
+          PKARQUIVO,
+          FKCONSERTO,
+          CAMINHO,
+          FKTECNICO,
+          DATACAD
+      `;
 
-        db.query(insertQuery, [idConserto, caminho, idTecnico, fkCodUsu], (insErr, result) => {
-          db.detach();
-          const pkarquivo = result[0].PKARQUIVO;
-          if (insErr) return reject(insErr);
-          resolve(true);
-        });
+        db.query(
+          insertQuery,
+          [idConserto, caminho, idTecnico, fkCodUsu],
+          (insErr, result) => {
+            db.detach();
+
+            if (insErr) return reject(insErr);
+
+            resolve(result);
+          }
+        );
       });
     });
   },

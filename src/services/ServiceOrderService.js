@@ -270,7 +270,7 @@ export const ServiceOrderService = {
 
         const uploadResult = await UploadService.uploadImage(file);
 
-        const savedImage = await ServiceOrderRepository.addImage(
+        const image = await ServiceOrderRepository.addImage(
             id,
             idTecnico,
             fkCodUsu,
@@ -279,9 +279,15 @@ export const ServiceOrderService = {
             dbType
         );
 
-        return this.getImageById(savedImage.PKARQUIVO, dbEnvKey, dbType);
+        return {
+            idConserto: image.FKCONSERTO ?? null,
+            idImagem: image.PKARQUIVO ?? null,
+            url: image.CAMINHO ?? null,
+            idTecnico: image.FKTECNICO ?? null,
+            dataHoraUpload: image.DATACAD ?? null
+        };
     },
-    
+
     async getImages(id, dbEnvKey, dbType) {
         const rows = await ServiceOrderRepository.getImages(id, dbEnvKey, dbType);
 
@@ -310,24 +316,27 @@ export const ServiceOrderService = {
         };
     },
 
-    async deleteImage(id, idImage, dbEnvKey, dbType) {
-        const existingOS = await ServiceOrderRepository.getById(id, dbEnvKey, dbType);
-        if (!existingOS) {
-            throw new Error("Ordem de serviço não encontrada");
-        }
+    async deleteImage(idConserto, imageId, dbEnvKey, dbType) {
+        const image = await ServiceOrderRepository.getImageById(
+            imageId,
+            dbEnvKey,
+            dbType
+        );
 
-        const image = await ServiceOrderRepository.getImageById(id, dbEnvKey, dbType);
         if (!image) {
             throw new Error("Imagem não encontrada");
         }
 
-        const result = await ServiceOrderRepository.deleteImage(
-            id,
-            idImage,
-            dbEnvKey
-        );
+        if (image.FKCONSERTO !== Number(idConserto)) {
+            throw new Error("Imagem não pertence a esta OS");
+        }
 
-        return result;
+        return ServiceOrderRepository.deleteImage(
+            idConserto,
+            imageId,
+            dbEnvKey,
+            dbType
+        );
     },
 
     // DELETE
