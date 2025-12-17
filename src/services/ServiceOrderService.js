@@ -262,6 +262,74 @@ export const ServiceOrderService = {
         };
     },
 
+    async addImage(id, file, idTecnico, fkCodUsu, dbEnvKey, dbType) {
+        const existing = await ServiceOrderRepository.getById(id, dbEnvKey, dbType);
+        if (!existing) throw new Error("Ordem de serviço não encontrada");
+
+        if (!file) throw new Error("Imagem não enviada");
+
+        const uploadResult = await UploadService.uploadImage(file);
+
+        const savedImage = await ServiceOrderRepository.addImage(
+            id,
+            idTecnico,
+            fkCodUsu,
+            uploadResult.url,
+            dbEnvKey,
+            dbType
+        );
+
+        return this.getImageById(savedImage.PKARQUIVO, dbEnvKey, dbType);
+    },
+    
+    async getImages(id, dbEnvKey, dbType) {
+        const rows = await ServiceOrderRepository.getImages(id, dbEnvKey, dbType);
+
+        if (!rows || rows.length === 0) return [];
+
+        return rows.map(row => ({
+            idConserto: row.FKCONSERTO ?? null,
+            idImagem: row.PKARQUIVO ?? null,
+            url: row.CAMINHO ?? null,
+            idTecnico: row.FKTECNICO ?? null,
+            dataHoraUpload: row.DATACAD ?? null
+        }));
+    },
+
+    async getImageById(id, dbEnvKey, dbType) {
+        const image = await ServiceOrderRepository.getImageById(id, dbEnvKey, dbType);
+
+        if (!image) return null;
+
+        return {
+            idConserto: image.FKCONSERTO ?? null,
+            idImagem: image.PKARQUIVO ?? null,
+            url: image.CAMINHO ?? null,
+            idTecnico: image.FKTECNICO ?? null,
+            dataHoraUpload: image.DATACAD ?? null
+        };
+    },
+
+    async deleteImage(id, idImage, dbEnvKey, dbType) {
+        const existingOS = await ServiceOrderRepository.getById(id, dbEnvKey, dbType);
+        if (!existingOS) {
+            throw new Error("Ordem de serviço não encontrada");
+        }
+
+        const image = await ServiceOrderRepository.getImageById(id, dbEnvKey, dbType);
+        if (!image) {
+            throw new Error("Imagem não encontrada");
+        }
+
+        const result = await ServiceOrderRepository.deleteImage(
+            id,
+            idImage,
+            dbEnvKey
+        );
+
+        return result;
+    },
+
     // DELETE
     async delete(id, dbEnvKey, dbType) {
         const existing = await ServiceOrderRepository.getById(id, dbEnvKey, dbType);

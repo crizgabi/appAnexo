@@ -332,6 +332,149 @@ export const FireBirdServiceOrderClient = {
     });
   },
 
+  addImage: (idConserto, idTecnico, fkCodUsu, caminho, dbEnvKey) => {
+    return new Promise((resolve, reject) => {
+      getConnection(dbEnvKey, (err, db) => {
+        if (err) return reject(err);
+
+        const insertQuery = `
+        INSERT INTO TBARQUIVO (
+          FKCONSERTO,
+          CAMINHO,
+          FKTECNICO,
+          FKCODUSU,
+          TIPO
+        )
+        VALUES (?, ?, ?, ?, 2)
+        `;
+
+        db.query(insertQuery, [idConserto, caminho, idTecnico, fkCodUsu], (insErr, result) => {
+          db.detach();
+          const pkarquivo = result[0].PKARQUIVO;
+          if (insErr) return reject(insErr);
+          resolve(true);
+        });
+      });
+    });
+  },
+
+  getImages: (id, dbEnvKey) => {
+    return new Promise((resolve, reject) => {
+      getConnection(dbEnvKey, (err, db) => {
+        if (err) return reject(err);
+
+        const selectQuery = `
+        SELECT
+          FKCONSERTO,
+          PKARQUIVO,
+          CAMINHO,
+          DESCRICAO,
+          FKTECNICO,
+          FKCODUSU,
+          NOMEARQUIVO,
+          DATACAD,
+          DATAATU
+        FROM TBARQUIVO
+        WHERE FKCONSERTO = ?
+        ORDER BY PKARQUIVO ASC
+      `;
+
+        db.query(selectQuery, [id], (selErr, selResult) => {
+          db.detach();
+
+          if (selErr) {
+            return reject(selErr);
+          }
+
+          if (!selResult || selResult.length === 0) {
+            return resolve([]);
+          }
+
+          resolve(selResult);
+        });
+      });
+    });
+  },
+
+  getImageById: (id, dbEnvKey) => {
+    return new Promise((resolve, reject) => {
+      getConnection(dbEnvKey, (err, db) => {
+        if (err) return reject(err);
+
+        const query = `
+        SELECT
+          FKCONSERTO,
+          PKARQUIVO,
+          CAMINHO,
+          DESCRICAO,
+          FKTECNICO,
+          FKCODUSU,
+          NOMEARQUIVO,
+          DATACAD,
+          DATAATU
+        FROM TBARQUIVO
+        WHERE PKARQUIVO = ?
+      `;
+
+        db.query(query, [id], (qErr, result) => {
+          db.detach();
+          if (qErr) return reject(qErr);
+          resolve((result && result[0]) || null);
+        });
+      });
+    });
+  },
+
+  deleteImage: (idConserto, seqImagem, dbEnvKey) => {
+    return new Promise((resolve, reject) => {
+      getConnection(dbEnvKey, (err, db) => {
+        if (err) return reject(err);
+
+        const selectQuery = `
+        SELECT PKARQUIVO, FKCONSERTO, CAMINHO, DESCRICAO
+        FROM TBARQUIVO
+        WHERE FKCONSERTO = ? AND PKARQUIVO = ?
+      `;
+
+        db.query(selectQuery, [idConserto, seqImagem], (selErr, selResult) => {
+          if (selErr) {
+            db.detach();
+            return reject(selErr);
+          }
+
+          if (!selResult || selResult.length === 0) {
+            db.detach();
+            return reject(new Error("Imagem não encontrada"));
+          }
+
+          const row = selResult[0];
+
+          // 2. remove registro da tabela
+          const deleteQuery = `
+          DELETE FROM TBARQUIVO
+          WHERE PKARQUIVO = ? AND FKCONSERTO = ? AND TIPO = 2
+        `;
+
+          db.query(deleteQuery, [seqImagem, idConserto], (delErr) => {
+            db.detach();
+
+            if (delErr) return reject(delErr);
+
+            // 3. retorno conforme contrato
+            resolve({
+              idConserto: row.FKCONSERTO,
+              seqImagem: row.PKARQUIVO,
+              urlRemovida: row.CAMINHO,
+              legenda: row.DESCRICAO,
+              dataHoraRemocao: new Date().toISOString(),
+              status: "removida"
+            });
+          });
+        });
+      });
+    });
+  },
+
   delete: (id, dbEnvKey) => {
     return new Promise((resolve, reject) => {
       getConnection(dbEnvKey, (err, db) => {

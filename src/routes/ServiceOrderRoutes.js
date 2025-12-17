@@ -20,5 +20,9 @@ router.delete("/:id/assinatura/:tipo", AuthMiddleware, ServiceOrderController.de
 router.get("/:id", AuthMiddleware, ServiceOrderController.getById);
 router.put("/:id", AuthMiddleware, ServiceOrderController.update);
 router.delete("/:id", AuthMiddleware, ServiceOrderController.delete);
+router.get("/:id/images", AuthMiddleware, ServiceOrderController.getImages);
+router.post("/:id/image", AuthMiddleware,  upload.single("image"), ServiceOrderController.addImage);
+router.get("/:id/images/:id", AuthMiddleware, ServiceOrderController.getImageById);
+router.delete("/:id/image/:id", AuthMiddleware, ServiceOrderController.deleteImage);
 
 export default router;

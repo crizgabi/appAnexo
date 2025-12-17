@@ -65,6 +65,38 @@ export const ServiceOrderRepository = {
         return client.deleteSignature(id, tipo, dbEnvKey);
     },
 
+    addImage: async (idConserto, idTecnico, fkCodUsu, caminho, dbEnvKey, dbType) => {
+        const client = DBClientFactory.getClient({
+            dbType,
+            module: "serviceOrder"
+        });
+        return client.addImage(idConserto, idTecnico, fkCodUsu, caminho, dbEnvKey);
+    },
+
+    getImages: async (id, dbEnvKey, dbType) => {
+        const client = DBClientFactory.getClient({
+            dbType,
+            module: "serviceOrder"
+        });
+        return client.getImages(id, dbEnvKey);
+    },
+
+    getImageById: async (id, dbEnvKey, dbType) => {
+        const client = DBClientFactory.getClient({
+            dbType,
+            module: "serviceOrder"
+        });
+        return client.getImageById(id, dbEnvKey);
+    },
+
+    deleteImage: async (idConserto, { caminho, legenda = null, idTecnico, fkCodUsu = null, nomeArquivo = null }, dbEnvKey) => {
+        const client = DBClientFactory.getClient({
+            dbType,
+            module: "serviceOrder"
+        });
+        return client.deleteImage(idConserto, { caminho, legenda, idTecnico, fkCodUsu, nomeArquivo }, dbEnvKey);
+    },
+
     delete: async (id, dbEnvKey, dbType) => {
         const client = DBClientFactory.getClient({
             dbType,

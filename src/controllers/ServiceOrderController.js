@@ -1,4 +1,5 @@
 import { ServiceOrderService } from "../services/ServiceOrderService.js";
+import { UserRepository } from "../repositories/UserRepository.js";
 import prisma from "../../src/db/prismaClient.js";
 
 export const ServiceOrderController = {
@@ -138,6 +139,115 @@ export const ServiceOrderController = {
             if (!tenant) return res.status(404).json({ error: "Tenant inválido" });
 
             const result = await ServiceOrderService.deleteSignature(req.params.id, req.params.tipo, tenant.dbEnvKey, tenant.dbType);
+            res.status(200).json(result);
+        } catch (err) {
+            res.status(400).json({ error: err.message });
+        }
+    },
+
+    addImage: async (req, res) => {
+        try {
+            const tenantId = req.headers["x-tenant-id"];
+            if (!tenantId) {
+                return res.status(400).json({ error: "x-tenant-id header obrigatório" });
+            }
+
+            const tenant = await prisma.tenant.findUnique({ where: { id: tenantId } });
+            if (!tenant) {
+                return res.status(404).json({ error: "Tenant inválido" });
+            }
+
+            const { login } = req.user;
+            const user = await UserRepository.findByLogin(login, tenant.dbEnvKey, tenant.dbType);
+            if (!user) return null;
+            const result = await ServiceOrderService.addImage(
+                req.params.id,
+                req.file,
+                user.FKTECNICO,
+                user.PKCODUSU,
+                tenant.dbEnvKey,
+                tenant.dbType
+            );
+
+            res.status(200).json(result);
+        } catch (err) {
+            res.status(400).json({ error: err.message });
+        }
+    },
+
+    getImages: async (req, res) => {
+        try {
+            const tenantId = req.headers["x-tenant-id"];
+            if (!tenantId) {
+                return res.status(400).json({ error: "x-tenant-id header obrigatório" });
+            }
+
+            const tenant = await prisma.tenant.findUnique({
+                where: { id: tenantId }
+            });
+
+            if (!tenant) {
+                return res.status(404).json({ error: "Tenant inválido" });
+            }
+
+            const result = await ServiceOrderService.getImages(
+                req.params.id,
+                tenant.dbEnvKey,
+                tenant.dbType
+            );
+
+            res.status(200).json(result);
+        } catch (err) {
+            res.status(400).json({ error: err.message });
+        }
+    },
+
+    getImageById: async (req, res) => {
+        try {
+            const tenantId = req.headers["x-tenant-id"];
+            if (!tenantId) {
+                return res.status(400).json({ error: "x-tenant-id header obrigatório" });
+            }
+
+            const tenant = await prisma.tenant.findUnique({
+                where: { id: tenantId }
+            });
+
+            if (!tenant) {
+                return res.status(404).json({ error: "Tenant inválido" });
+            }
+
+            const result = await ServiceOrderService.getImageById(
+                req.params.id,
+                tenant.dbEnvKey,
+                tenant.dbType
+            );
+
+            res.status(200).json(result);
+        } catch (err) {
+            res.status(400).json({ error: err.message });
+        }
+    },
+
+    deleteImage: async (req, res) => {
+        try {
+            const tenantId = req.headers["x-tenant-id"];
+            if (!tenantId) {
+                return res.status(400).json({ error: "x-tenant-id header obrigatório" });
+            }
+
+            const tenant = await prisma.tenant.findUnique({ where: { id: tenantId } });
+            if (!tenant) {
+                return res.status(404).json({ error: "Tenant inválido" });
+            }
+
+            const result = await ServiceOrderService.deleteImage(
+                req.params.id,
+                req.params.idImage,
+                tenant.dbEnvKey,
+                tenant.dbType
+            );
+
             res.status(200).json(result);
         } catch (err) {
             res.status(400).json({ error: err.message });
