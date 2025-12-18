@@ -218,7 +218,7 @@ export const ServiceOrderController = {
             }
 
             const result = await ServiceOrderService.getImageById(
-                req.params.id,
+                req.params.imageId,
                 tenant.dbEnvKey,
                 tenant.dbType
             );
@@ -243,11 +243,46 @@ export const ServiceOrderController = {
                 return res.status(404).json({ error: "Tenant inválido" });
             }
 
-            const { id, imageId } = req.params; // 🔥 ISSO FALTAVA
+            const { id, imageId } = req.params;
 
             const result = await ServiceOrderService.deleteImage(
                 id,
                 imageId,
+                tenant.dbEnvKey,
+                tenant.dbType
+            );
+
+            res.status(200).json(result);
+        } catch (err) {
+            res.status(400).json({ error: err.message });
+        }
+    },
+
+    updateImageDescription: async (req, res) => {
+        try {
+            const tenantId = req.headers["x-tenant-id"];
+            if (!tenantId) {
+                return res.status(400).json({ error: "x-tenant-id header obrigatório" });
+            }
+
+            const { descricao } = req.body;
+            const { imageId } = req.params;
+
+            if (!descricao) {
+                return res.status(400).json({ error: "Descrição obrigatória" });
+            }
+
+            const tenant = await prisma.tenant.findUnique({
+                where: { id: tenantId }
+            });
+
+            if (!tenant) {
+                return res.status(404).json({ error: "Tenant inválido" });
+            }
+
+            const result = await ServiceOrderService.updateImageDescription(
+                imageId,
+                descricao,
                 tenant.dbEnvKey,
                 tenant.dbType
             );

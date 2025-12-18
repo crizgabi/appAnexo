@@ -436,18 +436,24 @@ export const FireBirdServiceOrderClient = {
     });
   },
 
-  deleteImage: (idConserto, seqImagem, dbEnvKey) => {
+  deleteImage: (idConserto, idImagem, dbEnvKey) => {
     return new Promise((resolve, reject) => {
       getConnection(dbEnvKey, (err, db) => {
         if (err) return reject(err);
 
         const selectQuery = `
-        SELECT PKARQUIVO, FKCONSERTO, CAMINHO, DESCRICAO
+        SELECT
+          PKARQUIVO,
+          FKCONSERTO,
+          CAMINHO,
+          DESCRICAO,
+          FKTECNICO,
+          DATACAD
         FROM TBARQUIVO
-        WHERE FKCONSERTO = ? AND PKARQUIVO = ?
-      `;
+        WHERE FKCONSERTO = ? AND PKARQUIVO = ? AND TIPO = 2
+        `;
 
-        db.query(selectQuery, [idConserto, seqImagem], (selErr, selResult) => {
+        db.query(selectQuery, [idConserto, idImagem], (selErr, selResult) => {
           if (selErr) {
             db.detach();
             return reject(selErr);
@@ -460,27 +466,45 @@ export const FireBirdServiceOrderClient = {
 
           const row = selResult[0];
 
-          // 2. remove registro da tabela
           const deleteQuery = `
           DELETE FROM TBARQUIVO
           WHERE PKARQUIVO = ? AND FKCONSERTO = ? AND TIPO = 2
         `;
 
-          db.query(deleteQuery, [seqImagem, idConserto], (delErr) => {
+          db.query(deleteQuery, [idImagem, idConserto], (delErr) => {
             db.detach();
 
             if (delErr) return reject(delErr);
 
-            // 3. retorno conforme contrato
-            resolve({
-              idConserto: row.FKCONSERTO,
-              seqImagem: row.PKARQUIVO,
-              urlRemovida: row.CAMINHO,
-              legenda: row.DESCRICAO,
-              dataHoraRemocao: new Date().toISOString(),
-              status: "removida"
-            });
+            resolve(row);
           });
+        });
+      });
+    });
+  },
+
+  updateImageDescription: (idImagem, descricao, dbEnvKey) => {
+    return new Promise((resolve, reject) => {
+      getConnection(dbEnvKey, (err, db) => {
+        if (err) return reject(err);
+
+        const query = `
+        UPDATE TBARQUIVO
+        SET DESCRICAO = ?, DATAATU = CURRENT_TIMESTAMP
+        WHERE PKARQUIVO = ?
+        RETURNING
+          PKARQUIVO,
+          FKCONSERTO,
+          CAMINHO,
+          FKTECNICO,
+          DESCRICAO,
+          DATACAD
+      `;
+
+        db.query(query, [descricao, idImagem], (qErr, result) => {
+          db.detach();
+          if (qErr) return reject(qErr);
+          resolve(result);
         });
       });
     });

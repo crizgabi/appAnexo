@@ -98,6 +98,15 @@ export const ServiceOrderRepository = {
         return client.deleteImage(idConserto, imageId, dbEnvKey);
     },
 
+    updateImageDescription: async (idImagem, descricao, dbEnvKey, dbType) => {
+        const client = DBClientFactory.getClient({
+            dbType,
+            module: "serviceOrder"
+        });
+
+        return client.updateImageDescription(idImagem, descricao, dbEnvKey);
+    },
+
     delete: async (id, dbEnvKey, dbType) => {
         const client = DBClientFactory.getClient({
             dbType,

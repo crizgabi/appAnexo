@@ -297,6 +297,7 @@ export const ServiceOrderService = {
             idConserto: row.FKCONSERTO ?? null,
             idImagem: row.PKARQUIVO ?? null,
             url: row.CAMINHO ?? null,
+            descricao: row.DESCRICAO ?? null,
             idTecnico: row.FKTECNICO ?? null,
             dataHoraUpload: row.DATACAD ?? null
         }));
@@ -311,6 +312,7 @@ export const ServiceOrderService = {
             idConserto: image.FKCONSERTO ?? null,
             idImagem: image.PKARQUIVO ?? null,
             url: image.CAMINHO ?? null,
+            descricao: image.DESCRICAO ?? null,
             idTecnico: image.FKTECNICO ?? null,
             dataHoraUpload: image.DATACAD ?? null
         };
@@ -331,12 +333,39 @@ export const ServiceOrderService = {
             throw new Error("Imagem não pertence a esta OS");
         }
 
-        return ServiceOrderRepository.deleteImage(
+        const deleted = await ServiceOrderRepository.deleteImage(
             idConserto,
             imageId,
             dbEnvKey,
             dbType
         );
+
+        return {
+            idConserto: deleted.FKCONSERTO ?? null,
+            idImagem: deleted.PKARQUIVO ?? null,
+            url: deleted.CAMINHO ?? null,
+            descricao: deleted.DESCRICAO ?? null,
+            idTecnico: deleted.FKTECNICO ?? null,
+            dataHoraUpload: deleted.DATACAD ?? null
+        };
+    },
+
+    async updateImageDescription(idImagem, descricao, dbEnvKey, dbType) {
+        const updated = await ServiceOrderRepository.updateImageDescription(
+            idImagem,
+            descricao,
+            dbEnvKey,
+            dbType
+        );
+
+        return {
+            idConserto: updated.FKCONSERTO ?? null,
+            idImagem: updated.PKARQUIVO ?? null,
+            url: updated.CAMINHO ?? null,
+            idTecnico: updated.FKTECNICO ?? null,
+            descricao: updated.DESCRICAO ?? null,
+            dataHoraUpload: updated.DATACAD ?? null
+        };
     },
 
     // DELETE

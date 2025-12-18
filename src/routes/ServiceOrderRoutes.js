@@ -22,7 +22,8 @@ router.put("/:id", AuthMiddleware, ServiceOrderController.update);
 router.delete("/:id", AuthMiddleware, ServiceOrderController.delete);
 router.get("/:id/images", AuthMiddleware, ServiceOrderController.getImages);
 router.post("/:id/image", AuthMiddleware,  upload.single("image"), ServiceOrderController.addImage);
-router.get("/:id/images/:id", AuthMiddleware, ServiceOrderController.getImageById);
+router.get("/:id/images/:imageId", AuthMiddleware, ServiceOrderController.getImageById);
 router.delete("/:id/images/:imageId", AuthMiddleware, ServiceOrderController.deleteImage);
+router.patch("/:id/images/:imageId/description", AuthMiddleware, ServiceOrderController.updateImageDescription);
 
 export default router;
