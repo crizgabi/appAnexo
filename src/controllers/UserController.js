@@ -12,13 +12,13 @@ export const loginUser = async (req, res) => {
     const resolve = await resolveTenant(req);
     if (resolve.error) return res.status(resolve.status).json({ error: resolve.error });
 
-    const { tenant } = resolve;
+    const { tenant, empresa } = resolve;
 
     const result = await UserService.loginUser({
       login,
       password,
       dbEnvKey: tenant.dbEnvKey,
-      dbType: tenant.dbType
+      dbType: tenant.dbType,
     });
 
     if (!result)
@@ -29,7 +29,8 @@ export const loginUser = async (req, res) => {
       user: result.user,
       token: result.token,
       refreshToken: result.refreshToken,
-      tenantId: tenant.id
+      tenantId: tenant.id,
+      empresa: empresa.nome
     });
   } catch (err) {
     console.error(err);
@@ -48,7 +49,7 @@ export const refreshSession = async (req, res) => {
 
     if (!refreshToken)
       return res.status(400).json({ error: "Refresh token required" });
-    
+
     const tenant = await prisma.tenant.findUnique({ where: { id: tenantId } });
     if (!tenant) return res.status(404).json({ error: "Tenant inválido" });
 
@@ -138,29 +139,24 @@ export const showUserDetails = async (req, res) => {
 
 // Helpers
 async function resolveTenant(req) {
-  const tenantHeader = req.headers["x-tenant-id"];
   const { empresaId } = req.body;
 
   let tenant;
+  let empresa;
 
-  if (tenantHeader) {
-    tenant = await prisma.tenant.findUnique({ where: { id: tenantHeader } });
-    if (!tenant) return { error: "Tenant inválido", status: 404 };
-  } else {
-    if (!empresaId)
-      return { error: "empresaId obrigatório", status: 400 };
+  if (!empresaId)
+    return { error: "empresaId obrigatório", status: 400 };
 
-    const empresa = await prisma.empresa.findUnique({ where: { id: empresaId } });
-    if (!empresa)
-      return { error: "Empresa não encontrada", status: 404 };
+  empresa = await prisma.empresa.findUnique({ where: { id: empresaId } });
+  if (!empresa)
+    return { error: "Empresa não encontrada", status: 404 };
 
-    tenant = await prisma.tenant.findUnique({ where: { id: empresa.tenantId } });
-    if (!tenant)
-      return { error: "Tenant não encontrado", status: 500 };
-  }
-
-  return { tenant };
-}
+  tenant = await prisma.tenant.findUnique({ where: { id: empresa.tenantId } });
+  if (!tenant)
+    return { error: "Tenant não encontrado", status: 500 };
+  
+  return { tenant, empresa };
+};
 
 // GET /users/all
 export const getAllUsers = async (req, res) => {
