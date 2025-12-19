@@ -362,5 +362,51 @@ export const ServiceOrderController = {
             res.status(400).json({ error: err.message });
         }
     },
+
+/// CHECKLIST
+
+    addChecklist: async (req, res) => {
+        try {
+            const tenantId = req.headers["x-tenant-id"];
+            if (!tenantId) {
+                return res
+                    .status(400)
+                    .json({ error: "x-tenant-id header obrigatório" });
+            }
+
+            const tenant = await prisma.tenant.findUnique({
+                where: { id: tenantId }
+            });
+
+            if (!tenant) {
+                return res
+                    .status(404)
+                    .json({ error: "Tenant inválido" });
+            }
+
+            const { idChecklist, respostas } = req.body;
+
+            if (!idChecklist || !Array.isArray(respostas)) {
+                return res.status(400).json({
+                    error: "idChecklist e respostas são obrigatórios"
+                });
+            }
+
+            const result = await ServiceOrderService.addChecklist(
+                req.params.id,
+                { idChecklist, respostas },
+                tenant.dbEnvKey,
+                tenant.dbType
+            );
+
+            return res.status(201).json(result);
+        } catch (err) {
+            return res.status(400).json({
+                error: err.message
+            });
+        }
+    },
 };
+
+
 export default ServiceOrderController;

@@ -472,4 +472,113 @@ export const ServiceOrderService = {
             dataChecklistFinal: updated.DATACHECKLISTFINAL
         };
     },
+
+    /// CHECKLIST
+    
+    async addChecklist(idConserto, { idChecklist, respostas }, dbEnvKey, dbType) {
+        // 1. Verifica se a OS existe
+        const os = await ServiceOrderRepository.getById(
+            idConserto,
+            dbEnvKey,
+            dbType
+        );
+
+        if (!os) {
+            throw new Error("Ordem de serviço não encontrada");
+        }
+
+        // 2. Verifica se o checklist existe
+        const checklist =
+            await ChecklistRepository.getChecklistById(
+                idChecklist,
+                dbEnvKey,
+                dbType
+            );
+
+        if (!checklist) {
+            throw new Error("Checklist não encontrado");
+        }
+
+        // 3. Busca itens do checklist
+        const itens =
+            await ChecklistRepository.getChecklistItens(
+                idChecklist,
+                dbEnvKey,
+                dbType
+            );
+
+        if (!itens || itens.length === 0) {
+            throw new Error("Checklist não possui itens configurados");
+        }
+
+        const itensMap = new Map();
+        itens.forEach(item => itensMap.set(item.idItem, item));
+
+        // 4. Valida respostas
+        for (const resposta of respostas) {
+            const item = itensMap.get(resposta.idItem);
+
+            if (!item) {
+                throw new Error(
+                    `Item ${resposta.idItem} não pertence ao checklist informado`
+                );
+            }
+
+            // Validação simples por tipo (aprofundamos depois)
+            if (
+                resposta.resposta !== null &&
+                resposta.resposta !== undefined
+            ) {
+                switch (item.tipoResposta) {
+                    case "numero":
+                        if (typeof resposta.resposta !== "number") {
+                            throw new Error(
+                                `Resposta inválida para o item ${item.idItem}`
+                            );
+                        }
+                        break;
+
+                    case "booleano":
+                        if (typeof resposta.resposta !== "boolean") {
+                            throw new Error(
+                                `Resposta inválida para o item ${item.idItem}`
+                            );
+                        }
+                        break;
+
+                    case "texto":
+                    case "observacao":
+                        if (typeof resposta.resposta !== "string") {
+                            throw new Error(
+                                `Resposta inválida para o item ${item.idItem}`
+                            );
+                        }
+                        break;
+
+                    // alternativas / checkbox podem ser tratadas depois
+                    default:
+                        break;
+                }
+            }
+        }
+
+        // 5. Persistência
+        const result =
+            await ServiceOrderRepository.addChecklistResposta(
+                idConserto,
+                { idChecklist, respostas },
+                dbEnvKey,
+                dbType
+            );
+
+        // 6. Retorno (pode evoluir depois)
+        return {
+            message: "Checklist salvo com sucesso.",
+            idConserto,
+            idChecklist,
+            idChecklistResposta: result?.idChecklistResposta ?? null,
+            status: "preenchido"
+        };
+    }
+
 };

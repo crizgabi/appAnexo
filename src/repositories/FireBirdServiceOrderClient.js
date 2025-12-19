@@ -601,4 +601,94 @@ export const FireBirdServiceOrderClient = {
       });
     });
   },
+
+  addChecklistResposta: (idConserto, { idChecklist, respostas }, dbEnvKey) => {
+    return new Promise((resolve, reject) => {
+      getConnection(dbEnvKey, (err, db) => {
+        if (err) return reject(err);
+
+        const selectQuery = `
+        SELECT PKCHECKLISTRESP
+        FROM TBCHECKLISTRESP
+        WHERE FKCONSERTO = ?
+          AND FKCHECKLIST = ?
+      `;
+
+        db.query(selectQuery, [idConserto, idChecklist], (selErr, selResult) => {
+          if (selErr) {
+            db.detach();
+            return reject(selErr);
+          }
+
+          const proceedInsert = () => {
+            if (!respostas || respostas.length === 0) {
+              db.detach();
+              return resolve({
+                idChecklist,
+                idChecklistResposta: null
+              });
+            }
+
+            const insertQuery = `
+            INSERT INTO TBCHECKLISTRESP
+              (FKCONSERTO, FKCHECKLIST, FKCHECKLISTITEM, RESPOSTA, OBSERVACAO, DATAHORAREGISTRO)
+            VALUES (?, ?, ?, ?, ?, CURRENT_TIMESTAMP)
+          `;
+
+            let pending = respostas.length;
+            let lastId = null;
+
+            respostas.forEach((item) => {
+              db.query(
+                insertQuery,
+                [
+                  idConserto,
+                  idChecklist,
+                  item.idItem,
+                  item.resposta ?? null,
+                  item.observacao ?? null
+                ],
+                (insErr, insResult) => {
+                  if (insErr) {
+                    db.detach();
+                    return reject(insErr);
+                  }
+
+                  lastId = insResult?.PKCHECKLISTRESP ?? lastId;
+
+                  pending--;
+                  if (pending === 0) {
+                    db.detach();
+                    resolve({
+                      idChecklist,
+                      idChecklistResposta: lastId
+                    });
+                  }
+                }
+              );
+            });
+          };
+
+          if (selResult && selResult.length > 0) {
+            const deleteQuery = `
+            DELETE FROM TBCHECKLISTRESP
+            WHERE FKCONSERTO = ?
+              AND FKCHECKLIST = ?
+          `;
+
+            db.query(deleteQuery, [idConserto, idChecklist], (delErr) => {
+              if (delErr) {
+                db.detach();
+                return reject(delErr);
+              }
+              proceedInsert();
+            });
+          } else {
+            proceedInsert();
+          }
+        });
+      });
+    });
+  },
+
 };

@@ -141,4 +141,23 @@ export const ServiceOrderRepository = {
 
         return client.setCheckOut(idConserto, dataChecklistFinal, dbEnvKey);
     },
+
+    addChecklistResposta: async (
+        idConserto,
+        { idChecklist, respostas },
+        dbEnvKey,
+        dbType
+    ) => {
+        const client = DBClientFactory.getClient({
+            dbType,
+            module: "serviceOrder"
+        });
+
+        return client.addChecklistResposta(
+            idConserto,
+            { idChecklist, respostas },
+            dbEnvKey
+        );
+    },
+
 };
