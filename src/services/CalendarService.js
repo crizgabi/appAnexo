@@ -29,6 +29,8 @@ export const CalendarService = {
           nomeTecnicoResponsavel: r.nomeTecnicoResponsavel ?? null,
           dataAgendamento: r.dataAgendamento ?? null,
           horaAgendamento: r.horaAgendamento ?? null,
+          dataAtendimento: r.dataAtendimento ?? null,
+          dataChecklistFinal: r.dataChecklistFinal ?? null,
         };
       })
     );
