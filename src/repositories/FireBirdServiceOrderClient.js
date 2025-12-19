@@ -532,5 +532,73 @@ export const FireBirdServiceOrderClient = {
         );
       });
     });
-  }
+  },
+
+  getCheckinState: (idConserto, dbEnvKey) => {
+    return new Promise((resolve, reject) => {
+      getConnection(dbEnvKey, (err, db) => {
+        if (err) return reject(err);
+
+        const query = `
+        SELECT
+          PKCONSERTO,
+          DATAATENDIMENTO,
+          DATACHECKLISTFINAL
+          FROM TBCONSERTO
+          WHERE PKCONSERTO = ?
+      `;
+
+        db.query(query, [idConserto], (qErr, result) => {
+          db.detach();
+          if (qErr) return reject(qErr);
+
+          if (!result || result.length === 0) {
+            return resolve(null);
+          }
+
+          resolve(result[0]);
+        });
+      });
+    });
+  },
+
+  setCheckIn: (idConserto, dataAtendimento, dbEnvKey) => {
+    return new Promise((resolve, reject) => {
+      getConnection(dbEnvKey, (err, db) => {
+        if (err) return reject(err);
+
+        const query = `
+        UPDATE TBCONSERTO
+        SET DATAATENDIMENTO = ?
+        WHERE PKCONSERTO = ?
+      `;
+
+        db.query(query, [dataAtendimento, idConserto], (qErr) => {
+          db.detach();
+          if (qErr) return reject(qErr);
+          resolve(true);
+        });
+      });
+    });
+  },
+
+  setCheckOut: (idConserto, dataChecklistFinal, dbEnvKey) => {
+    return new Promise((resolve, reject) => {
+      getConnection(dbEnvKey, (err, db) => {
+        if (err) return reject(err);
+
+        const query = `
+        UPDATE TBCONSERTO
+        SET DATACHECKLISTFINAL = ?
+        WHERE PKCONSERTO = ?
+      `;
+
+        db.query(query, [dataChecklistFinal, idConserto], (qErr) => {
+          db.detach();
+          if (qErr) return reject(qErr);
+          resolve(true);
+        });
+      });
+    });
+  },
 };

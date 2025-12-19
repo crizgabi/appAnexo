@@ -25,5 +25,7 @@ router.post("/:id/image", AuthMiddleware,  upload.single("image"), ServiceOrderC
 router.get("/:id/images/:imageId", AuthMiddleware, ServiceOrderController.getImageById);
 router.delete("/:id/images/:imageId", AuthMiddleware, ServiceOrderController.deleteImage);
 router.patch("/:id/images/:imageId/description", AuthMiddleware, ServiceOrderController.updateImageDescription);
+router.post("/:id/checkin", AuthMiddleware, ServiceOrderController.checkIn);
+router.post("/:id/checkout", AuthMiddleware, ServiceOrderController.checkOut);
 
 export default router;

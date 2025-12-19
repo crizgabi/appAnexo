@@ -112,7 +112,7 @@ export const ServiceOrderService = {
             nomeTecnicoResponsavel: os.NMTECNICO ?? null,
             dataConserto: os.DATACONSERTO ?? null,
             dataAtendimento: formatDate(os.DATAATENDIMENTO) ?? null,
-            dataChecklistFinal: formatDate(os.DATACHECKLISTFINA) ?? null,
+            dataChecklistFinal: formatDate(os.DATACHECKLISTFINAL) ?? null,
             dataAgendamento: formatDate(os.DATACONSERTO),
             horaAgendamento: formatTime(os.HORA),
             observacoes: os.OBS ?? null,
@@ -387,5 +387,89 @@ export const ServiceOrderService = {
             idConserto: Number(id),
             deletedAt: null
         };
-    }
+    },
+
+    async checkIn(id, dataAtendimento, dbEnvKey, dbType) {
+        const existing = await ServiceOrderRepository.getCheckinState(
+            id,
+            dbEnvKey,
+            dbType
+        );
+
+        if (!existing) {
+            throw new Error("Ordem de serviço não encontrada");
+        }
+
+        // Idempotência
+        if (existing.DATAATENDIMENTO) {
+            return {
+                idConserto: id,
+                dataAtendimento: existing.DATAATENDIMENTO
+            };
+        }
+
+        const data = dataAtendimento
+            ? new Date(dataAtendimento)
+            : new Date();
+
+        await ServiceOrderRepository.setCheckIn(
+            id,
+            data,
+            dbEnvKey,
+            dbType
+        );
+
+        const updated = await ServiceOrderRepository.getCheckinState(
+            id,
+            dbEnvKey,
+            dbType
+        );
+
+        return {
+            idConserto: id,
+            dataAtendimento: updated.DATAATENDIMENTO
+        };
+    },
+
+    async checkOut(id, dataChecklistFinal, dbEnvKey, dbType) {
+        const existing = await ServiceOrderRepository.getCheckinState(
+            id,
+            dbEnvKey,
+            dbType
+        );
+
+        if (!existing) {
+            throw new Error("Ordem de serviço não encontrada");
+        }
+
+        // Idempotência
+        if (existing.DATACHECKLISTFINAL) {
+            return {
+                idConserto: id,
+                dataChecklistFinal: existing.DATACHECKLISTFINAL
+            };
+        }
+
+        const data = dataChecklistFinal
+            ? new Date(dataChecklistFinal)
+            : new Date();
+
+        await ServiceOrderRepository.setCheckOut(
+            id,
+            data,
+            dbEnvKey,
+            dbType
+        );
+
+        const updated = await ServiceOrderRepository.getCheckinState(
+            id,
+            dbEnvKey,
+            dbType
+        );
+
+        return {
+            idConserto: id,
+            dataChecklistFinal: updated.DATACHECKLISTFINAL
+        };
+    },
 };

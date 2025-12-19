@@ -306,6 +306,61 @@ export const ServiceOrderController = {
         } catch (err) {
             res.status(400).json({ error: err.message });
         }
-    }
+    },
+
+    checkIn: async (req, res) => {
+        try {
+            const tenantId = req.headers["x-tenant-id"];
+            if (!tenantId) {
+                return res.status(400).json({ error: "x-tenant-id header obrigatório" });
+            }
+
+            const tenant = await prisma.tenant.findUnique({ where: { id: tenantId } });
+            if (!tenant) {
+                return res.status(404).json({ error: "Tenant inválido" });
+            }
+
+            const { dataAtendimento } = req.body;
+
+            const result = await ServiceOrderService.checkIn(
+                req.params.id,
+                dataAtendimento,
+                tenant.dbEnvKey,
+                tenant.dbType
+            );
+
+            res.status(200).json(result);
+        } catch (err) {
+            // OS não encontrada ou qualquer regra do service
+            res.status(400).json({ error: err.message });
+        }
+    },
+
+    checkOut: async (req, res) => {
+        try {
+            const tenantId = req.headers["x-tenant-id"];
+            if (!tenantId) {
+                return res.status(400).json({ error: "x-tenant-id header obrigatório" });
+            }
+
+            const tenant = await prisma.tenant.findUnique({ where: { id: tenantId } });
+            if (!tenant) {
+                return res.status(404).json({ error: "Tenant inválido" });
+            }
+
+            const { dataChecklistFinal } = req.body;
+
+            const result = await ServiceOrderService.checkOut(
+                req.params.id,
+                dataChecklistFinal,
+                tenant.dbEnvKey,
+                tenant.dbType
+            );
+
+            res.status(200).json(result);
+        } catch (err) {
+            res.status(400).json({ error: err.message });
+        }
+    },
 };
 export default ServiceOrderController;

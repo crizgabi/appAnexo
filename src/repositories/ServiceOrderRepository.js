@@ -113,5 +113,32 @@ export const ServiceOrderRepository = {
             module: "serviceOrder"
         });
         return client.delete(id, dbEnvKey);
-    }
+    },
+
+    getCheckinState: async (idConserto, dbEnvKey, dbType) => {
+        const client = DBClientFactory.getClient({
+            dbType,
+            module: "serviceOrder"
+        });
+
+        return client.getCheckinState(idConserto, dbEnvKey);
+    },
+
+    setCheckIn: async (idConserto, dataAtendimento, dbEnvKey, dbType) => {
+        const client = DBClientFactory.getClient({
+            dbType,
+            module: "serviceOrder"
+        });
+
+        return client.setCheckIn(idConserto, dataAtendimento, dbEnvKey);
+    },
+
+    setCheckOut: async (idConserto, dataChecklistFinal, dbEnvKey, dbType) => {
+        const client = DBClientFactory.getClient({
+            dbType,
+            module: "serviceOrder"
+        });
+
+        return client.setCheckOut(idConserto, dataChecklistFinal, dbEnvKey);
+    },
 };
