@@ -602,91 +602,94 @@ export const FireBirdServiceOrderClient = {
     });
   },
 
-  addChecklistResposta: (idConserto, { idChecklist, respostas }, dbEnvKey) => {
+  /// CHECKLIST
+
+  async addChecklistResposta(idConserto, { idChecklist, respostas }, dbEnvKey) {
     return new Promise((resolve, reject) => {
-      getConnection(dbEnvKey, (err, db) => {
+      getConnection(dbEnvKey, async (err, db) => {
         if (err) return reject(err);
 
-        const selectQuery = `
-        SELECT PKCHECKLISTRESP
-        FROM TBCHECKLISTRESP
-        WHERE FKCONSERTO = ?
-          AND FKCHECKLIST = ?
-      `;
+        try {
+          for (const resposta of respostas) {
 
-        db.query(selectQuery, [idConserto, idChecklist], (selErr, selResult) => {
-          if (selErr) {
-            db.detach();
-            return reject(selErr);
-          }
+            const itemResult = await db.query(
+              `
+            SELECT PKCHECKLISTITEM, TIPO
+            FROM TBCHECKLISTITEM
+            WHERE PKCHECKLISTITEM = ?
+            `,
+              [resposta.idItem]
+            );
 
-          const proceedInsert = () => {
-            if (!respostas || respostas.length === 0) {
-              db.detach();
-              return resolve({
-                idChecklist,
-                idChecklistResposta: null
-              });
+            const item = itemResult[0];
+            if (!item) {
+              throw new Error(`Item ${resposta.idItem} não encontrado`);
             }
 
-            const insertQuery = `
-            INSERT INTO TBCHECKLISTRESP
-              (FKCONSERTO, FKCHECKLIST, FKCHECKLISTITEM, RESPOSTA, OBSERVACAO, DATAHORAREGISTRO)
-            VALUES (?, ?, ?, ?, ?, CURRENT_TIMESTAMP)
-          `;
+            let valorResposta = null;
+            let observacao = null;
 
-            let pending = respostas.length;
-            let lastId = null;
+            // 🔁 MAPEAMENTO TEXTO → NÚMERO
+            const mapaTexto = {
+              "Ruim": 1,
+              "Regular": 3,
+              "Bom": 5,
+              "Ótimo": 7,
+              "Baixo": -1,
+              "Alto": 1
+            };
 
-            respostas.forEach((item) => {
-              db.query(
-                insertQuery,
-                [
-                  idConserto,
-                  idChecklist,
-                  item.idItem,
-                  item.resposta ?? null,
-                  item.observacao ?? null
-                ],
-                (insErr, insResult) => {
-                  if (insErr) {
-                    db.detach();
-                    return reject(insErr);
+            switch (item.TIPO) {
+              case 0: // BOOLEANO
+                valorResposta = resposta.resposta ? 1 : 0;
+                break;
+
+              case 1: // NUMERO / NOTA
+              case 3:
+                valorResposta = resposta.resposta;
+                break;
+
+              case 2: // TEXTO NUMERADO
+                if (typeof resposta.resposta === "string") {
+                  valorResposta = mapaTexto[resposta.resposta];
+
+                  if (valorResposta === undefined) {
+                    throw new Error(
+                      `Texto inválido para o item ${resposta.idItem}`
+                    );
                   }
-
-                  lastId = insResult?.PKCHECKLISTRESP ?? lastId;
-
-                  pending--;
-                  if (pending === 0) {
-                    db.detach();
-                    resolve({
-                      idChecklist,
-                      idChecklistResposta: lastId
-                    });
-                  }
+                } else {
+                  valorResposta = resposta.resposta;
                 }
-              );
-            });
-          };
+                break;
+            }
 
-          if (selResult && selResult.length > 0) {
-            const deleteQuery = `
-            DELETE FROM TBCHECKLISTRESP
-            WHERE FKCONSERTO = ?
-              AND FKCHECKLIST = ?
-          `;
-
-            db.query(deleteQuery, [idConserto, idChecklist], (delErr) => {
-              if (delErr) {
-                db.detach();
-                return reject(delErr);
-              }
-              proceedInsert();
-            });
-          } else {
-            proceedInsert();
+            await db.execute(
+              `
+            INSERT INTO TBCHECKLISTRESPOSTAITEM (
+              FKCHECKLIST,
+              FKCHECKLISTITEM,
+              FKCONSERTO,
+              RESPOSTA,
+              TIPO
+            )
+            VALUES (?, ?, ?, ?, ?)
+            `,
+              [
+                idChecklist,
+                resposta.idItem,
+                idConserto,
+                valorResposta,
+                item.TIPO
+              ]
+            );
           }
-        });
+
+          resolve({ success: true });
+
+        } catch (e) {
+          reject(e);
+        }
       });
     });
   },

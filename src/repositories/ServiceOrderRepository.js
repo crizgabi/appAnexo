@@ -160,4 +160,22 @@ export const ServiceOrderRepository = {
         );
     },
 
+    getChecklistById: async (idChecklist, dbEnvKey, dbType) => {
+        const client = DBClientFactory.getClient({
+            dbType,
+            module: "serviceOrder"
+        });
+
+        return client.getChecklistById(idChecklist, dbEnvKey);
+    },
+
+    getChecklistItens: async (idChecklist, dbEnvKey, dbType) => {
+        const client = DBClientFactory.getClient({
+            dbType,
+            module: "serviceOrder"
+        });
+
+        return client.getChecklistItens(idChecklist, dbEnvKey);
+    },
+
 };
