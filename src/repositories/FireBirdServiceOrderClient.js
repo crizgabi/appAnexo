@@ -474,7 +474,7 @@ export const FireBirdServiceOrderClient = {
 
           const deleteQuery = `
           DELETE FROM TBARQUIVO
-          WHERE PKARQUIVO = ? AND FKCONSERTO = ? AND TIPO = 2
+          WHERE PKARQUIVO = ? AND FKCONSERTO = ?
         `;
 
           db.query(deleteQuery, [idImagem, idConserto], (delErr) => {

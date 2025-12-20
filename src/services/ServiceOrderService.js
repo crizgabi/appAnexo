@@ -1,6 +1,7 @@
 import OrdemServico from "../models/ServiceOrderModel.js";
 import { ServiceOrderRepository } from "../repositories/ServiceOrderRepository.js";
 import { UploadService } from "./UploadService.js";
+import { CacheService } from "../services/CacheService.js";
 
 export const ServiceOrderService = {
 
@@ -85,6 +86,12 @@ export const ServiceOrderService = {
 
     // GET BY ID
     async find(id, dbEnvKey, dbType) {
+
+        const cached = await CacheService.get(osCacheKey(id, dbEnvKey, dbType));
+        if (cached) {
+            return cached;
+        }
+
         const os = await ServiceOrderRepository.getById(id, dbEnvKey, dbType);
         if (!os) throw new Error("Ordem de serviço não encontrada");
 
@@ -99,7 +106,7 @@ export const ServiceOrderService = {
         }
 
         // normalize a single row to expected shape
-        return {
+        const result = {
             idConserto: os.PKCONSERTO ?? null,
             idCliente: os.FKCLIENTE ?? null,
             nomeCliente: os.RAZAOSOCIAL ?? null,
@@ -121,6 +128,10 @@ export const ServiceOrderService = {
             assinaturaTecnico: os.ARQASS1 ?? null,
             assinaturaCliente: os.ARQASS2 ?? null
         };
+
+        await CacheService.set(osCacheKey(id, dbEnvKey, dbType), result, 60);
+
+        return result;
     },
 
     // GET BY USER
@@ -190,6 +201,8 @@ export const ServiceOrderService = {
             dbType
         );
 
+        await CacheService.del(osCacheKey(id, dbEnvKey, dbType));
+
         return await this.find(id, dbEnvKey, dbType);
     },
 
@@ -219,6 +232,8 @@ export const ServiceOrderService = {
             { assinatura1: assinatura1Url, assinatura2: assinatura2Url },
             dbEnvKey, dbType
         );
+
+        await CacheService.del(osCacheKey(id, dbEnvKey, dbType));
 
         return this.getSignature(
             id,
@@ -263,6 +278,8 @@ export const ServiceOrderService = {
             dbType
         );
 
+        await CacheService.del(osCacheKey(id, dbEnvKey, dbType));
+
         return {
             deleted: true,
             tipo
@@ -285,6 +302,8 @@ export const ServiceOrderService = {
             dbEnvKey,
             dbType
         );
+
+        await CacheService.del(osCacheKey(id, dbEnvKey, dbType));
 
         return {
             idConserto: image.FKCONSERTO ?? null,
@@ -347,6 +366,8 @@ export const ServiceOrderService = {
             dbType
         );
 
+        await CacheService.del(osCacheKey(id, dbEnvKey, dbType));
+
         return {
             idConserto: deleted.FKCONSERTO ?? null,
             idImagem: deleted.PKARQUIVO ?? null,
@@ -381,6 +402,8 @@ export const ServiceOrderService = {
         if (!existing) throw new Error("Ordem de serviço não encontrada");
 
         await ServiceOrderRepository.delete(id, dbEnvKey, dbType);
+
+        await CacheService.del(osCacheKey(id, dbEnvKey, dbType));
 
         return {
             message: "Ordem de serviço removida com sucesso",
@@ -418,6 +441,8 @@ export const ServiceOrderService = {
             dbEnvKey,
             dbType
         );
+
+        await CacheService.del(osCacheKey(id, dbEnvKey, dbType));
 
         const updated = await ServiceOrderRepository.getCheckinState(
             id,
@@ -461,6 +486,8 @@ export const ServiceOrderService = {
             dbType
         );
 
+        await CacheService.del(osCacheKey(id, dbEnvKey, dbType));
+
         const updated = await ServiceOrderRepository.getCheckinState(
             id,
             dbEnvKey,
@@ -473,3 +500,9 @@ export const ServiceOrderService = {
         };
     },
 };
+
+//HELPERS
+
+function osCacheKey(id, dbEnvKey, dbType) {
+    return `os:find:${String(dbEnvKey)}:${String(dbType)}:${Number(id)}`;
+}
