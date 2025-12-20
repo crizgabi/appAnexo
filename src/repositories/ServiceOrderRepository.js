@@ -142,12 +142,7 @@ export const ServiceOrderRepository = {
         return client.setCheckOut(idConserto, dataChecklistFinal, dbEnvKey);
     },
 
-    addChecklistResposta: async (
-        idConserto,
-        { idChecklist, respostas },
-        dbEnvKey,
-        dbType
-    ) => {
+    addChecklistResposta: async (idConserto, { idChecklist, respostas }, dbEnvKey, dbType) => {
         const client = DBClientFactory.getClient({
             dbType,
             module: "serviceOrder"
@@ -176,6 +171,33 @@ export const ServiceOrderRepository = {
         });
 
         return client.getChecklistItens(idChecklist, dbEnvKey);
+    },
+
+    getChecklistsRespondidos: async (idConserto, dbEnvKey, dbType) => {
+        const client = DBClientFactory.getClient({
+            dbType,
+            module: "serviceOrder"
+        });
+
+        return client.getChecklistsRespondidos(idConserto, dbEnvKey);
+    },
+
+    deleteChecklistResposta: async (idConserto, idChecklist, dbEnvKey, dbType) => {
+        const client = DBClientFactory.getClient({
+            dbType,
+            module: "serviceOrder"
+        });
+
+        return client.deleteChecklistResposta(idConserto, idChecklist, dbEnvKey);
+    },
+
+    getChecklistDetail: async (idConserto, idChecklist, dbEnvKey, dbType) => {
+        const client = DBClientFactory.getClient({
+            dbType,
+            module: "serviceOrder"
+        });
+
+        return client.getChecklistDetail(idConserto, idChecklist, dbEnvKey);
     },
 
 };
