@@ -196,4 +196,13 @@ export const ServiceOrderRepository = {
         return client.deleteChecklistResposta(idConserto, idChecklist, dbEnvKey);
     },
 
+    getChecklistDetail: async (idConserto, idChecklist, dbEnvKey, dbType) => {
+        const client = DBClientFactory.getClient({
+            dbType,
+            module: "serviceOrder"
+        });
+
+        return client.getChecklistDetail(idConserto, idChecklist, dbEnvKey);
+    },
+
 };
