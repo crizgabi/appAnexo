@@ -598,6 +598,56 @@ export const ServiceOrderService = {
             idChecklistResposta: result?.idChecklistResposta ?? null,
             status: "preenchido"
         };
+    },
+
+    async listChecklistsRespondidos(idConserto, dbEnvKey, dbType) {
+
+        const os = await ServiceOrderRepository.getById(
+            idConserto,
+            dbEnvKey,
+            dbType
+        );
+
+        if (!os) {
+            throw new Error("Ordem de serviço não encontrada");
+        }
+
+        const respondidos = await ServiceOrderRepository.getChecklistsRespondidos(
+            idConserto,
+            dbEnvKey,
+            dbType
+        );
+
+        return (respondidos || []).map((item) => ({
+            idChecklist: item.FKCHECKLIST,
+            nomeChecklist: item.DESCRICAO,
+            dataResposta: item.DATAHORAREGISTRO
+        }));
+    },
+
+    async deleteChecklistResposta(idConserto, idChecklist, dbEnvKey, dbType) {
+        const os = await ServiceOrderRepository.getById(
+            idConserto,
+            dbEnvKey,
+            dbType
+        );
+
+        if (!os) {
+            throw new Error("Ordem de serviço não encontrada");
+        }
+
+        await ServiceOrderRepository.deleteChecklistResposta(
+            idConserto,
+            idChecklist,
+            dbEnvKey,
+            dbType
+        );
+
+        return {
+            message: "Checklist removido com sucesso",
+            idConserto,
+            idChecklist
+        };
     }
 
 };

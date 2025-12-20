@@ -705,4 +705,55 @@ export const FireBirdServiceOrderClient = {
     });
   },
 
+  getChecklistsRespondidos(idConserto, dbEnvKey) {
+    return new Promise((resolve, reject) => {
+      getConnection(dbEnvKey, (err, db) => {
+        if (err) return reject(err);
+
+        const query = `
+          SELECT
+            R.FKCHECKLIST,
+            C.DESCRICAO,
+            MAX(R.DATAHORAREGISTRO) AS DATAHORAREGISTRO
+          FROM TBCHECKLISTRESP R
+          INNER JOIN TBCHECKLIST C ON C.PKCHECKLIST = R.FKCHECKLIST
+          WHERE R.FKCONSERTO = ?
+          GROUP BY R.FKCHECKLIST, C.DESCRICAO
+          ORDER BY R.FKCHECKLIST
+        `;
+
+        db.query(query, [idConserto], (qErr, result) => {
+          db.detach();
+          if (qErr) return reject(qErr);
+
+          resolve(result || []);
+        });
+      });
+    });
+  },
+
+  deleteChecklistResposta(idConserto, idChecklist, dbEnvKey) {
+    return new Promise((resolve, reject) => {
+      getConnection(dbEnvKey, async (err, db) => {
+        if (err) return reject(err);
+
+        try {
+          await db.execute(
+            `
+            DELETE FROM TBCHECKLISTRESP
+            WHERE FKCONSERTO = ? AND FKCHECKLIST = ?
+            `,
+            [idConserto, idChecklist]
+          );
+
+          resolve(true);
+        } catch (e) {
+          reject(e);
+        } finally {
+          db.detach();
+        }
+      });
+    });
+  },
+
 };
