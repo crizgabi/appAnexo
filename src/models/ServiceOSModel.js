@@ -9,7 +9,8 @@ export default class ServiceOSModel  {
     valorTotal = 0,
     observacao = null,
     idUsuario = null,
-    ordem = null
+    ordem = null,
+    idTecnico = null
   }) {
     this.idItemServico = idItemServico;
     this.idConserto = idConserto;
@@ -21,5 +22,6 @@ export default class ServiceOSModel  {
     this.observacao = observacao;
     this.idUsuario = idUsuario;
     this.ordem = ordem;
+    this.idTecnico = idTecnico;
   }
 }

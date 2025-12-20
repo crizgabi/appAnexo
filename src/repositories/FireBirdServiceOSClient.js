@@ -60,6 +60,7 @@ export const FireBirdServiceOSClient = {
                                     PKCODCONSERV,
                                     FKCONSERTO,
                                     FKSERVICO,
+                                    FKTECNICO,
                                     NMSERVICO,
                                     QUANT,
                                     VALOR,
@@ -67,13 +68,14 @@ export const FireBirdServiceOSClient = {
                                     FKCODUSU,
                                     ORDEM,
                                     OBS
-                                ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                                ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
                             `;
 
                             const params = [
                                 nextId,
                                 item.idConserto,
                                 item.idServico,
+                                item.idTecnico,
                                 nomeServico, // Valor buscado e salvo na coluna NMSERVICO
                                 item.quantidade,
                                 item.valorUnitario,
@@ -91,6 +93,7 @@ export const FireBirdServiceOSClient = {
                                 resolve({
                                     idItemServico: nextId,
                                     idConserto: item.idConserto,
+                                    idTecnico: item.idTecnico,
                                     idServico: item.idServico,
                                     descricaoServico: nomeServico, // 👈 CORRIGIDO: Usa a variável 'nomeServico' que foi buscada
                                     quantidade: item.quantidade,
@@ -118,6 +121,7 @@ export const FireBirdServiceOSClient = {
                     SELECT
                       r.PKCODCONSERV,
                       r.FKSERVICO,
+                      r.FKTECNICO,
                       COALESCE(r.NMSERVICO, s.NOMESERVICO, s.DESCRICAO) AS NOME_SERVICO,
                       r.QUANT,
                       r.VALOR,
@@ -136,6 +140,7 @@ export const FireBirdServiceOSClient = {
 
                     const mappedRows = rows.map(row => ({
                         idItemServico: row.PKCODCONSERV,
+                        idTecnico: row.IDTECNICO || row.FKTECNICO,
                         idServico: row.FKSERVICO,
                         descricaoServico: row.NOME_SERVICO, // OK
                         quantidade: row.QUANT,

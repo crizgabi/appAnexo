@@ -1,7 +1,7 @@
 import ServiceOSModel from "../models/ServiceOSModel.js";
 import { ServiceOSRepository } from "../repositories/ServiceOSRepository.js";
 
-export const ServiceOSService  = {
+export const ServiceOSService = {
 
   create: async (data, dbEnvKey, dbType) => {
     const idOS = data.idConserto;
@@ -21,7 +21,9 @@ export const ServiceOSService  = {
       valorUnitario,
       valorTotal,
       idUsuario: data.idUsuario ?? null,
-      ordem: data.ordem ?? null
+      ordem: data.ordem ?? null,
+      idUsuario: data.idUsuario ?? null,
+      idTecnico: data.idTecnico ?? null
     });
 
     return ServiceOSRepository.create(item, dbEnvKey, dbType);

@@ -25,7 +25,9 @@ export const ServiceOSController = {
           idServico: req.body.idServico,
           quantidade: req.body.quantidade,
           valorUnitario: req.body.valorUnitario,
-          observacao: req.body.observacao
+          observacao: req.body.observacao,
+          idTecnico: req.body.idTecnico ?? null,
+          idUsuario: req.user?.idUsuario ?? null
         },
         tenant.dbEnvKey,
         tenant.dbType

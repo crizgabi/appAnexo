@@ -11,7 +11,8 @@ export default class ProductOSModel {
     valorTotal = 0,
     observacao = null,
     idUsuario = null,
-    ordem = null
+    ordem = null,
+    idTecnico = null
   }) {
     this.idItemProduto = idItemProduto;
     this.idConserto = idConserto;
@@ -25,5 +26,6 @@ export default class ProductOSModel {
     this.observacao = observacao;
     this.idUsuario = idUsuario;
     this.ordem = ordem;
+    this.idTecnico = idTecnico;
   }
 }

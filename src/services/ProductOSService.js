@@ -23,7 +23,9 @@ export const ProductOSService = {
             valorUnitario,
             descontoPercentual,
             valorTotal,
-            unidade: data.unidade ?? null
+            unidade: data.unidade ?? null,
+            idUsuario: data.idUsuario ?? null,
+            idTecnico: data.idTecnico ?? null 
         });
 
         return ProductOSRepository.create(item, dbEnvKey, dbType);

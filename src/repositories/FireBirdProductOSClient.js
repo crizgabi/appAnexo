@@ -31,22 +31,23 @@ export const FireBirdProductOSClient = {
 
                         const query = `
                             INSERT INTO TBRELCONSERTO (
-                                PKRELCONSERTO, FKCONSERTO, FKPRODUTO, DESCRICAO, QUANT, VALORUNIT,
+                                PKRELCONSERTO, FKCONSERTO, FKPRODUTO, DESCRICAO, QUANT, VALORUNIT, FKTECNICO,
                                 VALORTOTAL, FKCODUSU, ORDEM, UNIDADE, OBS
-                            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
                         `;
 
                         const params = [
-                            nextId,
-                            item.idConserto,
-                            item.idProduto,
-                            nomeProduto,
-                            item.quantidade,
-                            item.valorUnitario,
-                            valorTotal,
-                            item.idUsuario,
-                            item.ordem ?? null,
-                            item.unidade ?? "",
+                            nextId,              
+                            item.idConserto,     
+                            item.idProduto,       
+                            nomeProduto,          
+                            item.quantidade,    
+                            item.valorUnitario,   
+                            item.idTecnico,      
+                            valorTotal,          
+                            item.idUsuario,       
+                            item.ordem ?? null,   
+                            item.unidade ?? "",   
                             item.observacao ?? null
                         ];
 
@@ -57,6 +58,7 @@ export const FireBirdProductOSClient = {
                             resolve({
                                 idItemProduto: nextId,
                                 idConserto: item.idConserto,
+                                idTecnico: item.idTecnico,
                                 idProduto: item.idProduto,
                                 observacao: item.observacao,
                                 descricaoProduto: nomeProduto,
@@ -81,7 +83,8 @@ export const FireBirdProductOSClient = {
                 const query = `
           SELECT 
                     r.PKRELCONSERTO AS idItemProduto,
-                    r.FKPRODUTO AS idProduto,                  
+                    r.FKPRODUTO AS idProduto,
+                    r.FKTECNICO AS idTecnico,                  
                     COALESCE(p.NOME, r.DESCRICAO) AS descricaoProduto, 
                     r.UNIDADE AS unidade, 
                     r.QUANT,
@@ -100,6 +103,7 @@ export const FireBirdProductOSClient = {
                     const mappedRows = rows.map(row => ({
                         idItemProduto: row.IDITEMPRODUTO || row.PKRELCONSERTO,
                         idProduto: row.IDPRODUTO || row.FKPRODUTO,
+                        idTecnico: row.IDTECNICO || row.FKTECNICO,
                         descricaoProduto: row.DESCRICAOPRODUTO || row.NOME || row.DESCRICAO,
                         observacao: row.OBSERVACAO || row.OBS,
                         unidade: row.UNIDADE,

@@ -33,7 +33,9 @@ export const ProductOSController = {
           valorUnitario: req.body.valorUnitario,
           descontoPercentual: req.body.descontoPercentual,
           observacao: req.body.observacao,
-          unidade: req.body.unidade
+          unidade: req.body.unidade,
+          idTecnico: req.body.idTecnico ?? null,
+          idUsuario: req.user?.idUsuario ?? null
         },
         tenant.dbEnvKey,
         tenant.dbType
