@@ -3,6 +3,7 @@ import { CustomerType } from "../models/CustomerModel.js";
 import { UserRepository } from "../repositories/UserRepository.js";
 import { CityRepository } from "../repositories/CityRepository.js";
 import Customer from "../models/CustomerModel.js"
+import { CacheService } from "../services/CacheService.js";
 
 export const CustomerService = {
 
@@ -30,7 +31,7 @@ export const CustomerService = {
       };
     });
   },
-  
+
   // GET CUSTOMER LIST (by name)
   async getCustomersByName(razaoSocial, dbEnvKey, dbType) {
     const customers = await CustomerRepository.getCustomersByName(
@@ -59,6 +60,11 @@ export const CustomerService = {
 
   // GET CUSTOMER BY PRIMARY KEY
   async getCustomerByPrimaryKey(primaryKey, dbEnvKey, dbType) {
+    const cached = await CacheService.get(customerCacheKey(primaryKey, dbEnvKey, dbType));
+    if (cached) {
+      return cached;
+    }
+
     const customer = await CustomerRepository.getCustomerByPrimaryKey(
       primaryKey,
       dbEnvKey,
@@ -70,7 +76,7 @@ export const CustomerService = {
     const tipo =
       customer.TIPOFJ === 0 ? "juridica" : "fisica";
 
-    return {
+    const result = {
       razaoSocial: customer.RAZAOSOCIAL,
       codigoCidade: customer.FKCODCID,
       tipo,
@@ -92,6 +98,10 @@ export const CustomerService = {
       email: customer.EMAIL || "",
       obs: customer.OBS || "",
     };
+
+    await CacheService.set(customerCacheKey(primaryKey, dbEnvKey, dbType), result, 60);
+
+    return result;
   },
 
   createCustomer: async (customerData, userLogin, dbEnvKey, dbType) => {
@@ -214,6 +224,8 @@ export const CustomerService = {
       dbType
     );
 
+    await CacheService.del(customerCacheKey(pkcodcli, dbEnvKey, dbType));
+
     const response = await this.getCustomerByPrimaryKey(
       pkcodcli,
       dbEnvKey,
@@ -225,3 +237,8 @@ export const CustomerService = {
     };
   },
 };
+
+//HELPERS
+function customerCacheKey(id, dbEnvKey, dbType) {
+  return `customer:find:${String(dbEnvKey)}:${String(dbType)}:${Number(id)}`;
+}
