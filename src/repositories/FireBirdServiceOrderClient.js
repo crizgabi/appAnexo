@@ -604,91 +604,102 @@ export const FireBirdServiceOrderClient = {
 
   /// CHECKLIST
 
+  getChecklistById(idChecklist, dbEnvKey) {
+    return new Promise((resolve, reject) => {
+      getConnection(dbEnvKey, (err, db) => {
+        if (err) return reject(err);
+
+        const query = `
+          SELECT
+            PKCHECKLIST,
+            DESCRICAO,
+            ATIVO
+          FROM TBCHECKLIST
+          WHERE PKCHECKLIST = ?
+        `;
+
+        db.query(query, [idChecklist], (qErr, result) => {
+          db.detach();
+          if (qErr) return reject(qErr);
+
+          resolve((result && result[0]) || null);
+        });
+      });
+    });
+  },
+
+  getChecklistItens(idChecklist, dbEnvKey) {
+    return new Promise((resolve, reject) => {
+      getConnection(dbEnvKey, (err, db) => {
+        if (err) return reject(err);
+
+        const query = `
+          SELECT
+            PKCHECKLISTITEM,
+            FKCHECKLIST,
+            DESCRICAOITEM,
+            ORDEM,
+            TIPO,
+            OBRIGATORIO
+          FROM TBCHECKLISTITEM
+          WHERE FKCHECKLIST = ?
+          ORDER BY ORDEM
+        `;
+
+        db.query(query, [idChecklist], (qErr, result) => {
+          db.detach();
+          if (qErr) return reject(qErr);
+
+          resolve(result || []);
+        });
+      });
+    });
+  },
+
   async addChecklistResposta(idConserto, { idChecklist, respostas }, dbEnvKey) {
     return new Promise((resolve, reject) => {
       getConnection(dbEnvKey, async (err, db) => {
         if (err) return reject(err);
 
         try {
-          for (const resposta of respostas) {
-
-            const itemResult = await db.query(
-              `
-            SELECT PKCHECKLISTITEM, TIPO
-            FROM TBCHECKLISTITEM
-            WHERE PKCHECKLISTITEM = ?
+          await db.execute(
+            `
+            DELETE FROM TBCHECKLISTRESP
+            WHERE FKCONSERTO = ? AND FKCHECKLIST = ?
             `,
-              [resposta.idItem]
-            );
+            [idConserto, idChecklist]
+          );
 
-            const item = itemResult[0];
-            if (!item) {
-              throw new Error(`Item ${resposta.idItem} não encontrado`);
-            }
-
-            let valorResposta = null;
-            let observacao = null;
-
-            // 🔁 MAPEAMENTO TEXTO → NÚMERO
-            const mapaTexto = {
-              "Ruim": 1,
-              "Regular": 3,
-              "Bom": 5,
-              "Ótimo": 7,
-              "Baixo": -1,
-              "Alto": 1
-            };
-
-            switch (item.TIPO) {
-              case 0: // BOOLEANO
-                valorResposta = resposta.resposta ? 1 : 0;
-                break;
-
-              case 1: // NUMERO / NOTA
-              case 3:
-                valorResposta = resposta.resposta;
-                break;
-
-              case 2: // TEXTO NUMERADO
-                if (typeof resposta.resposta === "string") {
-                  valorResposta = mapaTexto[resposta.resposta];
-
-                  if (valorResposta === undefined) {
-                    throw new Error(
-                      `Texto inválido para o item ${resposta.idItem}`
-                    );
-                  }
-                } else {
-                  valorResposta = resposta.resposta;
-                }
-                break;
-            }
-
+          for (const resposta of respostas) {
             await db.execute(
               `
-            INSERT INTO TBCHECKLISTRESPOSTAITEM (
-              FKCHECKLIST,
-              FKCHECKLISTITEM,
-              FKCONSERTO,
-              RESPOSTA,
-              TIPO
-            )
-            VALUES (?, ?, ?, ?, ?)
-            `,
+              INSERT INTO TBCHECKLISTRESP (
+                FKCHECKLIST,
+                FKCHECKLISTITEM,
+                RESPOSTA,
+                OBSERVACAO,
+                FKCONSERTO,
+                DATAHORAREGISTRO,
+                TIPO
+              )
+              VALUES (?, ?, ?, ?, ?, CURRENT_TIMESTAMP, ?)
+              `,
               [
                 idChecklist,
                 resposta.idItem,
+                resposta.resposta,
+                resposta.observacao ?? null,
                 idConserto,
-                valorResposta,
-                item.TIPO
+                resposta.tipo,
               ]
             );
           }
 
           resolve({ success: true });
-
         } catch (e) {
           reject(e);
+        } finally {
+          db.detach();
         }
       });
     });

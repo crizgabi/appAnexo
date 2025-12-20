@@ -488,7 +488,18 @@ export const ServiceOrderService = {
             throw new Error("Ordem de serviço não encontrada");
         }
 
-        // 2. Busca itens do checklist
+        // 2. Verifica se o checklist existe
+        const checklist = await ServiceOrderRepository.getChecklistById(
+            idChecklist,
+            dbEnvKey,
+            dbType
+        );
+
+        if (!checklist) {
+            throw new Error("Checklist não encontrado");
+        }
+
+        // 3. Busca itens do checklist
         const itens = await ServiceOrderRepository.getChecklistItens(
             idChecklist,
             dbEnvKey,
@@ -499,19 +510,11 @@ export const ServiceOrderService = {
             throw new Error("Checklist não possui itens configurados");
         }
 
-        // 🔎 DEBUG (pode remover depois)
-        console.log(
-            "Itens do checklist:",
-            JSON.stringify(itens, null, 2)
-        );
-
-        // 3. MAPA CORRETO DOS ITENS (ESSENCIAL)
         const itensMap = new Map();
         itens.forEach(item => {
             itensMap.set(item.PKCHECKLISTITEM, item);
         });
 
-        // Enum dos tipos (baseado no seu banco)
         const TIPO_RESPOSTA = {
             BOOLEANO: 0,
             NUMERO: 1,
@@ -519,7 +522,6 @@ export const ServiceOrderService = {
             NOTA: 3
         };
 
-        // 4. Validação das respostas
         for (const resposta of respostas) {
             const item = itensMap.get(resposta.idItem);
 
@@ -529,42 +531,44 @@ export const ServiceOrderService = {
                 );
             }
 
-            // Se não respondeu e não é obrigatório, passa
-            if (resposta.resposta === null || resposta.resposta === undefined) {
-                if (item.OBRIGATORIO === 1) {
-                    throw new Error(
-                        `O item "${item.DESCRICAOITEM}" é obrigatório`
-                    );
-                }
-                continue;
+            const valor = resposta.resposta;
+            const observacaoValida = resposta.observacao === null
+                || resposta.observacao === undefined
+                || (typeof resposta.observacao === "string" && resposta.observacao.length <= 200);
+
+            if (!observacaoValida) {
+                throw new Error("Observação deve ser nula ou uma string de até 200 caracteres");
             }
 
             switch (item.TIPO) {
                 case TIPO_RESPOSTA.BOOLEANO:
-                    if (typeof resposta.resposta !== "boolean") {
+                    if (valor !== 0 && valor !== 1) {
                         throw new Error(
                             `Resposta inválida para o item ${item.DESCRICAOITEM}`
                         );
                     }
                     break;
-
                 case TIPO_RESPOSTA.NUMERO:
-                case TIPO_RESPOSTA.NOTA:
-                    if (typeof resposta.resposta !== "number") {
+                    if (typeof valor !== "number" || valor < 0 || valor > 10) {
                         throw new Error(
                             `Resposta inválida para o item ${item.DESCRICAOITEM}`
                         );
                     }
                     break;
-
                 case TIPO_RESPOSTA.TEXTO:
-                    if (typeof resposta.resposta !== "string") {
+                    if (typeof valor !== "number" || valor < 0 || valor > 2) {
                         throw new Error(
                             `Resposta inválida para o item ${item.DESCRICAOITEM}`
                         );
                     }
                     break;
-
+                case TIPO_RESPOSTA.NOTA:
+                    if (typeof valor !== "number" || valor < 0 || valor > 4) {
+                        throw new Error(
+                            `Resposta inválida para o item ${item.DESCRICAOITEM}`
+                        );
+                    }
+                    break;
                 default:
                     throw new Error(
                         `Tipo de resposta desconhecido para o item ${item.DESCRICAOITEM}`
@@ -572,15 +576,21 @@ export const ServiceOrderService = {
             }
         }
 
-        // 5. Persistência
+        const respostasParaPersistir = respostas.map((resposta) => {
+            const item = itensMap.get(resposta.idItem);
+            return {
+                ...resposta,
+                tipo: item.TIPO,
+            };
+        });
+
         const result = await ServiceOrderRepository.addChecklistResposta(
             idConserto,
-            { idChecklist, respostas },
+            { idChecklist, respostas: respostasParaPersistir },
             dbEnvKey,
             dbType
         );
 
-        // 6. Retorno
         return {
             message: "Checklist salvo com sucesso",
             idConserto,
