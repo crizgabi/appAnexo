@@ -648,6 +648,49 @@ export const ServiceOrderService = {
             idConserto,
             idChecklist
         };
+    },
+
+    async getChecklistDetail(idConserto, idChecklist, dbEnvKey, dbType) {
+        const os = await ServiceOrderRepository.getById(
+            idConserto,
+            dbEnvKey,
+            dbType
+        );
+
+        if (!os) {
+            throw new Error("Ordem de serviço não encontrada");
+        }
+
+        const checklist = await ServiceOrderRepository.getChecklistById(
+            idChecklist,
+            dbEnvKey,
+            dbType
+        );
+
+        if (!checklist) {
+            throw new Error("Checklist não encontrado");
+        }
+
+        const detail = await ServiceOrderRepository.getChecklistDetail(
+            idConserto,
+            idChecklist,
+            dbEnvKey,
+            dbType
+        );
+
+        return {
+            idChecklist: Number(idChecklist),
+            nomeChecklist: checklist.DESCRICAO,
+            dataResposta: detail.dataResposta,
+            itens: detail.itens.map((item) => ({
+                idItem: item.idItem,
+                ordem: item.ordem,
+                pergunta: item.pergunta,
+                tipoResposta: item.tipoResposta,
+                resposta: item.resposta,
+                observacao: item.observacao,
+            })),
+        };
     }
 
 };

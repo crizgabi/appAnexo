@@ -29,6 +29,7 @@ router.post("/:id/checkin", AuthMiddleware, ServiceOrderController.checkIn);
 router.post("/:id/checkout", AuthMiddleware, ServiceOrderController.checkOut);
 router.post("/:id/checklist", AuthMiddleware, ServiceOrderController.addChecklist);
 router.get("/:id/checklist", AuthMiddleware, ServiceOrderController.listChecklists);
+router.get("/:id/checklist/:idChecklist", AuthMiddleware, ServiceOrderController.getChecklistDetail);
 router.delete("/:id/checklist/:idChecklist", AuthMiddleware, ServiceOrderController.deleteChecklist);
 
 export default router;
