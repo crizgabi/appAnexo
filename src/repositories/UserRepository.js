@@ -19,5 +19,5 @@ export const UserRepository = {
   getAllUsers(dbEnvKey, dbType) {
     const client = DBClientFactory.getClient({ dbType, module: "user" });
     return client.getAllUsers(dbEnvKey);
-  }
+  },
 };

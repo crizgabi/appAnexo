@@ -15,7 +15,7 @@ export const FireBirdTechnicalClient = {
                  FROM TBTECNICO
                  WHERE ATIVO = 1
                  ORDER BY NMTECNICO
-     `;
+                `;
 
               db.query(query, (err, rows) => {
                             db.detach();

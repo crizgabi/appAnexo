@@ -4,7 +4,6 @@ import AuthMiddleware from "../middlewares/AuthMiddleware.js";
 
 const router = express.Router();
 
-console.log("TechnicalRoutes.js carregado!");
 router.get("/", AuthMiddleware, TechnicalController.getAll);
 
 export default router;
