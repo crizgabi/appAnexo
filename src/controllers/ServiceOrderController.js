@@ -362,5 +362,155 @@ export const ServiceOrderController = {
             res.status(400).json({ error: err.message });
         }
     },
+
+/// CHECKLIST
+
+ addChecklist: async (req, res) => {
+        try {
+            const tenantId = req.headers["x-tenant-id"];
+            if (!tenantId) {
+                return res
+                    .status(400)
+                    .json({ error: "x-tenant-id header obrigatório" });
+            }
+
+            const tenant = await prisma.tenant.findUnique({
+                where: { id: tenantId }
+            });
+
+            if (!tenant) {
+                return res
+                    .status(404)
+                    .json({ error: "Tenant inválido" });
+            }
+
+            const { idChecklist, respostas } = req.body;
+
+            if (!idChecklist || !Array.isArray(respostas)) {
+                return res.status(400).json({
+                    error: "idChecklist e respostas são obrigatórios"
+                });
+            }
+
+            const result = await ServiceOrderService.addChecklist(
+                req.params.id,
+                { idChecklist, respostas },
+                tenant.dbEnvKey,
+                tenant.dbType
+            );
+
+            return res.status(201).json(result);
+        } catch (err) {
+            return res.status(400).json({
+                error: err.message
+            });
+        }
+    },
+
+    listChecklists: async (req, res) => {
+        try {
+            const tenantId = req.headers["x-tenant-id"];
+            if (!tenantId) {
+                return res
+                    .status(400)
+                    .json({ error: "x-tenant-id header obrigatório" });
+            }
+
+            const tenant = await prisma.tenant.findUnique({
+                where: { id: tenantId }
+            });
+
+            if (!tenant) {
+                return res
+                    .status(404)
+                    .json({ error: "Tenant inválido" });
+            }
+
+            const result = await ServiceOrderService.listChecklistsRespondidos(
+                req.params.id,
+                tenant.dbEnvKey,
+                tenant.dbType
+            );
+
+            return res.status(200).json(result);
+        } catch (err) {
+            return res.status(400).json({
+                error: err.message
+            });
+        }
+    },
+
+    deleteChecklist: async (req, res) => {
+        try {
+            const tenantId = req.headers["x-tenant-id"];
+            if (!tenantId) {
+                return res
+                    .status(400)
+                    .json({ error: "x-tenant-id header obrigatório" });
+            }
+
+            const tenant = await prisma.tenant.findUnique({
+                where: { id: tenantId }
+            });
+
+            if (!tenant) {
+                return res
+                    .status(404)
+                    .json({ error: "Tenant inválido" });
+            }
+
+            const { idChecklist } = req.params;
+
+            const result = await ServiceOrderService.deleteChecklistResposta(
+                req.params.id,
+                idChecklist,
+                tenant.dbEnvKey,
+                tenant.dbType
+            );
+
+            return res.status(200).json(result);
+        } catch (err) {
+            return res.status(400).json({
+                error: err.message
+            });
+        }
+    },
+
+    getChecklistDetail: async (req, res) => {
+        try {
+            const tenantId = req.headers["x-tenant-id"];
+            if (!tenantId) {
+                return res
+                    .status(400)
+                    .json({ error: "x-tenant-id header obrigatório" });
+            }
+
+            const tenant = await prisma.tenant.findUnique({
+                where: { id: tenantId }
+            });
+
+            if (!tenant) {
+                return res
+                    .status(404)
+                    .json({ error: "Tenant inválido" });
+            }
+
+            const { id, idChecklist } = req.params;
+
+            const result = await ServiceOrderService.getChecklistDetail(
+                id,
+                idChecklist,
+                tenant.dbEnvKey,
+                tenant.dbType
+            );
+
+            return res.status(200).json(result);
+        } catch (err) {
+            return res.status(400).json({
+                error: err.message
+            });
+        }
+    },
 };
+
 export default ServiceOrderController;

@@ -3,6 +3,7 @@ import { CustomerService } from "../services/CustomerService.js";
 import { EquipmentService } from "../services/EquipmentService.js";
 import { ProductService } from "../services/ProductService.js";
 import { ServicesService } from "../services/ServicesService.js";
+import { ServiceOrderService } from "../services/ServiceOrderService.js";
 import prisma from "../../src/db/prismaClient.js";
 
 // POST /catalog
@@ -23,12 +24,16 @@ export const getCatalog = async (req, res) => {
             equipments,
             products,
             services,
+            serviceOrder,
+            checkLists
         ] = await Promise.all([
             UserService.getAllUsers(dbEnvKey, dbType),
             CustomerService.getAllCustomers(dbEnvKey, dbType),
             EquipmentService.list(dbEnvKey, dbType),
             ProductService.getAllProducts(dbEnvKey, dbType),
             ServicesService.getAllServices(dbEnvKey, dbType),
+            ServiceOrderService.list(dbEnvKey, dbType),
+            ServiceOrderService.getAllChecklists(dbEnvKey, dbType)
         ]);
 
         return res.status(200).json({
@@ -37,6 +42,8 @@ export const getCatalog = async (req, res) => {
             equipments,
             products,
             services,
+            serviceOrder,
+            checkLists
         });
 
     } catch (error) {

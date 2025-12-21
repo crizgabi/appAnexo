@@ -601,4 +601,269 @@ export const FireBirdServiceOrderClient = {
       });
     });
   },
+
+  /// CHECKLIST
+  getChecklistById(idChecklist, dbEnvKey) {
+    return new Promise((resolve, reject) => {
+      getConnection(dbEnvKey, (err, db) => {
+        if (err) return reject(err);
+
+        const query = `
+          SELECT
+            PKCHECKLIST,
+            DESCRICAO,
+            ATIVO
+          FROM TBCHECKLIST
+          WHERE PKCHECKLIST = ?
+        `;
+
+        db.query(query, [idChecklist], (qErr, result) => {
+          db.detach();
+          if (qErr) return reject(qErr);
+
+          resolve((result && result[0]) || null);
+        });
+      });
+    });
+  },
+
+  getChecklistItens(idChecklist, dbEnvKey) {
+    return new Promise((resolve, reject) => {
+      getConnection(dbEnvKey, (err, db) => {
+        if (err) return reject(err);
+
+        const query = `
+          SELECT
+            PKCHECKLISTITEM,
+            FKCHECKLIST,
+            DESCRICAOITEM,
+            ORDEM,
+            TIPO,
+            OBRIGATORIO
+          FROM TBCHECKLISTITEM
+          WHERE FKCHECKLIST = ?
+          ORDER BY ORDEM
+        `;
+
+        db.query(query, [idChecklist], (qErr, result) => {
+          db.detach();
+          if (qErr) return reject(qErr);
+
+          resolve(result || []);
+        });
+      });
+    });
+  },
+
+  async addChecklistResposta(idConserto, { idChecklist, respostas }, dbEnvKey) {
+    return new Promise((resolve, reject) => {
+      getConnection(dbEnvKey, async (err, db) => {
+        if (err) return reject(err);
+
+        try {
+          await db.execute(
+            `
+            DELETE FROM TBCHECKLISTRESP
+            WHERE FKCONSERTO = ? AND FKCHECKLIST = ?
+            `,
+            [idConserto, idChecklist]
+          );
+
+          for (const resposta of respostas) {
+            await db.execute(
+              `
+              INSERT INTO TBCHECKLISTRESP (
+                FKCHECKLIST,
+                FKCHECKLISTITEM,
+                RESPOSTA,
+                OBSERVACAO,
+                FKCONSERTO,
+                DATAHORAREGISTRO,
+                TIPO
+              )
+              VALUES (?, ?, ?, ?, ?, CURRENT_TIMESTAMP, ?)
+              `,
+              [
+                idChecklist,
+                resposta.idItem,
+                resposta.resposta,
+                resposta.observacao ?? null,
+                idConserto,
+                resposta.tipo,
+              ]
+            );
+          }
+
+          resolve({ success: true });
+        } catch (e) {
+          reject(e);
+        } finally {
+          db.detach();
+        }
+      });
+    });
+  },
+
+  getChecklistsRespondidos(idConserto, dbEnvKey) {
+    return new Promise((resolve, reject) => {
+      getConnection(dbEnvKey, (err, db) => {
+        if (err) return reject(err);
+
+        const query = `
+          SELECT
+            R.FKCHECKLIST,
+            C.DESCRICAO,
+            MAX(R.DATAHORAREGISTRO) AS DATAHORAREGISTRO
+          FROM TBCHECKLISTRESP R
+          INNER JOIN TBCHECKLIST C ON C.PKCHECKLIST = R.FKCHECKLIST
+          WHERE R.FKCONSERTO = ?
+          GROUP BY R.FKCHECKLIST, C.DESCRICAO
+          ORDER BY R.FKCHECKLIST
+        `;
+
+        db.query(query, [idConserto], (qErr, result) => {
+          db.detach();
+          if (qErr) return reject(qErr);
+
+          resolve(result || []);
+        });
+      });
+    });
+  },
+
+  deleteChecklistResposta(idConserto, idChecklist, dbEnvKey) {
+    return new Promise((resolve, reject) => {
+      getConnection(dbEnvKey, async (err, db) => {
+        if (err) return reject(err);
+
+        try {
+          await db.execute(
+            `
+            DELETE FROM TBCHECKLISTRESP
+            WHERE FKCONSERTO = ? AND FKCHECKLIST = ?
+            `,
+            [idConserto, idChecklist]
+          );
+
+          resolve(true);
+        } catch (e) {
+          reject(e);
+        } finally {
+          db.detach();
+        }
+      });
+    });
+  },
+
+  async getChecklistDetail(idConserto, idChecklist, dbEnvKey) {
+    const checklist = await this.getChecklistById(idChecklist, dbEnvKey);
+    const itens = await this.getChecklistItens(idChecklist, dbEnvKey);
+
+    return new Promise((resolve, reject) => {
+      getConnection(dbEnvKey, (err, db) => {
+        if (err) return reject(err);
+
+        const query = `
+          SELECT
+            FKCHECKLISTITEM,
+            RESPOSTA,
+            OBSERVACAO,
+            DATAHORAREGISTRO
+          FROM TBCHECKLISTRESP
+          WHERE FKCONSERTO = ? AND FKCHECKLIST = ?
+        `;
+
+        db.query(query, [idConserto, idChecklist], (qErr, result) => {
+          db.detach();
+          if (qErr) return reject(qErr);
+
+          const respostas = result || [];
+          const respostaMap = new Map();
+
+          respostas.forEach((resposta) => {
+            respostaMap.set(resposta.FKCHECKLISTITEM, resposta);
+          });
+
+          const itensDetalhados = itens.map((item) => {
+            const resposta = respostaMap.get(item.PKCHECKLISTITEM);
+            return {
+              idItem: item.PKCHECKLISTITEM,
+              ordem: item.ORDEM,
+              pergunta: item.DESCRICAOITEM,
+              tipoResposta: item.TIPO,
+              resposta: resposta ? resposta.RESPOSTA : null,
+              observacao: resposta ? resposta.OBSERVACAO : null,
+              dataResposta: resposta ? resposta.DATAHORAREGISTRO : null,
+            };
+          });
+
+          const dataResposta = respostas.length > 0
+            ? respostas.reduce((max, current) => {
+              const currentDate = new Date(current.DATAHORAREGISTRO);
+              return currentDate > max ? currentDate : max;
+            }, new Date(0))
+            : null;
+
+          resolve({
+            nomeChecklist: checklist?.DESCRICAO || null,
+            dataResposta: dataResposta,
+            itens: itensDetalhados
+          });
+        });
+      });
+    });
+  },
+
+      listChecklists: async (dbEnvKey) => {
+        return new Promise((resolve, reject) => {
+            getConnection(dbEnvKey, (err, db) => {
+                if (err) return reject(err);
+
+                const query = `
+                SELECT
+                    PKCHECKLIST,
+                    DESCRICAO,
+                    ATIVO
+                FROM TBCHECKLIST
+                ORDER BY PKCHECKLIST
+                `;
+
+                db.query(query, [], (qErr, result) => {
+                    db.detach();
+                    if (qErr) return reject(qErr);
+
+                    resolve(result || []);
+                });
+            });
+        });
+    },
+
+    listChecklistItens: async (dbEnvKey, idChecklist) => {
+        return new Promise((resolve, reject) => {
+            getConnection(dbEnvKey, (err, db) => {
+                if (err) return reject(err);
+
+                const query = `
+                SELECT
+                    PKCHECKLISTITEM,
+                    FKCHECKLIST,
+                    DESCRICAOITEM,
+                    ORDEM,
+                    TIPO
+                FROM TBCHECKLISTITEM
+                WHERE FKCHECKLIST = ?
+                ORDER BY ORDEM
+                `;
+
+                const params = [idChecklist];
+
+                db.query(query, params, (qErr, result) => {
+                    db.detach();
+                    if (qErr) return reject(qErr);
+
+                    resolve(result || []);
+                });
+            });
+        });
+    },
 };

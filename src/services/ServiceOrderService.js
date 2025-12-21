@@ -499,10 +499,272 @@ export const ServiceOrderService = {
             dataChecklistFinal: updated.DATACHECKLISTFINAL
         };
     },
+
+    async addChecklist(idConserto, { idChecklist, respostas }, dbEnvKey, dbType) {
+
+        // 1. Verifica se a OS existe
+        const os = await ServiceOrderRepository.getById(
+            idConserto,
+            dbEnvKey,
+            dbType
+        );
+
+        if (!os) {
+            throw new Error("Ordem de serviço não encontrada");
+        }
+
+        // 2. Verifica se o checklist existe
+        const checklist = await ServiceOrderRepository.getChecklistById(
+            idChecklist,
+            dbEnvKey,
+            dbType
+        );
+
+        if (!checklist) {
+            throw new Error("Checklist não encontrado");
+        }
+
+        // 3. Busca itens do checklist
+        const itens = await ServiceOrderRepository.getChecklistItens(
+            idChecklist,
+            dbEnvKey,
+            dbType
+        );
+
+        if (!itens || itens.length === 0) {
+            throw new Error("Checklist não possui itens configurados");
+        }
+
+        const itensMap = new Map();
+        itens.forEach(item => {
+            itensMap.set(item.PKCHECKLISTITEM, item);
+        });
+
+        const TIPO_RESPOSTA = {
+            BOOLEANO: 0,
+            NUMERO: 1,
+            TEXTO: 2,
+            NOTA: 3
+        };
+
+        for (const resposta of respostas) {
+            const item = itensMap.get(resposta.idItem);
+
+            if (!item) {
+                throw new Error(
+                    `Item ${resposta.idItem} não pertence ao checklist informado`
+                );
+            }
+
+            const valor = resposta.resposta;
+            const observacaoValida = resposta.observacao === null
+                || resposta.observacao === undefined
+                || (typeof resposta.observacao === "string" && resposta.observacao.length <= 200);
+
+            if (!observacaoValida) {
+                throw new Error("Observação deve ser nula ou uma string de até 200 caracteres");
+            }
+
+            switch (item.TIPO) {
+                case TIPO_RESPOSTA.BOOLEANO:
+                    if (valor !== 0 && valor !== 1) {
+                        throw new Error(
+                            `Resposta inválida para o item ${item.DESCRICAOITEM}`
+                        );
+                    }
+                    break;
+                case TIPO_RESPOSTA.NUMERO:
+                    if (typeof valor !== "number" || valor < 0 || valor > 10) {
+                        throw new Error(
+                            `Resposta inválida para o item ${item.DESCRICAOITEM}`
+                        );
+                    }
+                    break;
+                case TIPO_RESPOSTA.TEXTO:
+                    if (typeof valor !== "number" || valor < 0 || valor > 2) {
+                        throw new Error(
+                            `Resposta inválida para o item ${item.DESCRICAOITEM}`
+                        );
+                    }
+                    break;
+                case TIPO_RESPOSTA.NOTA:
+                    if (typeof valor !== "number" || valor < 0 || valor > 4) {
+                        throw new Error(
+                            `Resposta inválida para o item ${item.DESCRICAOITEM}`
+                        );
+                    }
+                    break;
+                default:
+                    throw new Error(
+                        `Tipo de resposta desconhecido para o item ${item.DESCRICAOITEM}`
+                    );
+            }
+        }
+
+        const respostasParaPersistir = respostas.map((resposta) => {
+            const item = itensMap.get(resposta.idItem);
+            return {
+                ...resposta,
+                tipo: item.TIPO,
+            };
+        });
+
+        const result = await ServiceOrderRepository.addChecklistResposta(
+            idConserto,
+            { idChecklist, respostas: respostasParaPersistir },
+            dbEnvKey,
+            dbType
+        );
+
+        return {
+            message: "Checklist salvo com sucesso",
+            idConserto,
+            idChecklist,
+            idChecklistResposta: result?.idChecklistResposta ?? null,
+            status: "preenchido"
+        };
+    },
+
+    async listChecklistsRespondidos(idConserto, dbEnvKey, dbType) {
+
+        const os = await ServiceOrderRepository.getById(
+            idConserto,
+            dbEnvKey,
+            dbType
+        );
+
+        if (!os) {
+            throw new Error("Ordem de serviço não encontrada");
+        }
+
+        const respondidos = await ServiceOrderRepository.getChecklistsRespondidos(
+            idConserto,
+            dbEnvKey,
+            dbType
+        );
+
+        return (respondidos || []).map((item) => ({
+            idChecklist: item.FKCHECKLIST,
+            nomeChecklist: item.DESCRICAO,
+            dataResposta: item.DATAHORAREGISTRO
+        }));
+    },
+
+    async deleteChecklistResposta(idConserto, idChecklist, dbEnvKey, dbType) {
+        const os = await ServiceOrderRepository.getById(
+            idConserto,
+            dbEnvKey,
+            dbType
+        );
+
+        if (!os) {
+            throw new Error("Ordem de serviço não encontrada");
+        }
+
+        await ServiceOrderRepository.deleteChecklistResposta(
+            idConserto,
+            idChecklist,
+            dbEnvKey,
+            dbType
+        );
+
+        return {
+            message: "Checklist removido com sucesso",
+            idConserto,
+            idChecklist
+        };
+    },
+
+    async getChecklistDetail(idConserto, idChecklist, dbEnvKey, dbType) {
+        const os = await ServiceOrderRepository.getById(
+            idConserto,
+            dbEnvKey,
+            dbType
+        );
+
+        if (!os) {
+            throw new Error("Ordem de serviço não encontrada");
+        }
+
+        const checklist = await ServiceOrderRepository.getChecklistById(
+            idChecklist,
+            dbEnvKey,
+            dbType
+        );
+
+        if (!checklist) {
+            throw new Error("Checklist não encontrado");
+        }
+
+        const detail = await ServiceOrderRepository.getChecklistDetail(
+            idConserto,
+            idChecklist,
+            dbEnvKey,
+            dbType
+        );
+
+        return {
+            idChecklist: Number(idChecklist),
+            nomeChecklist: checklist.DESCRICAO,
+            dataResposta: detail.dataResposta,
+            itens: detail.itens.map((item) => ({
+                idItem: item.idItem,
+                ordem: item.ordem,
+                pergunta: item.pergunta,
+                tipoResposta: item.tipoResposta,
+                resposta: item.resposta,
+                observacao: item.observacao,
+            })),
+        };
+    },
+
+    getAllChecklists: async (dbEnvKey, dbType) => {
+        try {
+            const checklists = await ServiceOrderRepository.listChecklists(
+                dbEnvKey,
+                dbType
+            );
+
+            if (!checklists) {
+                return [];
+            }
+
+            const checklistWithItems = await Promise.all(
+                checklists.map(async (checklist) => {
+                    const itens = await ServiceOrderRepository.listChecklistItens(
+                        dbEnvKey,
+                        dbType,
+                        checklist.PKCHECKLIST
+                    );
+
+                    const parsedItens = (itens || []).map((item) => {
+                        return {
+                            idItem: item.PKCHECKLISTITEM,
+                            ordem: item.ORDEM,
+                            pergunta: item.DESCRICAOITEM,
+                            tipoResposta: item.TIPO,
+                        };
+                    });
+
+                    return {
+                        idChecklist: checklist.PKCHECKLIST,
+                        nomeChecklist: checklist.DESCRICAO,
+                        ativo: checklist.ATIVO,
+                        itens: parsedItens,
+                    };
+                })
+            );
+
+            return checklistWithItems;
+        } catch (error) {
+            console.error("Error listing catalog checklist models:", error);
+            throw error;
+        }
+    },
 };
 
 //HELPERS
 
 function osCacheKey(id, dbEnvKey, dbType) {
     return `os:find:${String(dbEnvKey)}:${String(dbType)}:${Number(id)}`;
-}
+};

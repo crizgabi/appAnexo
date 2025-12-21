@@ -141,4 +141,80 @@ export const ServiceOrderRepository = {
 
         return client.setCheckOut(idConserto, dataChecklistFinal, dbEnvKey);
     },
+
+    addChecklistResposta: async (idConserto, { idChecklist, respostas }, dbEnvKey, dbType) => {
+        const client = DBClientFactory.getClient({
+            dbType,
+            module: "serviceOrder"
+        });
+
+        return client.addChecklistResposta(
+            idConserto,
+            { idChecklist, respostas },
+            dbEnvKey
+        );
+    },
+
+    getChecklistById: async (idChecklist, dbEnvKey, dbType) => {
+        const client = DBClientFactory.getClient({
+            dbType,
+            module: "serviceOrder"
+        });
+
+        return client.getChecklistById(idChecklist, dbEnvKey);
+    },
+
+    getChecklistItens: async (idChecklist, dbEnvKey, dbType) => {
+        const client = DBClientFactory.getClient({
+            dbType,
+            module: "serviceOrder"
+        });
+
+        return client.getChecklistItens(idChecklist, dbEnvKey);
+    },
+
+    getChecklistsRespondidos: async (idConserto, dbEnvKey, dbType) => {
+        const client = DBClientFactory.getClient({
+            dbType,
+            module: "serviceOrder"
+        });
+
+        return client.getChecklistsRespondidos(idConserto, dbEnvKey);
+    },
+
+    deleteChecklistResposta: async (idConserto, idChecklist, dbEnvKey, dbType) => {
+        const client = DBClientFactory.getClient({
+            dbType,
+            module: "serviceOrder"
+        });
+
+        return client.deleteChecklistResposta(idConserto, idChecklist, dbEnvKey);
+    },
+
+    getChecklistDetail: async (idConserto, idChecklist, dbEnvKey, dbType) => {
+        const client = DBClientFactory.getClient({
+            dbType,
+            module: "serviceOrder"
+        });
+
+        return client.getChecklistDetail(idConserto, idChecklist, dbEnvKey);
+    },
+
+        listChecklists: async (dbEnvKey, dbType) => {
+        const client = DBClientFactory.getClient({
+            dbType,
+            module: "serviceOrder"
+        });
+
+        return client.listChecklists(dbEnvKey);
+    },
+
+    listChecklistItens: async (dbEnvKey, dbType, idChecklist) => {
+        const client = DBClientFactory.getClient({
+            dbType,
+            module: "serviceOrder"
+        });
+
+        return client.listChecklistItens(dbEnvKey, idChecklist);
+    },
 };
