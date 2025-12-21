@@ -603,6 +603,57 @@ export const FireBirdServiceOrderClient = {
   },
 
   /// CHECKLIST
+  getChecklistById(idChecklist, dbEnvKey) {
+    return new Promise((resolve, reject) => {
+      getConnection(dbEnvKey, (err, db) => {
+        if (err) return reject(err);
+
+        const query = `
+          SELECT
+            PKCHECKLIST,
+            DESCRICAO,
+            ATIVO
+          FROM TBCHECKLIST
+          WHERE PKCHECKLIST = ?
+        `;
+
+        db.query(query, [idChecklist], (qErr, result) => {
+          db.detach();
+          if (qErr) return reject(qErr);
+
+          resolve((result && result[0]) || null);
+        });
+      });
+    });
+  },
+
+  getChecklistItens(idChecklist, dbEnvKey) {
+    return new Promise((resolve, reject) => {
+      getConnection(dbEnvKey, (err, db) => {
+        if (err) return reject(err);
+
+        const query = `
+          SELECT
+            PKCHECKLISTITEM,
+            FKCHECKLIST,
+            DESCRICAOITEM,
+            ORDEM,
+            TIPO,
+            OBRIGATORIO
+          FROM TBCHECKLISTITEM
+          WHERE FKCHECKLIST = ?
+          ORDER BY ORDEM
+        `;
+
+        db.query(query, [idChecklist], (qErr, result) => {
+          db.detach();
+          if (qErr) return reject(qErr);
+
+          resolve(result || []);
+        });
+      });
+    });
+  },
 
   getChecklistById(idChecklist, dbEnvKey) {
     return new Promise((resolve, reject) => {

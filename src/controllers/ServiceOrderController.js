@@ -365,7 +365,7 @@ export const ServiceOrderController = {
 
 /// CHECKLIST
 
-    addChecklist: async (req, res) => {
+ addChecklist: async (req, res) => {
         try {
             const tenantId = req.headers["x-tenant-id"];
             if (!tenantId) {
@@ -512,6 +512,5 @@ export const ServiceOrderController = {
         }
     },
 };
-
 
 export default ServiceOrderController;
