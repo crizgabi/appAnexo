@@ -888,7 +888,7 @@ export const FireBirdServiceOrderClient = {
           h.TOTAL
         FROM TBRELCONSERTOHORARIO h
         LEFT JOIN TBTECNICO t
-          ON t.PKTECNICO = h.FKTECNICO
+          ON t.PKCODTECNICO = h.FKTECNICO
         WHERE h.FKCONSERTO = ?
         ORDER BY
           h.DATA,
