@@ -200,7 +200,7 @@ export const ServiceOrderRepository = {
         return client.getChecklistDetail(idConserto, idChecklist, dbEnvKey);
     },
 
-        listChecklists: async (dbEnvKey, dbType) => {
+    listChecklists: async (dbEnvKey, dbType) => {
         const client = DBClientFactory.getClient({
             dbType,
             module: "serviceOrder"
@@ -216,5 +216,33 @@ export const ServiceOrderRepository = {
         });
 
         return client.listChecklistItens(dbEnvKey, idChecklist);
+    },
+
+    /// HORÁRIOS
+    getServiceOrderSchedules: async (idConserto, dbEnvKey, dbType) => {
+        const client = DBClientFactory.getClient({
+            dbType,
+            module: "serviceOrder"
+        });
+
+        return client.getServiceOrderSchedules(idConserto, dbEnvKey);
+    },
+
+    createServiceOrderSchedule: async (idConserto, data, horaInicio, horaFim, dbEnvKey, dbType) => {
+        const client = DBClientFactory.getClient({
+            dbType,
+            module: "serviceOrder"
+        });
+
+        return client.createServiceOrderSchedule(idConserto, data, horaInicio, horaFim, dbEnvKey);
+    },
+
+    deleteServiceOrderSchedule: async (idConserto, idHorario, dbEnvKey, dbType) => {
+        const client = DBClientFactory.getClient({
+            dbType,
+            module: "serviceOrder"
+        });
+
+        return client.deleteServiceOrderSchedule(idConserto, idHorario, dbEnvKey);
     },
 };

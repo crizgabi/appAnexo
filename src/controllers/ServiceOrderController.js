@@ -363,9 +363,9 @@ export const ServiceOrderController = {
         }
     },
 
-/// CHECKLIST
+    /// CHECKLIST
 
- addChecklist: async (req, res) => {
+    addChecklist: async (req, res) => {
         try {
             const tenantId = req.headers["x-tenant-id"];
             if (!tenantId) {
@@ -503,6 +503,134 @@ export const ServiceOrderController = {
                 tenant.dbEnvKey,
                 tenant.dbType
             );
+
+            return res.status(200).json(result);
+        } catch (err) {
+            return res.status(400).json({
+                error: err.message
+            });
+        }
+    },
+
+    /// HORÁRIOS
+
+    getServiceOrderSchedules: async (req, res) => {
+        try {
+            const tenantId = req.headers["x-tenant-id"];
+            if (!tenantId) {
+                return res
+                    .status(400)
+                    .json({ error: "x-tenant-id header obrigatório" });
+            }
+
+            const tenant = await prisma.tenant.findUnique({
+                where: { id: tenantId }
+            });
+
+            if (!tenant) {
+                return res
+                    .status(404)
+                    .json({ error: "Tenant inválido" });
+            }
+
+            const { id } = req.params;
+
+            const result =
+                await ServiceOrderService.getServiceOrderSchedules(
+                    id,
+                    tenant.dbEnvKey,
+                    tenant.dbType
+                );
+
+            return res.status(200).json(result);
+        } catch (err) {
+            return res.status(400).json({
+                error: err.message
+            });
+        }
+    },
+
+    createServiceOrderSchedule: async (req, res) => {
+        try {
+            const tenantId = req.headers["x-tenant-id"];
+            if (!tenantId) {
+                return res
+                    .status(400)
+                    .json({ error: "x-tenant-id header obrigatório" });
+            }
+
+            const tenant = await prisma.tenant.findUnique({
+                where: { id: tenantId }
+            });
+
+            if (!tenant) {
+                return res
+                    .status(404)
+                    .json({ error: "Tenant inválido" });
+            }
+
+            const { data, horaInicio, horaFim } = req.body;
+
+            if (!data || !horaInicio || !horaFim) {
+                return res.status(400).json({
+                    error: "data, horaInicio e horaFim são obrigatórios"
+                });
+            }
+
+            const result =
+                await ServiceOrderService.createServiceOrderSchedule(
+                    req.params.id,
+                    data,
+                    horaInicio,
+                    horaFim,
+                    tenant.dbEnvKey,
+                    tenant.dbType
+                );
+
+            return res.status(201).json(result);
+        } catch (err) {
+            // Regra de negócio (422)
+            if (err.code === "INVALID_TIME_RANGE") {
+                return res.status(422).json({
+                    error: "INVALID_TIME_RANGE",
+                    message: err.message
+                });
+            }
+
+            return res.status(400).json({
+                error: err.message
+            });
+        }
+    },
+
+    deleteServiceOrderSchedule: async (req, res) => {
+        try {
+            const tenantId = req.headers["x-tenant-id"];
+            if (!tenantId) {
+                return res
+                    .status(400)
+                    .json({ error: "x-tenant-id header obrigatório" });
+            }
+
+            const tenant = await prisma.tenant.findUnique({
+                where: { id: tenantId }
+            });
+
+            if (!tenant) {
+                return res
+                    .status(404)
+                    .json({ error: "Tenant inválido" });
+            }
+
+            const { scheduleId } = req.params;
+
+            const result =
+                await ServiceOrderService.deleteServiceOrderSchedule(
+                    req.params.id,
+                    scheduleId,
+                    tenant.dbEnvKey,
+                    tenant.dbType
+                );
 
             return res.status(200).json(result);
         } catch (err) {
