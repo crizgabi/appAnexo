@@ -43,6 +43,7 @@ export const ProductService = {
                     referencia: p.REFERENCIA,
                     codbarras: p.CODBARRAS,
                     valorvenda: p.VALORVENDA,
+                    unidade: p.SIGLA ?? null
                 };
             });
         } catch (error) {
@@ -70,6 +71,7 @@ export const ProductService = {
                     referencia: p.REFERENCIA,
                     codbarras: p.CODBARRAS,
                     valorvenda: p.VALORVENDA,
+                    unidade: p.SIGLA ?? null
                 };
             });
         } catch (error) {
@@ -97,6 +99,7 @@ export const ProductService = {
                     referencia: p.REFERENCIA,
                     codbarras: p.CODBARRAS,
                     valorvenda: p.VALORVENDA,
+                    unidade: p.SIGLA ?? null
                 };
             });
         } catch (error) {
@@ -131,7 +134,7 @@ export const ProductService = {
                 agilizarEstoque: p.AGILIZARESTOQUE,
                 unidadeId: p.FKCODUNI,
                 nomeunidade: p.NOMEUNIDADE,
-                sigla: p.SIGLA,
+                unidade: p.SIGLA ?? null,
                 categoriaId: p.FKCODCAT,
                 nomecategoria: p.NOMECATEGORIA,
                 marcaId: p.FKCODMARCA,
@@ -158,6 +161,7 @@ export const ProductService = {
                     referencia: p.REFERENCIA,
                     codbarras: p.CODBARRAS,
                     valorvenda: p.VALORVENDA,
+                    unidade: p.SIGLA ?? null
                 };
             });
         } catch (error) {

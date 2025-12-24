@@ -761,6 +761,140 @@ export const ServiceOrderService = {
             throw error;
         }
     },
+
+    /// HORÁRIOS
+    getServiceOrderSchedules: async (idConserto, dbEnvKey, dbType) => {
+        try {
+            const schedules =
+                await ServiceOrderRepository.getServiceOrderSchedules(
+                    idConserto,
+                    dbEnvKey,
+                    dbType
+                );
+
+            if (!schedules || schedules.length === 0) {
+                return [];
+            }
+
+            return schedules.map((row) => {
+                const formatDate = (value) =>
+                    value
+                        ? value.toISOString().split("T")[0]
+                        : null;
+
+                const formatTime = (value) =>
+                    value
+                        ? value.toISOString().substring(11, 16)
+                        : null;
+
+                return {
+                    id: row.PKCODHORARIO,
+                    data: formatDate(row.DATA),
+                    inicio: formatTime(row.INICIO),
+                    fim: formatTime(row.FINAL),
+                    ordem: row.ORDEM ?? null,
+                    tecnicoId: row.FKTECNICO ?? null,
+                    tecnicoNome: row.NMTECNICO ?? null,
+                    operacaoId: row.FKOPERACAO ?? null,
+                    operacaoNome: row.OPERACAO ?? null,
+                    totalMinutos: row.TOTALMINUTO ?? null,
+                    totalFormatado: row.TOTAL ?? null
+                };
+            });
+        } catch (error) {
+            console.error("Error listing service order schedules:", error);
+            throw error;
+        }
+    },
+
+    async createServiceOrderSchedule(
+        idConserto,
+        data,
+        horaInicio,
+        horaFim,
+        dbEnvKey,
+        dbType
+    ) {
+        // 1. Verifica se a OS existe
+        const existing = await ServiceOrderRepository.getById(
+            idConserto,
+            dbEnvKey,
+            dbType
+        );
+
+        if (!existing) {
+            throw new Error("Ordem de serviço não encontrada");
+        }
+
+        // 2. Validação de regra de negócio
+        if (!data || !horaInicio || !horaFim) {
+            throw new Error("Dados de horário inválidos");
+        }
+
+        // horaFim deve ser maior que horaInicio
+        if (horaFim <= horaInicio) {
+            const error = new Error(
+                "Hora final não pode ser menor ou igual à hora inicial."
+            );
+            error.code = "INVALID_TIME_RANGE";
+            throw error;
+        }
+
+        // 3. Cria o registro de horário
+        const created =
+            await ServiceOrderRepository.createServiceOrderSchedule(
+                idConserto,
+                data,
+                horaInicio,
+                horaFim,
+                dbEnvKey,
+                dbType
+            );
+
+        if (!created) {
+            throw new Error("Erro ao registrar horário: ");
+        }
+
+        // 4. Limpa cache da OS
+        await CacheService.del(osCacheKey(idConserto, dbEnvKey, dbType));
+
+        // 5. Monta response conforme contrato
+        return {
+            idHorario: created.PKCODHORARIO ?? null,
+            idConserto: idConserto,
+            data: data,
+            horaInicio: horaInicio,
+            horaFim: horaFim,
+            message: "Horário registrado com sucesso."
+        };
+    },
+    async deleteServiceOrderSchedule(
+        idConserto,
+        idHorario,
+        dbEnvKey,
+        dbType
+    ) {
+        const os = await ServiceOrderRepository.getById(
+            idConserto,
+            dbEnvKey,
+            dbType
+        );
+
+        if (!os) {
+            throw new Error("Ordem de serviço não encontrada");
+        }
+
+        await ServiceOrderRepository.deleteServiceOrderSchedule(
+            idConserto,
+            idHorario,
+            dbEnvKey,
+            dbType
+        );
+
+        return {
+            success: true
+        };
+    },
 };
 
 //HELPERS

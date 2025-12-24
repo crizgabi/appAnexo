@@ -31,5 +31,8 @@ router.post("/:id/checklist", AuthMiddleware, ServiceOrderController.addChecklis
 router.get("/:id/checklist", AuthMiddleware, ServiceOrderController.listChecklists);
 router.get("/:id/checklist/:idChecklist", AuthMiddleware, ServiceOrderController.getChecklistDetail);
 router.delete("/:id/checklist/:idChecklist", AuthMiddleware, ServiceOrderController.deleteChecklist);
+router.get("/:id/schedule", AuthMiddleware, ServiceOrderController.getServiceOrderSchedules);
+router.post("/:id/schedule", AuthMiddleware, ServiceOrderController.createServiceOrderSchedule);
+router.delete("/:id/schedule/:scheduleId", AuthMiddleware, ServiceOrderController.deleteServiceOrderSchedule);
 
 export default router;

@@ -137,7 +137,6 @@ export const UserService = {
         return {
           id: u.PKTECNICO,
           login: u.LOGIN,
-          passwordHash: u.SENHA,
           tecnico: {
             id: u.PKTECNICO,
             nome: u.NMTECNICO,

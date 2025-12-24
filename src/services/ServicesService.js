@@ -21,6 +21,7 @@ export const ServicesService = {
                     nome: c.NOMESERVICO,
                     referencia: c.REFERENCIA,
                     valor: c.VALOR,
+                    unidade: c.SIGLA ?? null
                 };
             });
         } catch (error) {
@@ -48,6 +49,7 @@ export const ServicesService = {
                     nome: c.NOMESERVICO,
                     referencia: c.REFERENCIA,
                     valor: c.VALOR,
+                    unidade: c.SIGLA ?? null
                 };
             });
         } catch (error) {
@@ -75,6 +77,7 @@ export const ServicesService = {
                     nome: c.NOMESERVICO,
                     referencia: c.REFERENCIA,
                     valor: c.VALOR,
+                    unidade: c.SIGLA ?? null
                 };
             });
         } catch (error) {
@@ -102,6 +105,7 @@ export const ServicesService = {
                     nome: c.NOMESERVICO,
                     referencia: c.REFERENCIA,
                     valor: c.VALOR,
+                    unidade: c.SIGLA ?? null
                 };
             });
         } catch (error) {
@@ -127,6 +131,7 @@ export const ServicesService = {
                 nome: service.NOMESERVICO,
                 referencia: service.REFERENCIA,
                 valor: service.VALOR,
+                unidade: c.SIGLA ?? null
             };
         } catch (error) {
             console.error("Error listing service:", error);
@@ -152,6 +157,7 @@ export const ServicesService = {
                     nome: c.NOMESERVICO,
                     referencia: c.REFERENCIA,
                     valor: c.VALOR,
+                    unidade: c.SIGLA ?? null
                 };
             });
         } catch (error) {

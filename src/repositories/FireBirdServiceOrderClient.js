@@ -814,12 +814,12 @@ export const FireBirdServiceOrderClient = {
     });
   },
 
-      listChecklists: async (dbEnvKey) => {
-        return new Promise((resolve, reject) => {
-            getConnection(dbEnvKey, (err, db) => {
-                if (err) return reject(err);
+  listChecklists: async (dbEnvKey) => {
+    return new Promise((resolve, reject) => {
+      getConnection(dbEnvKey, (err, db) => {
+        if (err) return reject(err);
 
-                const query = `
+        const query = `
                 SELECT
                     PKCHECKLIST,
                     DESCRICAO,
@@ -828,22 +828,22 @@ export const FireBirdServiceOrderClient = {
                 ORDER BY PKCHECKLIST
                 `;
 
-                db.query(query, [], (qErr, result) => {
-                    db.detach();
-                    if (qErr) return reject(qErr);
+        db.query(query, [], (qErr, result) => {
+          db.detach();
+          if (qErr) return reject(qErr);
 
-                    resolve(result || []);
-                });
-            });
+          resolve(result || []);
         });
-    },
+      });
+    });
+  },
 
-    listChecklistItens: async (dbEnvKey, idChecklist) => {
-        return new Promise((resolve, reject) => {
-            getConnection(dbEnvKey, (err, db) => {
-                if (err) return reject(err);
+  listChecklistItens: async (dbEnvKey, idChecklist) => {
+    return new Promise((resolve, reject) => {
+      getConnection(dbEnvKey, (err, db) => {
+        if (err) return reject(err);
 
-                const query = `
+        const query = `
                 SELECT
                     PKCHECKLISTITEM,
                     FKCHECKLIST,
@@ -855,15 +855,146 @@ export const FireBirdServiceOrderClient = {
                 ORDER BY ORDEM
                 `;
 
-                const params = [idChecklist];
+        const params = [idChecklist];
 
-                db.query(query, params, (qErr, result) => {
-                    db.detach();
-                    if (qErr) return reject(qErr);
+        db.query(query, params, (qErr, result) => {
+          db.detach();
+          if (qErr) return reject(qErr);
 
-                    resolve(result || []);
-                });
-            });
+          resolve(result || []);
         });
-    },
+      });
+    });
+  },
+
+  /// HORÁRIOS
+  getServiceOrderSchedules(idConserto, dbEnvKey) {
+    return new Promise((resolve, reject) => {
+      getConnection(dbEnvKey, (err, db) => {
+        if (err) return reject(err);
+
+        const query = `
+        SELECT
+          h.PKCODHORARIO,
+          h.DATA,
+          h.INICIO,
+          h.FINAL,
+          h.ORDEM,
+          h.FKTECNICO,
+          t.NMTECNICO,
+          h.FKOPERACAO,
+          h.OPERACAO,
+          h.TOTALMINUTO,
+          h.TOTAL
+        FROM TBRELCONSERTOHORARIO h
+        LEFT JOIN TBTECNICO t
+          ON t.PKCODTECNICO = h.FKTECNICO
+        WHERE h.FKCONSERTO = ?
+        ORDER BY
+          h.DATA,
+          h.ORDEM,
+          h.INICIO
+      `;
+
+        db.query(query, [idConserto], (qErr, result) => {
+          db.detach();
+          if (qErr) return reject(qErr);
+
+          resolve(result || []);
+        });
+      });
+    });
+  },
+
+  createServiceOrderSchedule(
+    idConserto,
+    data,
+    horaInicio,
+    horaFim,
+    dbEnvKey
+  ) {
+    return new Promise((resolve, reject) => {
+      getConnection(dbEnvKey, (err, db) => {
+        if (err) return reject(err);
+
+        const query = `
+        INSERT INTO TBRELCONSERTOHORARIO (
+          FKCONSERTO,
+          DATA,
+          INICIO,
+          FINAL
+        )
+        VALUES (?, ?, ?, ?)
+        RETURNING PKCODHORARIO
+      `;
+
+        const params = [
+          idConserto,
+          data,
+          horaInicio,
+          horaFim
+        ];
+
+        db.query(query, params, (qErr, result) => {
+          db.detach();
+          if (qErr) return reject(qErr);
+
+          // Firebird retorna o RETURNING como array 
+          resolve(result);
+        });
+      });
+    });
+  },
+
+  deleteServiceOrderSchedule: (idConserto, idHorario, dbEnvKey) => {
+    return new Promise((resolve, reject) => {
+      getConnection(dbEnvKey, (err, db) => {
+        if (err) return reject(err);
+
+        const selectQuery = `
+        SELECT
+          PKCODHORARIO,
+          FKCONSERTO,
+          DATA,
+          INICIO,
+          FINAL,
+          ORDEM,
+          FKTECNICO,
+          FKOPERACAO,
+          OPERACAO,
+          TOTALMINUTO,
+          TOTAL
+        FROM TBRELCONSERTOHORARIO
+        WHERE FKCONSERTO = ? AND PKCODHORARIO = ?
+      `;
+
+        db.query(selectQuery, [idConserto, idHorario], (selErr, selResult) => {
+          if (selErr) {
+            db.detach();
+            return reject(selErr);
+          }
+
+          if (!selResult || selResult.length === 0) {
+            db.detach();
+            return reject(new Error("Horário não encontrado"));
+          }
+
+          const row = selResult[0];
+
+          const deleteQuery = `
+          DELETE FROM TBRELCONSERTOHORARIO
+          WHERE PKCODHORARIO = ? AND FKCONSERTO = ?
+        `;
+
+          db.query(deleteQuery, [idHorario, idConserto], (delErr) => {
+            db.detach();
+
+            if (delErr) return reject(delErr);
+
+            resolve(row);
+          });
+        });
+      });
+    });
+  },
 };
