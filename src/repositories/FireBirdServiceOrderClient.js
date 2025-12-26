@@ -39,7 +39,6 @@ export const FireBirdServiceOrderClient = {
           db.detach();
           if (qErr) return reject(qErr);
 
-          // result can be an array with row object or a single object depending on driver
           const row = Array.isArray(result) ? result[0] : result;
           if (!row || (row && row.PKCONSERTO == null)) {
             return reject(new Error("Não foi retornado PKCONSERTO"));
@@ -888,7 +887,7 @@ export const FireBirdServiceOrderClient = {
           h.TOTAL
         FROM TBRELCONSERTOHORARIO h
         LEFT JOIN TBTECNICO t
-          ON t.PKCODTECNICO = h.FKTECNICO
+          ON t.PKTECNICO = h.FKTECNICO
         WHERE h.FKCONSERTO = ?
         ORDER BY
           h.DATA,
@@ -908,6 +907,8 @@ export const FireBirdServiceOrderClient = {
 
   createServiceOrderSchedule(
     idConserto,
+    idTenico,
+    nomeTecnico,
     data,
     horaInicio,
     horaFim,
@@ -920,16 +921,20 @@ export const FireBirdServiceOrderClient = {
         const query = `
         INSERT INTO TBRELCONSERTOHORARIO (
           FKCONSERTO,
+          FKTECNICO,
+          NMTECNICO,
           DATA,
           INICIO,
           FINAL
         )
-        VALUES (?, ?, ?, ?)
+        VALUES (?, ?, ?, ?, ?, ?)
         RETURNING PKCODHORARIO
       `;
 
         const params = [
           idConserto,
+          idTenico,
+          nomeTecnico,
           data,
           horaInicio,
           horaFim
@@ -939,7 +944,6 @@ export const FireBirdServiceOrderClient = {
           db.detach();
           if (qErr) return reject(qErr);
 
-          // Firebird retorna o RETURNING como array 
           resolve(result);
         });
       });

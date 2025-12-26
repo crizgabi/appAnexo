@@ -577,9 +577,16 @@ export const ServiceOrderController = {
                 });
             }
 
+            const { login } = req.user;
+            const user = await UserRepository.findByLogin(login, tenant.dbEnvKey, tenant.dbType);
+            if (!user) return null;
+
+            const tecnico = await UserRepository.getThecnicianByOsPrimaryKey(req.params.id, tenant.dbEnvKey, tenant.dbType)
             const result =
                 await ServiceOrderService.createServiceOrderSchedule(
                     req.params.id,
+                    user.FKTECNICO,
+                    tecnico.NMTECNICO,
                     data,
                     horaInicio,
                     horaFim,

@@ -57,6 +57,29 @@ export const FireBirdUserClient = {
     });
   },
 
+  getThecnicianByOsPrimaryKey: (idConserto, dbEnvKey) => {
+    return new Promise((resolve, reject) => {
+      getConnection(dbEnvKey, (err, db) => {
+        if (err) return reject(err);
+
+        const query = `
+        SELECT
+          T.NMTECNICO,
+          T.FKCODUSU
+        FROM TBCONSERTO C
+        LEFT JOIN TBTECNICO T ON T.PKTECNICO = C.FKTECNICO
+        WHERE C.PKCONSERTO = ?
+      `;
+
+        db.query(query, [idConserto], (qErr, result) => {
+          db.detach();
+          if (qErr) return reject(qErr);
+          resolve(result[0] || []);
+        });
+      });
+    });
+  },
+
   updatePassword(login, newPassword, dbEnvKey) {
     return new Promise((resolve, reject) => {
       getConnection(dbEnvKey, (err, db) => {

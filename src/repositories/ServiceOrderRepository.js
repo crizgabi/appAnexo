@@ -228,13 +228,13 @@ export const ServiceOrderRepository = {
         return client.getServiceOrderSchedules(idConserto, dbEnvKey);
     },
 
-    createServiceOrderSchedule: async (idConserto, data, horaInicio, horaFim, dbEnvKey, dbType) => {
+    createServiceOrderSchedule: async (idConserto, idTenico, nomeTecnico, data, horaInicio, horaFim, dbEnvKey, dbType) => {
         const client = DBClientFactory.getClient({
             dbType,
             module: "serviceOrder"
         });
 
-        return client.createServiceOrderSchedule(idConserto, data, horaInicio, horaFim, dbEnvKey);
+        return client.createServiceOrderSchedule(idConserto, idTenico, nomeTecnico, data, horaInicio, horaFim, dbEnvKey);
     },
 
     deleteServiceOrderSchedule: async (idConserto, idHorario, dbEnvKey, dbType) => {

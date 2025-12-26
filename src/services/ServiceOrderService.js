@@ -809,6 +809,8 @@ export const ServiceOrderService = {
 
     async createServiceOrderSchedule(
         idConserto,
+        idTecnico,
+        nomeTecnico,
         data,
         horaInicio,
         horaFim,
@@ -844,6 +846,8 @@ export const ServiceOrderService = {
         const created =
             await ServiceOrderRepository.createServiceOrderSchedule(
                 idConserto,
+                idTecnico,
+                nomeTecnico.NMTECNICO,
                 data,
                 horaInicio,
                 horaFim,
@@ -862,12 +866,15 @@ export const ServiceOrderService = {
         return {
             idHorario: created.PKCODHORARIO ?? null,
             idConserto: idConserto,
+            idTecnico: idTecnico,
+            nomeTecnico: nomeTecnico,
             data: data,
             horaInicio: horaInicio,
             horaFim: horaFim,
             message: "Horário registrado com sucesso."
         };
     },
+    
     async deleteServiceOrderSchedule(
         idConserto,
         idHorario,
