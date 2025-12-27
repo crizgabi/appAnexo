@@ -287,11 +287,6 @@ export const ServiceOrderService = {
     },
 
     async addImage(id, file, idTecnico, fkCodUsu, dbEnvKey, dbType) {
-        console.log("R2 ENV CHECK", {
-            CF_ACCOUNT_ID: process.env.CF_ACCOUNT_ID,
-            CF_ACCESS_KEY_ID: process.env.CF_ACCESS_KEY_ID,
-            HAS_CF_SECRET: !!process.env.CF_SECRET_ACCESS_KEY
-        });
 
         const existing = await ServiceOrderRepository.getById(id, dbEnvKey, dbType);
         if (!existing) throw new Error("Ordem de serviço não encontrada");
