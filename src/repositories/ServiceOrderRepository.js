@@ -89,6 +89,14 @@ export const ServiceOrderRepository = {
         return client.getImageById(id, dbEnvKey);
     },
 
+    getImagesByOs: async (serviceOrderId, dbEnvKey, dbType) => {
+        const client = DBClientFactory.getClient({
+            dbType,
+            module: "serviceOrder"
+        });
+        return client.getImagesByOs(serviceOrderId, dbEnvKey);
+    },
+
     deleteImage: async (idConserto, imageId, dbEnvKey, dbType) => {
         const client = DBClientFactory.getClient({
             dbType,

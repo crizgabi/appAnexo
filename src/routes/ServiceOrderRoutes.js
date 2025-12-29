@@ -34,5 +34,6 @@ router.delete("/:id/checklist/:idChecklist", AuthMiddleware, ServiceOrderControl
 router.get("/:id/schedule", AuthMiddleware, ServiceOrderController.getServiceOrderSchedules);
 router.post("/:id/schedule", AuthMiddleware, ServiceOrderController.createServiceOrderSchedule);
 router.delete("/:id/schedule/:scheduleId", AuthMiddleware, ServiceOrderController.deleteServiceOrderSchedule);
+router.get("/images/:serviceOrderId/download", AuthMiddleware, ServiceOrderController.getImagesByOs);
 
 export default router;

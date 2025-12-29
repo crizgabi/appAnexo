@@ -345,6 +345,25 @@ export const ServiceOrderService = {
         };
     },
 
+    async getImagesByOs(serviceOrderId, dbEnvKey, dbType) {
+        const images = await ServiceOrderRepository.getImagesByOs(
+            serviceOrderId,
+            dbEnvKey,
+            dbType
+        );
+
+        if (!images || images.length === 0) return [];
+
+        return images.map(image => ({
+            idConserto: image.FKCONSERTO ?? null,
+            idImagem: image.PKARQUIVO ?? null,
+            descricao: image.DESCRICAO ?? null,
+            idTecnico: image.FKTECNICO ?? null,
+            dataHoraUpload: image.DATACAD ?? null,
+            url: image.CAMINHO,
+        }));
+    },
+
     async deleteImage(idConserto, imageId, dbEnvKey, dbType) {
         const image = await ServiceOrderRepository.getImageById(
             imageId,

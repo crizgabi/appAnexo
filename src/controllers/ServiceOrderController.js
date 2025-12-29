@@ -293,6 +293,42 @@ export const ServiceOrderController = {
         }
     },
 
+    getImagesByOs: async (req, res) => {
+        try {
+            const tenantId = req.headers["x-tenant-id"];
+            if (!tenantId) {
+                return res.status(400).json({ error: "x-tenant-id header obrigatório" });
+            }
+
+            const tenant = await prisma.tenant.findUnique({
+                where: { id: tenantId }
+            });
+
+            if (!tenant) {
+                return res.status(404).json({ error: "Tenant inválido" });
+            }
+
+            const { serviceOrderId } = req.params;
+
+            if (!serviceOrderId) {
+                return res.status(400).json({ error: "serviceOrderId é obrigatório" });
+            }
+
+            const images = await ServiceOrderService.getImagesByOs(
+                serviceOrderId,
+                tenant.dbEnvKey,
+                tenant.dbType
+            );
+
+            return res.status(200).json(images);
+        } catch (err) {
+            console.error("Erro ao listar imagens da OS:", err);
+            return res.status(400).json({
+                error: err.message || "Erro ao listar imagens"
+            });
+        }
+    },
+
     delete: async (req, res) => {
         try {
             const tenantId = req.headers["x-tenant-id"];

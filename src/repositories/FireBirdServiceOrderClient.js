@@ -441,6 +441,36 @@ export const FireBirdServiceOrderClient = {
     });
   },
 
+  getImagesByOs: (serviceOrderId, dbEnvKey) => {
+    return new Promise((resolve, reject) => {
+      getConnection(dbEnvKey, (err, db) => {
+        if (err) return reject(err);
+
+        const query = `
+        SELECT
+          FKCONSERTO,
+          PKARQUIVO,
+          CAMINHO,
+          DESCRICAO,
+          FKTECNICO,
+          FKCODUSU,
+          NOMEARQUIVO,
+          DATACAD,
+          DATAATU
+        FROM TBARQUIVO
+        WHERE FKCONSERTO = ?
+        ORDER BY PKARQUIVO ASC
+      `;
+
+        db.query(query, [serviceOrderId], (qErr, result) => {
+          db.detach();
+          if (qErr) return reject(qErr);
+          resolve(result || []);
+        });
+      });
+    });
+  },
+
   deleteImage: (idConserto, idImagem, dbEnvKey) => {
     return new Promise((resolve, reject) => {
       getConnection(dbEnvKey, (err, db) => {
