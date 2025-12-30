@@ -11,12 +11,8 @@ jest.unstable_mockModule("../../../src/repositories/ServicesRepository.js", () =
     },
 }));
 
-const { ServicesService } = await import(
-    "../../../src/services/ServicesService.js"
-);
-const { ServicesRepository } = await import(
-    "../../../src/repositories/ServicesRepository.js"
-);
+const { ServicesService } = await import("../../../src/services/ServicesService.js");
+const { ServicesRepository } = await import("../../../src/repositories/ServicesRepository.js");
 
 describe("ServicesService.getServicesByDescription", () => {
     it("deve retornar serviços mapeados", async () => {

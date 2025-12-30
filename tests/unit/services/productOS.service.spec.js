@@ -9,21 +9,15 @@ jest.unstable_mockModule("../../../src/repositories/ProductOSRepository.js", () 
 }));
 
 jest.unstable_mockModule("../../../src/models/ProductOSModel.js", () => ({
-    default: jest.fn(),
+    default: class ProductOSModel {
+        constructor(data) {
+            Object.assign(this, data);
+        }
+    },
 }));
 
-const { ProductOSService } = await import(
-    "../../../src/services/ProductOSService.js"
-);
-const { ProductOSRepository } = await import(
-    "../../../src/repositories/ProductOSRepository.js"
-);
-const ProductOSModel = (await import(
-    "../../../src/models/ProductOSModel.js"
-)).default;
-
-
-
+const { ProductOSService } = await import("../../../src/services/ProductOSService.js");
+const { ProductOSRepository } = await import("../../../src/repositories/ProductOSRepository.js");
 
 describe("ProductOSService.create", () => {
     beforeEach(() => jest.clearAllMocks());
@@ -40,9 +34,7 @@ describe("ProductOSService.create", () => {
         ).rejects.toThrow("Campo obrigatório faltando: idProduto");
     });
 
-
     it("deve criar produto da OS com valores default", async () => {
-        ProductOSModel.mockImplementation((data) => data);
         ProductOSRepository.create.mockResolvedValue({ idItem: 1 });
 
         const result = await ProductOSService.create(
@@ -54,7 +46,7 @@ describe("ProductOSService.create", () => {
             "sql"
         );
 
-        expect(ProductOSModel).toHaveBeenCalledWith(
+        expect(ProductOSRepository.create).toHaveBeenCalledWith(
             expect.objectContaining({
                 idConserto: 10,
                 idProduto: 5,
@@ -62,16 +54,15 @@ describe("ProductOSService.create", () => {
                 valorUnitario: 0,
                 descontoPercentual: 0,
                 valorTotal: 0,
-            })
+            }),
+            "db",
+            "sql"
         );
 
-        expect(ProductOSRepository.create).toHaveBeenCalled();
         expect(result).toEqual({ idItem: 1 });
     });
 
-
     it("deve calcular corretamente o valorTotal", async () => {
-        ProductOSModel.mockImplementation((data) => data);
         ProductOSRepository.create.mockResolvedValue(true);
 
         await ProductOSService.create(
@@ -85,18 +76,17 @@ describe("ProductOSService.create", () => {
             "sql"
         );
 
-        expect(ProductOSModel).toHaveBeenCalledWith(
+        expect(ProductOSRepository.create).toHaveBeenCalledWith(
             expect.objectContaining({
                 quantidade: 4,
                 valorUnitario: 50,
                 valorTotal: 200,
-            })
+            }),
+            "db",
+            "sql"
         );
     });
 });
-
-
-
 
 describe("ProductOSService.getAllByOS", () => {
     it("deve retornar os produtos da OS", async () => {
@@ -107,13 +97,15 @@ describe("ProductOSService.getAllByOS", () => {
 
         const result = await ProductOSService.getAllByOS(10, "db", "sql");
 
-        expect(ProductOSRepository.getAllByOS).toHaveBeenCalledWith(10, "db", "sql");
+        expect(ProductOSRepository.getAllByOS).toHaveBeenCalledWith(
+            10,
+            "db",
+            "sql"
+        );
+
         expect(result).toHaveLength(2);
     });
-})
-
-
-
+});
 
 describe("ProductOSService.delete", () => {
     it("deve deletar item da OS", async () => {
@@ -121,7 +113,12 @@ describe("ProductOSService.delete", () => {
 
         const result = await ProductOSService.delete(5, "db", "sql");
 
-        expect(ProductOSRepository.delete).toHaveBeenCalledWith(5, "db", "sql");
+        expect(ProductOSRepository.delete).toHaveBeenCalledWith(
+            5,
+            "db",
+            "sql"
+        );
+
         expect(result).toBe(true);
     });
 });
