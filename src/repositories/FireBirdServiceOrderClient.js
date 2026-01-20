@@ -631,7 +631,6 @@ export const FireBirdServiceOrderClient = {
     });
   },
 
-  /// CHECKLIST
   getChecklistById(idChecklist, dbEnvKey) {
     return new Promise((resolve, reject) => {
       getConnection(dbEnvKey, (err, db) => {
@@ -896,7 +895,6 @@ export const FireBirdServiceOrderClient = {
     });
   },
 
-  /// HORÁRIOS
   getServiceOrderSchedules(idConserto, dbEnvKey) {
     return new Promise((resolve, reject) => {
       getConnection(dbEnvKey, (err, db) => {

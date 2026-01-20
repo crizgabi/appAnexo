@@ -24,7 +24,6 @@ app.use(cors({
   credentials: true
 }));
 
-// Rotas
 app.use("/users", UserRoutes);
 app.use("/customers", CustomerRoutes);
 app.use("/cep", CepRoutes);

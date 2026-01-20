@@ -1,7 +1,6 @@
 import { CustomerService } from "../services/CustomerService.js";
 import prisma from "../../src/db/prismaClient.js";
 
-// GET /customers/:id
 export const getCustomer = async (req, res) => {
   const { id } = req.params;
 
@@ -33,7 +32,6 @@ export const getCustomer = async (req, res) => {
   }
 };
 
- // GET /customers/search?razaoSocial= (com mudanças para retornar mesmo vazio)
 export const getCustomersByName = async (req, res) => {
   const { razaoSocial } = req.query;
 
@@ -69,7 +67,6 @@ export const getCustomersByName = async (req, res) => {
   }
 };
 
-// GET /customers
 export const getAllCustomers = async (req, res) => {
   try {
     const tenantId = req.headers["x-tenant-id"];
@@ -94,7 +91,6 @@ export const getAllCustomers = async (req, res) => {
 };
 
 
-//POST /customers
 export const createCustomer = async (req, res) => {
   const customerData = req.body;
   const { login } = req.user;
@@ -128,7 +124,6 @@ export const createCustomer = async (req, res) => {
   }
 };
 
- //PUT /customers/:id
 export const updateCustomer = async (req, res) => {
   const customerData = req.body;
   const { id } = req.params;

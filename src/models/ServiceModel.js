@@ -31,14 +31,11 @@ class Service {
     if (!descricao) {
       throw new Error("O campo 'descricao' é obrigatório.");
     }
-
-    // Inicialização das propriedades
     this.id = pkcodser || null;
     this.descricao = descricao;
     this.dataCadastro = datacad || null;
     this.dataAtualizacao = dataatu || null;
     this.usuarioId = fkcodusu;
-
     this.valorCusto = valorCusto != null ? Number(valorCusto) : 0;
     this.valorMaterial = valorMaterial != null ? Number(valorMaterial) : 0;
     this.valorInsumo = valorInsumo != null ? Number(valorInsumo) : 0;

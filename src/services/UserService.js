@@ -7,7 +7,6 @@ import { format } from "date-fns";
 
 export const UserService = {
 
-  // LOGIN
   async loginUser({ login, password, dbEnvKey, dbType }) {
     const user = await UserRepository.findByLogin(login, dbEnvKey, dbType);
     if (!user) return null;
@@ -33,7 +32,6 @@ export const UserService = {
     };
   },
 
-  // UPDATE PASSWORD
   async updatePassword(login, currentPassword, newPassword, dbEnvKey, dbType) {
     const user = await UserRepository.findByLogin(login, dbEnvKey, dbType);
     if (!user) return null;
@@ -45,7 +43,6 @@ export const UserService = {
     return { login: user.LOGIN };
   },
 
-  // REFRESH TOKEN
   async refreshToken(refreshToken) {
     const existing = await RefreshTokenRepository.findRefreshToken(refreshToken);
     if (!existing) return null;
@@ -66,7 +63,6 @@ export const UserService = {
     };
   },
 
-  // validateRefreshToken
   async validateRefreshToken(refreshToken) {
     const row = await RefreshTokenRepository.findRefreshToken(refreshToken);
     if (!row) return null;
@@ -79,7 +75,6 @@ export const UserService = {
     return row;
   },
 
-  // USER DETAILS
   async showUserDetails(login, dbEnvKey, dbType) {
     try {
       const user = await UserRepository.findByLogin(login, dbEnvKey, dbType);
@@ -120,7 +115,6 @@ export const UserService = {
     }
   },
 
-  // USER DETAILS
   async getAllUsers(dbEnvKey, dbType) {
     try {
       const users = await UserRepository.getAllUsers(dbEnvKey, dbType);
@@ -162,7 +156,6 @@ export const UserService = {
   },
 };
 
-// HELPERS
 function generateToken({ login }) {
   return jwt.sign({ login }, process.env.JWT_SECRET, { expiresIn: "1h" });
 }

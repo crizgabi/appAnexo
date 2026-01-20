@@ -3,7 +3,6 @@ import prisma from "../../src/db/prismaClient.js";
 
 export const EquipmentController = {
 
-  // GET /equipamentos
   getAll: async (req, res) => {
     try {
       const tenantId = req.headers["x-tenant-id"];
@@ -30,7 +29,7 @@ export const EquipmentController = {
     }
   },
 
-  // GET /equipamentos/:id
+  
   getById: async (req, res) => {
     try {
       const { id } = req.params;
@@ -65,7 +64,6 @@ export const EquipmentController = {
     }
   },
 
-  // GET /equipamentos/cliente/:idCliente
   getByCustomerId: async (req, res) => {
     try {
       const { idCliente } = req.params;
@@ -92,7 +90,6 @@ export const EquipmentController = {
     }
   },
 
-  // POST /equipamentos
   create: async (req, res) => {
     try {
       const tenantId = req.headers["x-tenant-id"];
@@ -121,7 +118,6 @@ export const EquipmentController = {
     }
   },
 
-  // PUT /equipamentos/:id
   update: async (req, res) => {
     try {
       const { id } = req.params;
@@ -153,7 +149,6 @@ export const EquipmentController = {
     }
   },
 
-  // DELETE /equipamentos/:id
   delete: async (req, res) => {
     try {
       const { id } = req.params;

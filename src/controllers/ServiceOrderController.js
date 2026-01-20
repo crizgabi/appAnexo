@@ -367,7 +367,6 @@ export const ServiceOrderController = {
 
             res.status(200).json(result);
         } catch (err) {
-            // OS não encontrada ou qualquer regra do service
             res.status(400).json({ error: err.message });
         }
     },
@@ -399,7 +398,6 @@ export const ServiceOrderController = {
         }
     },
 
-    /// CHECKLIST
 
     addChecklist: async (req, res) => {
         try {
@@ -548,8 +546,6 @@ export const ServiceOrderController = {
         }
     },
 
-    /// HORÁRIOS
-
     getServiceOrderSchedules: async (req, res) => {
         try {
             const tenantId = req.headers["x-tenant-id"];
@@ -632,7 +628,6 @@ export const ServiceOrderController = {
 
             return res.status(201).json(result);
         } catch (err) {
-            // Regra de negócio (422)
             if (err.code === "INVALID_TIME_RANGE") {
                 return res.status(422).json({
                     error: "INVALID_TIME_RANGE",

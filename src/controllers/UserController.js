@@ -1,7 +1,6 @@
 import { UserService } from "../services/UserService.js";
 import prisma from "../db/prismaClient.js";
 
-// POST /login
 export const loginUser = async (req, res) => {
   const { login, password } = req.body;
 
@@ -38,7 +37,6 @@ export const loginUser = async (req, res) => {
   }
 };
 
-// POST /users/refresh
 export const refreshSession = async (req, res) => {
   try {
     const tenantId = req.headers["x-tenant-id"];
@@ -69,7 +67,6 @@ export const refreshSession = async (req, res) => {
   }
 };
 
-// PUT /users/update-password
 export const updatePassword = async (req, res) => {
   const { currentPassword, newPassword } = req.body;
   const { login } = req.user;
@@ -106,7 +103,6 @@ export const updatePassword = async (req, res) => {
   }
 };
 
-// GET /users/details
 export const showUserDetails = async (req, res) => {
   const { login } = req.user;
 
@@ -137,7 +133,6 @@ export const showUserDetails = async (req, res) => {
   }
 };
 
-// Helpers
 async function resolveTenant(req) {
   const { empresaId } = req.body;
 
@@ -158,7 +153,6 @@ async function resolveTenant(req) {
   return { tenant, empresa };
 };
 
-// GET /users/all
 export const getAllUsers = async (req, res) => {
 
   try {

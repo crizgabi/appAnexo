@@ -1,4 +1,3 @@
-// Enum para os tipos de cliente
 export const CustomerType = Object.freeze({
   JURIDICA: 0,
   FISICA: 1,
@@ -53,27 +52,23 @@ class Customer {
       throw new Error("Nome fantasia é obrigatório para pessoa jurídica.");
     }
 
-    // Inicialização das propriedades
     this.razaoSocial = razaoSocial;
     this.codigoCidade = codigoCidade;
     this.tipo = tipo;
     this.cpf = cpf || null;
     this.cnpj = cnpj || null;
     this.nomeFantasia = nomeFantasia || null;
-
     this.endereco = endereco || '';
     this.num = num || '';
     this.comp = comp || '';
     this.bairro = bairro || '';
     this.cep = cep || '';
-
     this.fax = fax || '';
     this.telefone1 = telefone1 || '';
     this.telefone2 = telefone2 || '';
     this.telefone1Whatsapp = telefone1Whatsapp || isWhatsApp.NO;
     this.telefone2Whatsapp = telefone2Whatsapp || isWhatsApp.NO;
     this.celularWhatsapp = celularWhatsapp || isWhatsApp.NO;
-
     this.email = email || '';
     this.obs = obs || '';
     this.fkcodusu = fkcodusu || 1;

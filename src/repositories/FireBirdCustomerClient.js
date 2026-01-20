@@ -3,7 +3,6 @@ import { CustomerType } from "../models/CustomerModel.js";
 
 export const FireBirdCustomerClient = {
 
-  // LISTAR TODOS OS CLIENTES (SEM FILTRO)
 getAllCustomers: (dbEnvKey) => {
   return new Promise((resolve, reject) => {
     getConnection(dbEnvKey, (err, db) => {
@@ -24,7 +23,6 @@ getAllCustomers: (dbEnvKey) => {
   });
 },
 
-  // LISTA CLIENTES
   getCustomersByName: (razaoSocial, dbEnvKey) => {
     return new Promise((resolve, reject) => {
       getConnection(dbEnvKey, (err, db) => {
@@ -46,7 +44,6 @@ getAllCustomers: (dbEnvKey) => {
     });
   },
 
-  // BUSCA POR PRIMARY KEY
   getCustomerByPrimaryKey: (primaryKey, dbEnvKey) => {
     return new Promise((resolve, reject) => {
       getConnection(dbEnvKey, (err, db) => {
@@ -88,7 +85,6 @@ getAllCustomers: (dbEnvKey) => {
     });
   },
 
-  // CRIA CLIENTE
   createCustomer: (customerData, dbEnvKey) => {
     return new Promise((resolve, reject) => {
       getConnection(dbEnvKey, (err, db) => {
@@ -174,7 +170,6 @@ getAllCustomers: (dbEnvKey) => {
     });
   },
 
-  // UPDATE
   updateCustomer: (pkcodcli, customerData, dbEnvKey) => {
     return new Promise((resolve, reject) => {
       getConnection(dbEnvKey, (err, db) => {

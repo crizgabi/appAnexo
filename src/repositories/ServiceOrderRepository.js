@@ -226,7 +226,6 @@ export const ServiceOrderRepository = {
         return client.listChecklistItens(dbEnvKey, idChecklist);
     },
 
-    /// HORÁRIOS
     getServiceOrderSchedules: async (idConserto, dbEnvKey, dbType) => {
         const client = DBClientFactory.getClient({
             dbType,

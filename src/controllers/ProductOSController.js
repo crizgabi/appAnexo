@@ -3,7 +3,6 @@ import prisma from "../db/prismaClient.js";
 
 export const ProductOSController = {
 
-  // CRIAR ITEM NA OS
   create: async (req, res) => {
     try {
       const tenantId = req.headers["x-tenant-id"];
@@ -14,7 +13,6 @@ export const ProductOSController = {
       if (!tenant)
         return res.status(404).json({ error: "Tenant inválido" });
 
-      // idConserto vem da URL
       const idConserto = req.params.id;
       if (!idConserto)
         return res.status(400).json({ error: "Parâmetro obrigatório faltando: idConserto" });
@@ -52,7 +50,6 @@ export const ProductOSController = {
     }
   },
 
-  // LISTAR ITENS DE UMA OS
   getAllByOS: async (req, res) => {
     try {
       const tenantId = req.headers["x-tenant-id"];
@@ -78,7 +75,6 @@ export const ProductOSController = {
     }
   },
 
-  // REMOVER ITEM DA OS
   delete: async (req, res) => {
     try {
       const tenantId = req.headers["x-tenant-id"];
