@@ -11,7 +11,6 @@ export default class Equipment {
     codigoInterno = null,
     numeroPatrimonio = null,
     descricao = null,
-    //imagens = [],
     dataCadastro = null,
     dataAtualizacao = null,
   }) {
@@ -26,7 +25,6 @@ export default class Equipment {
     this.codigoInterno = codigoInterno;
     this.numeroPatrimonio = numeroPatrimonio;
     this.descricao = descricao;
-    //this.imagens = imagens;
     this.dataCadastro = dataCadastro;
     this.dataAtualizacao = dataAtualizacao;
   }

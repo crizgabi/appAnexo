@@ -6,7 +6,6 @@ import { ServicesService } from "../services/ServicesService.js";
 import { ServiceOrderService } from "../services/ServiceOrderService.js";
 import prisma from "../../src/db/prismaClient.js";
 
-// POST /catalog
 export const getCatalog = async (req, res) => {
     try {
         const tenantId = req.headers["x-tenant-id"];

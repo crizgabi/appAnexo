@@ -29,7 +29,6 @@ export const CepService = {
                 throw new Error("Não foi possível identificar o endereço pelo CEP.");
             }
 
-            // Retorna o objeto completo com logradouro, bairro, localidade, uf, ibge, etc.
             return data;
         } catch (error) {
             console.error("Erro ao buscar endereço pelo CEP:", error.message);

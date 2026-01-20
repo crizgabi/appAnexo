@@ -5,7 +5,6 @@ import { CacheService } from "../services/CacheService.js";
 
 export const ServiceOrderService = {
 
-    // CREATE
     async create(data, dbEnvKey, dbType) {
 
         if (!data.idCliente) {
@@ -26,7 +25,6 @@ export const ServiceOrderService = {
 
         try {
             const created = await ServiceOrderRepository.create(os, dbEnvKey, dbType);
-            // created expected to be { idConserto, numeroOS }
             return {
                 message: "Ordem de serviço criada com sucesso",
                 idConserto: created.idConserto,
@@ -41,13 +39,11 @@ export const ServiceOrderService = {
                 dataCadastro: os.dataCadastro
             };
         } catch (err) {
-            // rethrow but keep meaningful message
             const msg = (err && err.message) ? err.message : String(err);
             throw new Error(`Erro ao criar OS: ${msg}`);
         }
     },
 
-    // LIST / GET ALL
     async list(dbEnvKey, dbType) {
         const rows = await ServiceOrderRepository.getAll(dbEnvKey, dbType);
 
@@ -84,7 +80,6 @@ export const ServiceOrderService = {
         }));
     },
 
-    // GET BY ID
     async find(id, dbEnvKey, dbType) {
 
         const cached = await CacheService.get(osCacheKey(id, dbEnvKey, dbType));
@@ -105,7 +100,6 @@ export const ServiceOrderService = {
             return new Date(time).toISOString().substring(11, 16);
         }
 
-        // normalize a single row to expected shape
         const result = {
             idConserto: os.PKCONSERTO ?? null,
             idCliente: os.FKCLIENTE ?? null,
@@ -134,7 +128,6 @@ export const ServiceOrderService = {
         return result;
     },
 
-    // GET BY USER
     async findByUser(id, dbEnvKey, dbType) {
         const rows = await ServiceOrderRepository.getByUser(id, dbEnvKey, dbType);
         if (!rows) return [];
@@ -173,7 +166,6 @@ export const ServiceOrderService = {
         }));
     },
 
-    // UPDATE OS
     async update(id, data, dbEnvKey, dbType) {
 
         const existing =
@@ -206,7 +198,6 @@ export const ServiceOrderService = {
         return await this.find(id, dbEnvKey, dbType);
     },
 
-    // add signatures to OS
     async addSignature(id, files, dbEnvKey, dbType) {
         const existing =
             await ServiceOrderRepository.getById(id, dbEnvKey, dbType);
@@ -416,7 +407,6 @@ export const ServiceOrderService = {
         };
     },
 
-    // DELETE
     async delete(id, dbEnvKey, dbType) {
         const existing = await ServiceOrderRepository.getById(id, dbEnvKey, dbType);
         if (!existing) throw new Error("Ordem de serviço não encontrada");
@@ -443,7 +433,6 @@ export const ServiceOrderService = {
             throw new Error("Ordem de serviço não encontrada");
         }
 
-        // Idempotência
         if (existing.DATAATENDIMENTO) {
             return {
                 idConserto: id,
@@ -487,7 +476,6 @@ export const ServiceOrderService = {
             throw new Error("Ordem de serviço não encontrada");
         }
 
-        // Idempotência
         if (existing.DATACHECKLISTFINAL) {
             return {
                 idConserto: id,
@@ -522,7 +510,6 @@ export const ServiceOrderService = {
 
     async addChecklist(idConserto, { idChecklist, respostas }, dbEnvKey, dbType) {
 
-        // 1. Verifica se a OS existe
         const os = await ServiceOrderRepository.getById(
             idConserto,
             dbEnvKey,
@@ -533,7 +520,6 @@ export const ServiceOrderService = {
             throw new Error("Ordem de serviço não encontrada");
         }
 
-        // 2. Verifica se o checklist existe
         const checklist = await ServiceOrderRepository.getChecklistById(
             idChecklist,
             dbEnvKey,
@@ -544,7 +530,6 @@ export const ServiceOrderService = {
             throw new Error("Checklist não encontrado");
         }
 
-        // 3. Busca itens do checklist
         const itens = await ServiceOrderRepository.getChecklistItens(
             idChecklist,
             dbEnvKey,
@@ -782,7 +767,6 @@ export const ServiceOrderService = {
         }
     },
 
-    /// HORÁRIOS
     getServiceOrderSchedules: async (idConserto, dbEnvKey, dbType) => {
         try {
             const schedules =
@@ -837,7 +821,6 @@ export const ServiceOrderService = {
         dbEnvKey,
         dbType
     ) {
-        // 1. Verifica se a OS existe
         const existing = await ServiceOrderRepository.getById(
             idConserto,
             dbEnvKey,
@@ -848,12 +831,10 @@ export const ServiceOrderService = {
             throw new Error("Ordem de serviço não encontrada");
         }
 
-        // 2. Validação de regra de negócio
         if (!data || !horaInicio || !horaFim) {
             throw new Error("Dados de horário inválidos");
         }
 
-        // horaFim deve ser maior que horaInicio
         if (horaFim <= horaInicio) {
             const error = new Error(
                 "Hora final não pode ser menor ou igual à hora inicial."
@@ -862,7 +843,6 @@ export const ServiceOrderService = {
             throw error;
         }
 
-        // 3. Cria o registro de horário
         const created =
             await ServiceOrderRepository.createServiceOrderSchedule(
                 idConserto,
@@ -879,10 +859,8 @@ export const ServiceOrderService = {
             throw new Error("Erro ao registrar horário: ");
         }
 
-        // 4. Limpa cache da OS
         await CacheService.del(osCacheKey(idConserto, dbEnvKey, dbType));
 
-        // 5. Monta response conforme contrato
         return {
             idHorario: created.PKCODHORARIO ?? null,
             idConserto: idConserto,
@@ -923,8 +901,6 @@ export const ServiceOrderService = {
         };
     },
 };
-
-//HELPERS
 
 function osCacheKey(id, dbEnvKey, dbType) {
     return `os:find:${String(dbEnvKey)}:${String(dbType)}:${Number(id)}`;

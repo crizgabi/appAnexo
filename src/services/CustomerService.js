@@ -7,7 +7,6 @@ import { CacheService } from "../services/CacheService.js";
 
 export const CustomerService = {
 
-  // GET ALL CUSTOMERS (sem filtro)
   async getAllCustomers(dbEnvKey, dbType) {
     const customers = await CustomerRepository.getAllCustomers(
       dbEnvKey,
@@ -32,7 +31,6 @@ export const CustomerService = {
     });
   },
 
-  // GET CUSTOMER LIST (by name)
   async getCustomersByName(razaoSocial, dbEnvKey, dbType) {
     const customers = await CustomerRepository.getCustomersByName(
       razaoSocial,
@@ -58,7 +56,6 @@ export const CustomerService = {
     });
   },
 
-  // GET CUSTOMER BY PRIMARY KEY
   async getCustomerByPrimaryKey(primaryKey, dbEnvKey, dbType) {
     const cached = await CacheService.get(customerCacheKey(primaryKey, dbEnvKey, dbType));
     if (cached) {
@@ -108,12 +105,10 @@ export const CustomerService = {
     const user = await UserRepository.findByLogin(userLogin, dbEnvKey, dbType);
     if (!user) throw new Error("Usuário não encontrado");
 
-    // tipo F/J
     const tipo = customerData.tipo === 1
       ? CustomerType.FISICA
       : CustomerType.JURIDICA;
 
-    // cidade
     const cidade = await CityRepository.findByNameAndUf(
       customerData.cidade,
       customerData.uf,
@@ -165,7 +160,6 @@ export const CustomerService = {
     };
   },
 
-  // UPDATE CUSTOMER
   async updateCustomer(pkcodcli, customerData, userLogin, dbEnvKey, dbType) {
     const user = await UserRepository.findByLogin(userLogin, dbEnvKey, dbType);
     if (!user) throw new Error("Usuário não encontrado");
@@ -238,7 +232,6 @@ export const CustomerService = {
   },
 };
 
-//HELPERS
 function customerCacheKey(id, dbEnvKey, dbType) {
   return `customer:find:${String(dbEnvKey)}:${String(dbType)}:${Number(id)}`;
 }

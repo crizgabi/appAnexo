@@ -6,8 +6,6 @@ export const FireBirdServiceOSClient = {
             getConnection(dbEnvKey, (err, conn) => {
                 if (err) return reject(err);
 
-                // 1️⃣ Buscar nome do serviço
-                // CORREÇÃO: Usando alias NOME_SERVICO e fallback para DESCRICAO
                 const getServicoQuery = `
                     SELECT COALESCE(NOMESERVICO, DESCRICAO) AS NOME_SERVICO 
                     FROM TBSERVICO 
@@ -20,10 +18,8 @@ export const FireBirdServiceOSClient = {
                         return reject(errServ);
                     }
 
-                    // CORREÇÃO: Mapeando corretamente para o alias NOME_SERVICO
                     const nomeServico = resServ?.[0]?.NOME_SERVICO ?? "";
 
-                    // 2️⃣ Buscar próxima ORDEM
                     const getNextOrderQuery = `
                         SELECT COALESCE(MAX(ORDEM), 0) AS MAX_ORDEM
                         FROM TBRELCONSERTOSERV
@@ -37,8 +33,7 @@ export const FireBirdServiceOSClient = {
                         }
 
                         const nextOrder = (resOrd?.[0]?.MAX_ORDEM ?? 0) + 1;
-
-                        // 3️⃣ Buscar próximo ID
+                  
                         const getNextIdQuery =
                             "SELECT MAX(PKCODCONSERV) AS MAX_ID FROM TBRELCONSERTOSERV";
 
@@ -53,8 +48,7 @@ export const FireBirdServiceOSClient = {
                                 : 1;
 
                             const valorTotal = item.quantidade * item.valorUnitario;
-
-                            // 4️⃣ Insert
+                        
                             const insertQuery = `
                                 INSERT INTO TBRELCONSERTOSERV (
                                     PKCODCONSERV,
@@ -76,7 +70,7 @@ export const FireBirdServiceOSClient = {
                                 item.idConserto,
                                 item.idServico,
                                 item.idTecnico,
-                                nomeServico, // Valor buscado e salvo na coluna NMSERVICO
+                                nomeServico, 
                                 item.quantidade,
                                 item.valorUnitario,
                                 valorTotal,
@@ -89,13 +83,12 @@ export const FireBirdServiceOSClient = {
                                 conn.detach();
                                 if (errInsert) return reject(errInsert);
 
-                                // 5️⃣ Retorno COMPLETO 
                                 resolve({
                                     idItemServico: nextId,
                                     idConserto: item.idConserto,
                                     idTecnico: item.idTecnico,
                                     idServico: item.idServico,
-                                    descricaoServico: nomeServico, // 👈 CORRIGIDO: Usa a variável 'nomeServico' que foi buscada
+                                    descricaoServico: nomeServico, 
                                     quantidade: item.quantidade,
                                     valorUnitario: item.valorUnitario,
                                     valorTotal,
@@ -116,7 +109,6 @@ export const FireBirdServiceOSClient = {
             getConnection(dbEnvKey, (err, conn) => {
                 if (err) return reject(err);
 
-                // CORREÇÃO: Adicionando s.DESCRICAO no COALESCE para maior garantia de que o nome será retornado
                 const query = `
                     SELECT
                       r.PKCODCONSERV,
@@ -142,7 +134,7 @@ export const FireBirdServiceOSClient = {
                         idItemServico: row.PKCODCONSERV,
                         idTecnico: row.IDTECNICO || row.FKTECNICO,
                         idServico: row.FKSERVICO,
-                        descricaoServico: row.NOME_SERVICO, // OK
+                        descricaoServico: row.NOME_SERVICO,
                         quantidade: row.QUANT,
                         valorUnitario: row.VALOR,
                         valorTotal: row.VALORTOTAL,

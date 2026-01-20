@@ -122,7 +122,6 @@ export const FireBirdEquipmentClient = {
 
     findByCliente(idCliente, dbEnvKey) {
         return new Promise((resolve, reject) => {
-            // Garante que o idCliente seja número
             const clienteId = Number(idCliente);
             if (isNaN(clienteId)) {
                 return reject(new Error("idCliente inválido: deve ser numérico"));
@@ -154,7 +153,6 @@ export const FireBirdEquipmentClient = {
         });
     },
 
-    // ATUALIZA OS DADOS DE UM EQUIPAMENTO. Somente os dados enviados no body serão atualizados, os outros serão mantidos.
     update(id, equipmentData, dbEnvKey) {
         return new Promise((resolve, reject) => {
             getConnection(dbEnvKey, (err, conn) => {
